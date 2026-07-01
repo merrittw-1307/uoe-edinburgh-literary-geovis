@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Narrative Topology Network</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: #F8F9FC;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+  }
+  h1 { font-size: 20px; color: #21295C; margin-bottom: 6px; text-align: center; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 20px; text-align: center; }
+  .controls { display: flex; gap: 16px; margin-bottom: 16px; align-items: center; font-size: 13px; color: #555; }
+  input[type=range] { width: 120px; }
+  .tooltip {
+    position: fixed;
+    background: white;
+    border: 1px solid #E0E4F0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: none;
+    z-index: 100;
+    min-width: 200px;
+  }
+  .tooltip .place { font-weight: bold; font-size: 13px; color: #21295C; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<h1>Narrative Topology Network</h1>
+<div class="subtitle">Place co-occurrence across literary works · node size = mention frequency · drag nodes · scroll to zoom</div>
+<div class="controls">
+  <label>Min co-occurrence weight: <input type="range" id="threshold" min="8" max="28" value="8" step="1"> <span id="thresholdVal">8</span></label>
+</div>
+<div id="chart"></div>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const allNodes = [{"place":"Arthur's Seat","total_mentions":78},{"place":"Bruntsfield","total_mentions":108},{"place":"Calton Hill","total_mentions":48},{"place":"Canongate","total_mentions":240},{"place":"Cumberland Bar","total_mentions":192},{"place":"Drummond Place","total_mentions":212},{"place":"Dundas Street","total_mentions":260},{"place":"Forth","total_mentions":194},{"place":"High Street","total_mentions":76},{"place":"Holyrood","total_mentions":128},{"place":"India Street","total_mentions":152},{"place":"Leith","total_mentions":968},{"place":"Moray Place","total_mentions":266},{"place":"Morningside","total_mentions":98},{"place":"New Town","total_mentions":172},{"place":"Princes Street","total_mentions":238},{"place":"Queen Street","total_mentions":170},{"place":"Scotland Street","total_mentions":554},{"place":"Stockbridge","total_mentions":100},{"place":"The Meadows","total_mentions":100}];
+
+const allEdges = [{"source":"Leith","target":"Princes Street","weight":28},{"source":"New Town","target":"Princes Street","weight":18},{"source":"Dundas Street","target":"Princes Street","weight":17},{"source":"Bruntsfield","target":"Dundas Street","weight":16},{"source":"Bruntsfield","target":"Princes Street","weight":16},{"source":"Dundas Street","target":"New Town","weight":16},{"source":"Dundas Street","target":"Morningside","weight":15},{"source":"Morningside","target":"Stockbridge","weight":15},{"source":"Princes Street","target":"Stockbridge","weight":15},{"source":"Dundas Street","target":"The Meadows","weight":15},{"source":"Morningside","target":"Princes Street","weight":15},{"source":"Dundas Street","target":"Stockbridge","weight":15},{"source":"Arthur's Seat","target":"Leith","weight":15},{"source":"Princes Street","target":"The Meadows","weight":14},{"source":"Leith","target":"New Town","weight":14},{"source":"Bruntsfield","target":"Morningside","weight":14},{"source":"Bruntsfield","target":"New Town","weight":14},{"source":"Bruntsfield","target":"Stockbridge","weight":14},{"source":"Queen Street","target":"Stockbridge","weight":13},{"source":"Princes Street","target":"Queen Street","weight":13},{"source":"Stockbridge","target":"The Meadows","weight":13},{"source":"New Town","target":"The Meadows","weight":13},{"source":"Holyrood","target":"Leith","weight":13},{"source":"New Town","target":"Stockbridge","weight":13},{"source":"Dundas Street","target":"Queen Street","weight":13},{"source":"Morningside","target":"Queen Street","weight":13},{"source":"Bruntsfield","target":"The Meadows","weight":13},{"source":"Morningside","target":"The Meadows","weight":13},{"source":"Canongate","target":"Holyrood","weight":13},{"source":"Morningside","target":"New Town","weight":13},{"source":"Dundas Street","target":"Leith","weight":12},{"source":"New Town","target":"Queen Street","weight":12},{"source":"Forth","target":"Leith","weight":12},{"source":"Canongate","target":"Leith","weight":12},{"source":"High Street","target":"Leith","weight":12},{"source":"Bruntsfield","target":"Queen Street","weight":12},{"source":"Moray Place","target":"Princes Street","weight":11},{"source":"Moray Place","target":"Queen Street","weight":11},{"source":"Drummond Place","target":"Dundas Street","weight":11},{"source":"Calton Hill","target":"Leith","weight":11},{"source":"Leith","target":"Stockbridge","weight":11},{"source":"Drummond Place","target":"Princes Street","weight":11},{"source":"Leith","target":"Morningside","weight":11},{"source":"Queen Street","target":"The Meadows","weight":11},{"source":"Dundas Street","target":"Moray Place","weight":11},{"source":"Drummond Place","target":"Queen Street","weight":10},{"source":"Drummond Place","target":"Morningside","weight":10},{"source":"Drummond Place","target":"New Town","weight":10},{"source":"Moray Place","target":"Stockbridge","weight":10},{"source":"Moray Place","target":"Scotland Street","weight":10},{"source":"Leith","target":"The Meadows","weight":10},{"source":"Drummond Place","target":"Scotland Street","weight":10},{"source":"Leith","target":"Queen Street","weight":10},{"source":"Drummond Place","target":"Moray Place","weight":10},{"source":"Moray Place","target":"New Town","weight":10},{"source":"Moray Place","target":"Morningside","weight":10},{"source":"Bruntsfield","target":"Leith","weight":10},{"source":"Dundas Street","target":"Scotland Street","weight":10},{"source":"Arthur's Seat","target":"Canongate","weight":10},{"source":"Morningside","target":"Scotland Street","weight":10},{"source":"Arthur's Seat","target":"Holyrood","weight":10},{"source":"Princes Street","target":"Scotland Street","weight":10},{"source":"Queen Street","target":"Scotland Street","weight":10},{"source":"Forth","target":"High Street","weight":10},{"source":"Cumberland Bar","target":"Drummond Place","weight":9},{"source":"Cumberland Bar","target":"Moray Place","weight":9},{"source":"Cumberland Bar","target":"Queen Street","weight":9},{"source":"Bruntsfield","target":"Moray Place","weight":9},{"source":"Cumberland Bar","target":"Princes Street","weight":9},{"source":"Bruntsfield","target":"Drummond Place","weight":9},{"source":"Leith","target":"Moray Place","weight":9},{"source":"Cumberland Bar","target":"Morningside","weight":9},{"source":"Calton Hill","target":"Princes Street","weight":9},{"source":"Cumberland Bar","target":"Scotland Street","weight":9},{"source":"Scotland Street","target":"Stockbridge","weight":9},{"source":"Drummond Place","target":"Stockbridge","weight":9},{"source":"New Town","target":"Scotland Street","weight":9},{"source":"Arthur's Seat","target":"Princes Street","weight":9},{"source":"Cumberland Bar","target":"Dundas Street","weight":9},{"source":"Moray Place","target":"The Meadows","weight":9},{"source":"Arthur's Seat","target":"Calton Hill","weight":9},{"source":"Cumberland Bar","target":"Stockbridge","weight":8},{"source":"Drummond Place","target":"The Meadows","weight":8},{"source":"Drummond Place","target":"Leith","weight":8},{"source":"Drummond Place","target":"India Street","weight":8},{"source":"Arthur's Seat","target":"High Street","weight":8},{"source":"Bruntsfield","target":"Scotland Street","weight":8},{"source":"India Street","target":"Queen Street","weight":8},{"source":"India Street","target":"Moray Place","weight":8},{"source":"India Street","target":"Morningside","weight":8},{"source":"India Street","target":"Princes Street","weight":8},{"source":"India Street","target":"Scotland Street","weight":8},{"source":"Cumberland Bar","target":"New Town","weight":8},{"source":"Leith","target":"Scotland Street","weight":8},{"source":"Scotland Street","target":"The Meadows","weight":8},{"source":"Dundas Street","target":"India Street","weight":8}];
+
+const W = 900, H = 700;
+const maxWeight = 28;
+const tooltip = document.getElementById('tooltip');
+
+const svg = d3.select('#chart')
+  .append('svg')
+  .attr('width', W)
+  .attr('height', H)
+  .style('background', '#F4F6FB')
+  .style('border-radius', '12px');
+
+const g = svg.append('g');
+
+svg.call(d3.zoom()
+  .scaleExtent([0.3, 3])
+  .on('zoom', e => g.attr('transform', e.transform)));
+
+function nodeRadius(d) {
+  return Math.log1p(d.total_mentions) * 2.8;
+}
+
+function draw(threshold) {
+  g.selectAll('*').remove();
+
+  const edges = allEdges.filter(e => e.weight >= threshold);
+  const activePlaces = new Set(edges.flatMap(e => [e.source, e.target]));
+  const activeNodes = allNodes
+    .filter(n => activePlaces.has(n.place))
+    .map(n => ({...n}));
+
+  const nodeById = {};
+  activeNodes.forEach(n => nodeById[n.place] = n);
+
+  const simEdges = edges.map(e => ({...e}));
+
+  const simulation = d3.forceSimulation(activeNodes)
+    .force('link', d3.forceLink(simEdges)
+      .id(d => d.place)
+      .distance(d => 280 / d.weight * 8)
+      .strength(0.7))
+    .force('charge', d3.forceManyBody().strength(-400))
+    .force('center', d3.forceCenter(W/2, H/2))
+    .force('collision', d3.forceCollide(d => nodeRadius(d) + 18));
+
+  // Links
+  const link = g.append('g')
+    .selectAll('line')
+    .data(simEdges)
+    .join('line')
+    .attr('stroke', '#A26769')
+    .attr('stroke-opacity', 0.45)
+    .attr('stroke-width', d => (d.weight / maxWeight) ** 2 * 12);
+
+  // Nodes
+  const node = g.append('g')
+    .selectAll('circle')
+    .data(activeNodes)
+    .join('circle')
+    .attr('r', d => nodeRadius(d))
+    .attr('fill', '#21295C')
+    .attr('stroke', 'white')
+    .attr('stroke-width', 1.5)
+    .attr('opacity', 0.9)
+    .attr('cursor', 'pointer')
+    .call(d3.drag()
+      .on('start', (event, d) => {
+        if (!event.active) simulation.alphaTarget(0.3).restart();
+        d.fx = d.x; d.fy = d.y;
+      })
+      .on('drag', (event, d) => { d.fx = event.x; d.fy = event.y; })
+      .on('end', (event, d) => {
+        if (!event.active) simulation.alphaTarget(0);
+        d.fx = null; d.fy = null;
+      }))
+    .on('mouseover', function(event, d) {
+      d3.select(this).attr('fill', '#B85042');
+      const connected = simEdges
+        .filter(e => (e.source.place||e.source) === d.place || (e.target.place||e.target) === d.place)
+        .sort((a,b) => b.weight - a.weight)
+        .slice(0, 5)
+        .map(e => {
+          const sp = e.source.place || e.source;
+          const tp = e.target.place || e.target;
+          const other = sp === d.place ? tp : sp;
+          return `<div style="display:flex;justify-content:space-between;gap:16px;margin-top:3px"><span>${other}</span><span style="color:#21295C;font-weight:bold">${e.weight}</span></div>`;
+        }).join('');
+      tooltip.style.display = 'block';
+      tooltip.innerHTML = `
+        <div class="place">${d.place}</div>
+        <div style="color:#888;font-size:11px;margin-bottom:6px">${d.total_mentions} total mentions</div>
+        <div style="font-size:11px;color:#555;margin-bottom:3px">Top co-occurrences:</div>
+        ${connected}`;
+    })
+    .on('mousemove', function(event) {
+      tooltip.style.left = (event.clientX + 14) + 'px';
+      tooltip.style.top  = (event.clientY - 10) + 'px';
+    })
+    .on('mouseout', function() {
+      d3.select(this).attr('fill', '#21295C');
+      tooltip.style.display = 'none';
+    });
+
+  // Labels — outside the node, below
+  const label = g.append('g')
+    .selectAll('text')
+    .data(activeNodes)
+    .join('text')
+    .attr('text-anchor', 'middle')
+    .attr('font-size', '10px')
+    .attr('fill', '#333')
+    .attr('font-weight', '500')
+    .attr('pointer-events', 'none')
+    .text(d => d.place);
+
+  simulation.on('tick', () => {
+    link
+      .attr('x1', d => d.source.x)
+      .attr('y1', d => d.source.y)
+      .attr('x2', d => d.target.x)
+      .attr('y2', d => d.target.y);
+
+    node
+      .attr('cx', d => d.x)
+      .attr('cy', d => d.y);
+
+    label
+      .attr('x', d => d.x)
+      .attr('y', d => d.y + nodeRadius(d) + 12);
+  });
+}
+
+draw(8);
+
+document.getElementById('threshold').addEventListener('input', function() {
+  document.getElementById('thresholdVal').textContent = this.value;
+  draw(+this.value);
+});
+</script>
+</body>
+</html>

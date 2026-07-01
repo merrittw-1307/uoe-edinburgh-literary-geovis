@@ -1,0 +1,404 @@
+source,target,weight
+Leith,Princes Street,28
+New Town,Princes Street,18
+Dundas Street,Princes Street,17
+Bruntsfield,Dundas Street,16
+Bruntsfield,Princes Street,16
+Dundas Street,New Town,16
+Dundas Street,Morningside,15
+Morningside,Stockbridge,15
+Princes Street,Stockbridge,15
+Dundas Street,The Meadows,15
+Morningside,Princes Street,15
+Dundas Street,Stockbridge,15
+Arthur's Seat,Leith,15
+Princes Street,The Meadows,14
+Leith,New Town,14
+Bruntsfield,Morningside,14
+Bruntsfield,New Town,14
+Bruntsfield,Stockbridge,14
+Queen Street,Stockbridge,13
+Princes Street,Queen Street,13
+Stockbridge,The Meadows,13
+New Town,The Meadows,13
+Holyrood,Leith,13
+New Town,Stockbridge,13
+Dundas Street,Queen Street,13
+Morningside,Queen Street,13
+Bruntsfield,The Meadows,13
+Morningside,The Meadows,13
+Canongate,Holyrood,13
+Morningside,New Town,13
+Dundas Street,Leith,12
+New Town,Queen Street,12
+Forth,Leith,12
+Canongate,Leith,12
+High Street,Leith,12
+Bruntsfield,Queen Street,12
+Moray Place,Princes Street,11
+Moray Place,Queen Street,11
+Drummond Place,Dundas Street,11
+Calton Hill,Leith,11
+Leith,Stockbridge,11
+Drummond Place,Princes Street,11
+Leith,Morningside,11
+Queen Street,The Meadows,11
+Dundas Street,Moray Place,11
+Drummond Place,Queen Street,10
+Drummond Place,Morningside,10
+Drummond Place,New Town,10
+Moray Place,Stockbridge,10
+Moray Place,Scotland Street,10
+Leith,The Meadows,10
+Drummond Place,Scotland Street,10
+Leith,Queen Street,10
+Drummond Place,Moray Place,10
+Moray Place,New Town,10
+Moray Place,Morningside,10
+Bruntsfield,Leith,10
+Dundas Street,Scotland Street,10
+Arthur's Seat,Canongate,10
+Morningside,Scotland Street,10
+Arthur's Seat,Holyrood,10
+Princes Street,Scotland Street,10
+Queen Street,Scotland Street,10
+Forth,High Street,10
+Cumberland Bar,Drummond Place,9
+Cumberland Bar,Moray Place,9
+Cumberland Bar,Queen Street,9
+Bruntsfield,Moray Place,9
+Cumberland Bar,Princes Street,9
+Bruntsfield,Drummond Place,9
+Leith,Moray Place,9
+Cumberland Bar,Morningside,9
+Calton Hill,Princes Street,9
+Cumberland Bar,Scotland Street,9
+Scotland Street,Stockbridge,9
+Drummond Place,Stockbridge,9
+New Town,Scotland Street,9
+Arthur's Seat,Princes Street,9
+Cumberland Bar,Dundas Street,9
+Moray Place,The Meadows,9
+Arthur's Seat,Calton Hill,9
+Cumberland Bar,Stockbridge,8
+Drummond Place,The Meadows,8
+Drummond Place,Leith,8
+Drummond Place,India Street,8
+Arthur's Seat,High Street,8
+Bruntsfield,Scotland Street,8
+India Street,Queen Street,8
+India Street,Moray Place,8
+India Street,Morningside,8
+India Street,Princes Street,8
+India Street,Scotland Street,8
+Cumberland Bar,New Town,8
+Leith,Scotland Street,8
+Scotland Street,The Meadows,8
+Dundas Street,India Street,8
+Cumberland Bar,The Meadows,7
+Leith,Pilrig,7
+Bruntsfield,India Street,7
+Canongate,High Street,7
+Bruntsfield,Cumberland Bar,7
+Cumberland Bar,Leith,7
+Cumberland Bar,India Street,7
+Dundas Street,Howe Street,7
+Leith Walk,Princes Street,7
+Howe Street,Princes Street,7
+India Street,Stockbridge,7
+Howe Street,The Meadows,7
+Howe Street,New Town,7
+Leith,West End,7
+Howe Street,Morningside,7
+India Street,New Town,7
+India Street,The Meadows,7
+Leith,Niddrie,7
+Arthur's Seat,Forth,7
+High Street,Holyrood,7
+Leith,Leith Walk,7
+Leith,Southside,6
+India Street,Leith,6
+Holyrood,Prestonpans,6
+Leith,Prestonpans,6
+Howe Street,Stockbridge,6
+Old Town,Princes Street,6
+Howe Street,Queen Street,6
+Niddrie,West End,6
+Leith Walk,Niddrie,6
+Bruntsfield,Howe Street,6
+Howe Street,Leith,6
+Leith Walk,West End,6
+Niddrie,Princes Street,6
+Niddrie,Southside,6
+Calton Hill,Forth,6
+Princes Street,West End,6
+Leith Walk,Southside,5
+Southside,West End,5
+Princes Street,Southside,5
+Canongate,Forth,5
+Holyrood,Princes Street,5
+Canongate,West Port,5
+Forth,Holyrood,5
+Niddrie,Tollcross,5
+Lothian Road,Southside,5
+Southside,Tollcross,5
+Howe Street,Moray Place,5
+Leith,Old Town,5
+Dalkeith,West Port,5
+Forth,Pilrig,5
+Lothian Road,Niddrie,5
+Canongate,Prestonpans,5
+Lothian Road,Tollcross,5
+Howe Street,Scotland Street,5
+Gorgie,Leith,5
+Gorgie,Leith Walk,5
+Leith,Tollcross,5
+Drummond Place,Howe Street,5
+Cumberland Bar,Howe Street,5
+Leith,Lothian Road,5
+Leith,West Port,5
+Gorgie,Princes Street,5
+Leith Walk,Wester Hailes,4
+Arthur's Seat,Dalkeith,4
+Leith Walk,Waverley Station,4
+Howe Street,India Street,4
+Leith Walk,Lochend,4
+Lochend,Princes Street,4
+Leith,Waverley Station,4
+Leith,Lochend,4
+Lochend,Niddrie,4
+Gorgie,West End,4
+Lochend,Southside,4
+Southside,Wester Hailes,4
+Leith Walk,Lothian Road,4
+Leith Walk,Tollcross,4
+Gorgie,Niddrie,4
+Lothian Road,Princes Street,4
+Princes Street,Tollcross,4
+Waverley Station,Wester Hailes,4
+Tollcross,West End,4
+Lochend,Waverley Station,4
+Southside,Waverley Station,4
+Princes Street,Wester Hailes,4
+Princes Street,Waverley Station,4
+Lothian Road,West End,4
+Niddrie,Wester Hailes,4
+Lochend,Wester Hailes,4
+Niddrie,Waverley Station,4
+Leith,Wester Hailes,4
+Leith,University of Edinburgh,4
+Leith,Swanston,4
+Forth,Princes Street,4
+Grassmarket,West Port,4
+Calton Hill,Old Town,4
+Calton Hill,High Street,4
+Calton Hill,Holyrood,4
+Calton Hill,Canongate,4
+Arthur's Seat,University of Edinburgh,4
+Arthur's Seat,Prestonpans,4
+Arthur's Seat,West Port,4
+Canongate,Princes Street,4
+Arthur's Seat,Old Town,4
+Arthur's Seat,Lasswade,4
+Canongate,Dalkeith,4
+Calton Hill,Swanston,4
+Canongate,Grassmarket,4
+Princes Street,St Giles,4
+Holyrood,West Port,4
+Dalkeith,Leith,4
+Calton Hill,University of Edinburgh,4
+Grassmarket,Leith,4
+Holyrood,Lasswade,4
+Lasswade,Princes Street,4
+Princes Street,University of Edinburgh,4
+Holyrood,University of Edinburgh,4
+Lasswade,Leith,4
+Forth,Swanston,4
+Canongate,University of Edinburgh,4
+Cramond,Leith,4
+Cramond,Forth,4
+High Street,West Port,3
+Lasswade,Royal Society of Edinburgh,3
+Holyrood,Old Town,3
+Leith,Linlithgow,3
+Arthur's Seat,Castle Street,3
+Holyrood,Royal Society of Edinburgh,3
+High Street,Prestonpans,3
+Holyrood,Linlithgow,3
+Canongate,Lasswade,3
+Canongate,Castle Street,3
+Castle Street,University of Edinburgh,3
+Arthur's Seat,Royal Society of Edinburgh,3
+Castle Street,Royal Society of Edinburgh,3
+Castle Street,Princes Street,3
+Castle Street,Leith,3
+Calton Hill,Castle Street,3
+Castle Street,Lasswade,3
+Princes Street,Swanston,3
+Calton Hill,Lasswade,3
+Canongate,Royal Society of Edinburgh,3
+Calton Hill,Royal Society of Edinburgh,3
+Castle Street,Holyrood,3
+Grassmarket,Holyrood,3
+Pilrig,Southside,3
+Montgomery Street,Princes Street,3
+Montgomery Street,Southside,3
+Montgomery Street,Tollcross,3
+Montgomery Street,Waverley Station,3
+Montgomery Street,Wester Hailes,3
+Niddrie,Pilrig,3
+Pilrig,Princes Street,3
+Pilrig,Tollcross,3
+Grassmarket,High Street,3
+Pilrig,West End,3
+Arthur's Seat,Grassmarket,3
+Tollcross,Waverley Station,3
+Tollcross,Wester Hailes,3
+Arthur's Seat,Holyrood Park,3
+Canongate,Holyrood Park,3
+High Street,Holyrood Park,3
+Montgomery Street,Niddrie,3
+Lothian Road,Wester Hailes,3
+Lothian Road,Waverley Station,3
+Lothian Road,Pilrig,3
+Dalkeith,Holyrood,3
+Dalkeith,High Street,3
+Lasswade,University of Edinburgh,3
+Canongate,Linlithgow,3
+Gorgie,Lothian Road,3
+Gorgie,Southside,3
+Gorgie,Tollcross,3
+Leith,Montgomery Street,3
+Leith Walk,Montgomery Street,3
+Leith Walk,Pilrig,3
+Arthur's Seat,Linlithgow,3
+Lochend,Lothian Road,3
+Lochend,Montgomery Street,3
+Lochend,Tollcross,3
+Lothian Road,Montgomery Street,3
+Dalkeith,Grassmarket,3
+Holyrood Park,Leith,3
+Leith,Royal Society of Edinburgh,3
+Cramond,Swanston,3
+Waverley Station,West End,3
+Calton Hill,Pilrig,3
+Calton Hill,Swanston Cottage,3
+Leith,Swanston Cottage,3
+Swanston,Swanston Cottage,3
+Lochend,West End,3
+Leith,St Giles,3
+Calton Hill,Cramond,3
+Lasswade,St Giles,3
+Holyrood,St Giles,3
+Cramond,Princes Street,3
+West End,Wester Hailes,3
+Royal Society of Edinburgh,University of Edinburgh,3
+Princes Street,Royal Society of Edinburgh,3
+Arthur's Seat,St Giles,3
+Forth,Silvermills,2
+Arthur's Seat,Haddington,2
+Forth,Hermiston,2
+Lochend,Pilrig,2
+Niddrie,Ocean Drive,2
+Calton Hill,Hermiston,2
+New Town,Swanston,2
+Pilrig,Swanston,2
+Hermiston,Swanston,2
+Ocean Drive,Southside,2
+Ocean Drive,West End,2
+Gorgie,Wester Hailes,2
+Heriot Row,Swanston Cottage,2
+Gorgie,Waverley Station,2
+Heriot Row,Swanston,2
+Heriot Row,Leith,2
+Forth,Holyrood Park,2
+Gorgie,Pilrig,2
+Princes Street,Swanston Cottage,2
+Gorgie,Montgomery Street,2
+Holyrood,Holyrood Park,2
+Gorgie,Lochend,2
+Hermiston,Leith,2
+Hermiston,Princes Street,2
+Calton Hill,Silvermills,2
+High Street,Princes Street,2
+Arthur's Seat,Silvermills,2
+Arthur's Seat,Pilrig,2
+Arthur's Seat,Cramond,2
+Arthur's Seat,Swanston,2
+New Town,Old Town,2
+Pilrig,Wester Hailes,2
+Forth,Swanston Cottage,2
+Pilrig,Waverley Station,2
+Leith,Ocean Drive,2
+Forth,Old Town,2
+Forth,New Town,2
+Cramond,Swanston Cottage,2
+High Street,Pilrig,2
+Montgomery Street,West End,2
+High Street,Silvermills,2
+Cramond,Old Town,2
+Canongate,Haddington,2
+Calton Hill,New Town,2
+Leith,Silvermills,2
+Montgomery Street,Pilrig,2
+Pilrig,Silvermills,2
+Cramond,New Town,2
+Leith,Liberton,2
+Calton Hill,Heriot Row,2
+Canongate,St Giles,2
+Hanover Street,St Giles,2
+Hanover Street,Royal Society of Edinburgh,2
+Hanover Street,Princes Street,2
+Hanover Street,Musselburgh,2
+Hanover Street,Leith,2
+Calton Hill,Prestonpans,2
+Hanover Street,Lasswade,2
+Hanover Street,Holyrood,2
+Castle Street,St Giles,2
+Castle Street,Musselburgh,2
+Canongate,Old Town,2
+Castle Street,Hanover Street,2
+Canongate,Musselburgh,2
+Liberton,West Port,2
+Canongate,Hanover Street,2
+Calton Hill,St Giles,2
+Calton Hill,Musselburgh,2
+Castle Street,Prestonpans,2
+Calton Hill,Hanover Street,2
+Arthur's Seat,Musselburgh,2
+Arthur's Seat,Hanover Street,2
+Prestonpans,University of Edinburgh,2
+Prestonpans,Royal Society of Edinburgh,2
+Lasswade,Old Town,2
+Lasswade,Prestonpans,2
+Prestonpans,Princes Street,2
+Hanover Street,University of Edinburgh,2
+Holyrood,Musselburgh,2
+Lasswade,Musselburgh,2
+Leith,Musselburgh,2
+Old Town,University of Edinburgh,2
+Dalkeith,Liberton,2
+Dalkeith,Linlithgow,2
+Dalkeith,Prestonpans,2
+Forth,Haddington,2
+Forth,Linlithgow,2
+Forth,Prestonpans,2
+Canongate,Liberton,2
+Arthur's Seat,Liberton,2
+St Giles,University of Edinburgh,2
+Royal Society of Edinburgh,St Giles,2
+Haddington,High Street,2
+Haddington,Holyrood,2
+Haddington,Leith,2
+Haddington,Linlithgow,2
+High Street,Linlithgow,2
+Musselburgh,University of Edinburgh,2
+Musselburgh,St Giles,2
+Musselburgh,Royal Society of Edinburgh,2
+Musselburgh,Princes Street,2
+Linlithgow,Prestonpans,2
+Linlithgow,West Port,2
+Prestonpans,West Port,2
+Hermiston,High Street,2
+Old Town,St Giles,2
+Old Town,Swanston,2

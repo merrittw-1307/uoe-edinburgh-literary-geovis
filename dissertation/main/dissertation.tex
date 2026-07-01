@@ -1,0 +1,869 @@
+% MSc Dissertation - A Visual Trace Map of Edinburgh Place Names in Literature
+% Merritt Wang | Supervisor: Uta Hinrichs | University of Edinburgh | 2026
+
+\documentclass[logo,msc]{infthesis}
+\usepackage{msccheck}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{wasysym}
+\usepackage{tikz}
+\usepackage{pdfpages}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage{booktabs}
+\usepackage{xcolor}
+
+\begin{document}
+\begin{preliminary}
+
+\title{A Visual Trace Map of Edinburgh Place Names in Literature}
+\author{Merritt Wang}
+\date{\today}
+
+\abstract{
+% TODO (~200-300 words)
+% Suggested structure:
+%   Sentence 1-2: State the problem — existing tools visualise literary
+%     place names as geographic data, but literary meaning comes from
+%     narrative context, not coordinates.
+%   Sentence 3-4: Introduce the data — LitLong Edinburgh database:
+%     548 works (1687-2015), 2,135 place names, 48,056 mention records,
+%     345 authors.
+%   Sentence 5-6: State the two research directions —
+%     (1) author spatial fingerprints and (2) narrative topology networks.
+%   Sentence 7-8: Describe the method — interactive D3.js visualisations
+%     driven by real data; user study with two participant groups.
+%   Sentence 9-10: State the key findings and contribution.
+}
+
+\maketitle
+
+\newenvironment{ethics}
+   {\begin{frontenv}{Research Ethics Approval}{\LARGE}}
+   {\end{frontenv}\newpage}
+
+\begin{ethics}
+This project obtained approval from the Informatics Research Ethics committee.\\
+Ethics application number: 446635\\
+Date when approval was obtained: % TODO: fill in date\\
+The participants' information sheet and a consent form are included in the appendix.\\
+\standarddeclaration
+\end{ethics}
+
+\begin{acknowledgements}
+% TODO
+\end{acknowledgements}
+
+\tableofcontents
+\listoffigures
+
+\end{preliminary}
+
+
+% ============================================================
+% CHAPTER 1: INTRODUCTION (~1,500 words)
+% ============================================================
+\chapter{Introduction}
+
+\section{Motivation}
+% TODO (~300 words)
+%
+% Key points to cover:
+% - Edinburgh is one of the most literarily documented cities in the world.
+%   The LitLong / Palimpsest project (University of Edinburgh) extracted
+%   place-name mentions from 548 literary works spanning 1687-2015,
+%   producing 48,056 geo-referenced records.
+%
+% - Existing tools (including the original LitLong interface) visualise
+%   this data on geographic maps. This assumes that a place name's meaning
+%   is determined by its location.
+%
+% - In literature, meaning comes from narrative context:
+%   WHEN in the narrative a place appears (early/late in the story),
+%   WHAT other places surround it (co-occurrence),
+%   WHO chose it (authorial style),
+%   HOW frequently it recurs.
+%
+% - A geographic map cannot show any of this. It can only show WHERE.
+%
+% - Motivating example to consider using:
+%   Irvine Welsh's Trainspotting clusters almost entirely around Leith
+%   (41% of all mentions in the Leith & North sector), while
+%   Walter Scott clusters around Old Town (33.5%).
+%   On a geographic map, both authors' dots appear in the same city.
+%   Only a purpose-built visualisation can reveal this divergence.
+
+\section{Problem Statement}
+% TODO (~200 words)
+%
+% Core question: Can place names in literary text be visualised as an
+% independent narrative structure, rather than simply as a rendering of
+% geographic information?
+%
+% Two sub-problems:
+% (1) Can an author's spatial attention be represented as a distinctive
+%     visual "fingerprint" that allows different authors to be distinguished?
+% (2) Do places that co-occur in literary works form a narrative topology
+%     that diverges meaningfully from their geographic topology?
+%
+% What existing tools do NOT do:
+% - They do not separate literary space from geographic space.
+% - They do not visualise authorial spatial style.
+% - They do not show which places are narratively proximate vs
+%   geographically proximate.
+
+\section{Research Questions}
+% TODO (~200 words)
+%
+% RQ1 (Direction 1 — Author Spatial Fingerprint):
+%   Does each author's distribution of place-name mentions across
+%   Edinburgh's city sectors form a visually distinctive spatial signature
+%   that allows users to identify authors from their fingerprint alone?
+%
+% RQ2 (Direction 2 — Narrative Topology):
+%   Does the co-occurrence of place names within literary works reveal a
+%   narrative topology that diverges from the geographic topology of
+%   Edinburgh?
+%
+% Success criterion for RQ1 (defined by supervisor):
+%   Users should be able to match a fingerprint to an author on a
+%   one-to-one basis — i.e. different authors must produce visually
+%   distinct shapes (one-to-one, not many-to-one).
+%
+% Success criterion for RQ2:
+%   The visualisation should reveal cases where narrative proximity
+%   contradicts geographic proximity — e.g. Leith and Princes Street
+%   are the strongest co-occurring pair (weight=28) despite being
+%   geographically separated.
+
+\section{Contributions}
+% TODO (~200 words)
+%
+% List of contributions:
+% 1. A novel interactive visualisation system for literary place-name data
+%    that separates narrative structure from geographic information.
+%
+% 2. Two complementary visualisation directions implemented in D3.js:
+%    author spatial fingerprints and narrative topology networks.
+%
+% 3. An empirical finding with implications for literary geography:
+%    among 5 representative Edinburgh authors (McCall Smith, Welsh,
+%    Lockhart, Stevenson, Scott), ZERO place names are shared by 3 or
+%    more authors. Only 18 place names are shared by exactly 2 authors.
+%    This confirms that each author constructs an almost entirely private
+%    imaginary Edinburgh.
+%
+% 4. A validated method for extracting narrative order from the LitLong
+%    database using the start_word field, which is globally unique and
+%    monotonically increasing within each document.
+%
+% 5. A user evaluation comparing domain expert and general public responses
+%    to multiple visualisation designs, informing the final design selection.
+
+\section{Dissertation Overview}
+% TODO (~100 words)
+% Brief roadmap: what each chapter covers.
+
+
+% ============================================================
+% CHAPTER 2: LITERATURE REVIEW (~3,000 words)
+% ============================================================
+\chapter{Literature Review}
+
+\section{Literary Geography and Geocriticism}
+% TODO (~500 words)
+%
+% Key references to cover:
+% - Westphal (2011): Geocriticism — place as a cultural and narrative
+%   construct, not a fixed coordinate.
+% - Tally (2013): Spatiality — the "spatial turn" in literary studies.
+% - Franco Moretti (2005): Graphs, Maps, Trees — quantitative approaches
+%   to literary geography; his literary maps of European novels.
+%   Important: Moretti himself acknowledges that his maps reveal the
+%   ABSENCE of places as much as their presence (useful for your
+%   "literary silence" angle if you develop Direction 4 later).
+%
+% Key argument to make:
+%   Literary geography has established that place in fiction is not
+%   simply a geographic referent but a narrative and cultural construction.
+%   However, most digital literary geography tools have not caught up with
+%   this theoretical insight — they still plot place names on coordinates.
+
+\section{The LitLong Edinburgh Project}
+% TODO (~400 words)
+%
+% Key points:
+% - Anderson et al. (2016): Palimpsest / LitLong project description.
+%   The NLP pipeline used to extract place names from literary texts.
+% - Database structure: 620 documents, 2,135 place names, 50,248 mention
+%   records, 424 authors, 29 literary genres.
+%   (Note: the SQL dump is more complete than the CSV snapshot —
+%   620 docs vs 548 in CSV, 50,248 mentions vs 48,056.)
+% - The api_sentence table contains full source text for each mention —
+%   this enables the "hover to read original sentence" feature.
+% - The start_word field encodes narrative position and can be used
+%   to reconstruct reading order within each document.
+% - Prior visualisation: the original LitLong web interface used a
+%   geographic map — describe its limitations.
+
+\section{Visualising Place in Literary Corpora}
+% TODO (~500 words)
+%
+% Key references:
+% - Stange & Dork (2015): "Unfolding the City" / Novel City Maps.
+%   CRITICAL reference for Direction 1. They created street-map-style
+%   fingerprints of literary place mentions. Your work pushes further:
+%   you DROP geographic coordinates entirely and use abstract sectors.
+%
+% - Google Literary Atlas / other mapping projects — what they do and
+%   why they are still fundamentally geographic.
+%
+% - Cooper et al. on literary GIS — the tension between geographic
+%   precision and literary interpretation.
+%
+% Key argument: existing visualisation work either uses geographic maps
+% (losing narrative structure) or is fully abstract (losing geographic
+% intuition). This project aims for a middle ground.
+
+\section{Information Visualisation for Humanities Data}
+% TODO (~500 words)
+%
+% Key references:
+% - Shneiderman (1996): "Overview first, zoom and filter, details on demand"
+%   — the information seeking mantra that underpins your interactive design.
+% - Tufte (1983): small multiples as a principle — directly relevant to
+%   your Small Multiples visualisation.
+% - Drucker (2011): "Humanities Approaches to Graphical Display" —
+%   argues that humanistic data is "capta" (interpreted) not "data"
+%   (given), and that visualisations should reflect uncertainty and
+%   interpretation. Relevant to your design philosophy.
+% - Hinrichs & Carpendale (2011): "Gestures in the Wild" — your supervisor's
+%   own work on embodied interaction with visualisation; worth citing.
+
+\section{Graph and Network Visualisation}
+% TODO (~500 words)
+%
+% Key references:
+% - Fruchterman & Reingold (1991): force-directed graph layout algorithm
+%   used in your network visualisation.
+% - Nollenburg & Wolff (2006): metro-map layout algorithm —
+%   CITE THIS in relation to why you used manual layout instead of
+%   algorithmic: "Schematic metro-map layout is a known hard problem
+%   in graph drawing (Nollenburg & Wolff, 2006)."
+% - Beck et al. (2017): survey of set visualisation techniques.
+% - London Tube Map (Beck, 1933) as a design precedent for replacing
+%   geographic topology with functional/narrative topology.
+%   Key point: Beck's map was initially REJECTED because it "didn't look
+%   like a map" — but it succeeded because it served the traveller's
+%   actual need (which line, which direction) rather than geographic
+%   accuracy. Your narrative topology serves the reader's need
+%   (which places are narratively connected) rather than geographic fidelity.
+
+\section{Gap and Contribution}
+% TODO (~300 words)
+%
+% Synthesise the gap:
+% - Literary geography theory says place is narrative, not geographic.
+% - But existing digital tools still use geographic maps.
+% - Stange & Dork came closest but kept geographic coordinates.
+% - No existing tool visualises place co-occurrence as narrative topology.
+% - No existing tool allows direct comparison of author spatial styles
+%   using abstract (non-geographic) fingerprints.
+% This project fills that gap.
+
+
+% ============================================================
+% CHAPTER 3: DESIGN (~2,000 words)
+% ============================================================
+\chapter{Design}
+
+\section{Design Rationale}
+% TODO (~300 words)
+%
+% Why interactive:
+% - Static maps cannot support the "overview + detail" interaction
+%   that humanities scholars need to explore a 548-work corpus.
+% - Interactivity allows users to filter by author, adjust thresholds,
+%   and access source text on demand.
+%
+% Why D3.js:
+% - Proposed in the project brief.
+% - Web-native: no installation required, results shareable via URL.
+% - R's interactive options (Shiny, Plotly) require a server and are
+%   not web-native. Supervisor noted uncertainty about R's interactive
+%   capability in Week 4 meeting.
+% - D3.js is the standard tool in digital humanities visualisation.
+%
+% Design philosophy:
+% - Narrative structure over geographic accuracy.
+% - The visualisations deliberately move away from coordinates.
+%   Where coordinates are used (Small Multiples), they serve as a
+%   loose spatial anchor, not a precise map.
+
+\section{Data Exploration and Key Findings}
+% TODO (~400 words)
+%
+% IMPORTANT — report these findings with specific numbers:
+%
+% Finding 1 — Author spatial languages are highly individual:
+%   Among the 5 test authors, ZERO place names are shared by 3 or more.
+%   Only 18 place names are shared by exactly 2 authors.
+%   This means individual place names cannot serve as radar chart axes
+%   (most axes would be zero for most authors).
+%   Decision: use city sectors as axes instead (supervisor's suggestion).
+%
+% Finding 2 — Sector distributions validate the approach:
+%   - McCall Smith: New Town 60.7% (Scotland Street series set there)
+%   - Welsh: Leith & North 41.1% (Trainspotting centred on Leith)
+%   - Scott: Old Town 33.5% (historical fiction in Old Town)
+%   - Lockhart: New Town 44.3% (19th century literary circle)
+%   - Stevenson: New Town 35.2% + Leith 19.8% (spans both areas)
+%   Data-driven result matches established literary-geographic knowledge.
+%   This cross-validation strengthens the method's credibility.
+%
+% Finding 3 — Co-occurrence granularity:
+%   Sentence-level: 0 co-occurring pairs (too fine-grained).
+%   Page-level: up to 92 co-occurring places per page (too coarse, hairball).
+%   Document-level: 403 pairs with weight >= 2 (selected as appropriate).
+%
+% Finding 4 — Narrative topology diverges from geographic topology:
+%   Strongest co-occurring pair: Leith & Princes Street (weight=28).
+%   These are geographically separated (Leith is a port district north
+%   of the city centre; Princes Street is the main shopping street).
+%   Yet they appear together in 28 different literary works.
+%   This is a concrete example of narrative proximity != geographic proximity.
+%
+% Finding 5 — Walter Scott's broad geographic range:
+%   Scott's data includes locations far outside Edinburgh city centre
+%   (Forth: lat 56.05, Haddington: lon -2.80, Linlithgow: lon -3.58).
+%   This caused coordinate range compression in Small Multiples.
+%   Decision: fix coordinate range to Edinburgh core area
+%   (lat 55.88-56.01, lon -3.30 to -3.05).
+
+\section{Direction 1: Author Spatial Fingerprint}
+% TODO (~500 words)
+%
+% Design candidates considered (with rationale for each):
+%
+% (a) Radar Chart — SELECTED as primary design
+%     Axes = 6 city sectors (not individual place names — see Finding 1).
+%     Shape = author's fingerprint.
+%     Why city sectors: supervisor's hand-drawn sketch explicitly noted
+%     "city sectors"; data confirmed this is the only viable axis strategy.
+%     Sector definitions based on lat/lon coordinate ranges derived from
+%     api_location data.
+%
+% (b) Bar-code Fingerprint — retained as secondary design
+%     Each place = one vertical bar; height = mention frequency (log scale).
+%     Why log scale: Welsh's Leith mention count (650) is an extreme outlier.
+%     On linear scale, all other bars compressed flat. Log scale is standard
+%     treatment for long-tail distributions.
+%
+% (c) Small Multiples — retained as tertiary design
+%     5 panels side-by-side; real-world coordinates (supervisor's sketch
+%     noted "Real-world"); abstract city map overlay for spatial context.
+%     Finding: single-panel readability is lower than radar chart;
+%     value is comparative across panels.
+%
+% (d) Colour Map Silhouette — explored but deprioritised
+%     City boundary silhouette with heat overlay.
+%     Issue: if all authors concentrate in city centre, discriminability
+%     is low. Retained as a future direction.
+
+\section{Direction 2: Narrative Topology Network}
+% TODO (~500 words)
+%
+% Design candidates considered:
+%
+% (a) Force-directed Network — SELECTED as primary design
+%     Nodes = places (size = mention frequency).
+%     Edges = document-level co-occurrence (weight = number of works).
+%     Layout: D3 force simulation.
+%     Node position carries NO geographic meaning — proximity in graph
+%     = narrative proximity only.
+%     Key debugging decisions:
+%       v1: weight * 0.3 — no visible width difference.
+%       v2: sqrt scaling — marginal improvement.
+%       v3: weight >= 8 threshold + (w/max)^2 * 12 scaling + k=3.5.
+%       v3 resolved both density and scaling issues.
+%
+% (b) Linear Connection Diagram — retained as secondary design
+%     Places on a linear axis; Bezier arcs for co-occurrence.
+%     REASON for linear over chord (circular):
+%       Supervisor feedback: circular form implies cyclical structure,
+%       which is inappropriate for literary narratives (which are linear).
+%       "The book has a beginning and an end."
+%     Arc height proportional to node distance; weight >= 6 threshold.
+%
+% (c) Metro-map Topology — retained as conceptual/illustrative design
+%     8 lines, 50+ stations on manual grid layout.
+%     Echoes the London Underground map (Beck, 1933) cited in project brief.
+%     Why manual layout: algorithmic schematic layout is a known hard
+%     problem (Nollenburg & Wolff, 2006); deferred for future work.
+%
+% (d) Adjacency Matrix Heatmap — explored but deprioritised
+%     Most precise representation but unfriendly for general audiences.
+%     May be appropriate for domain-expert-only study condition.
+%
+% (e) Chord Diagram — replaced by linear diagram
+%     See supervisor feedback above.
+
+\section{Sketch Evaluation and Design Selection}
+% TODO (~300 words)
+%
+% Describe the user study approach (detail in Chapter 5):
+% - 6 candidate designs presented to participants without over-explanation.
+% - Two tasks: (1) author identification task (fingerprint direction),
+%   (2) narrative relationship identification task (topology direction).
+% - Vote on most intuitive design.
+% - Two participant groups: domain experts vs general public.
+% - Hypothesis: experts may prefer precise designs (adjacency matrix,
+%   bar-code); general public may prefer intuitive designs (radar chart,
+%   metro map).
+% - Final design selection based on task accuracy rates + participant votes.
+
+
+% ============================================================
+% CHAPTER 4: IMPLEMENTATION (~3,500 words)
+% ============================================================
+\chapter{Implementation}
+
+\section{Data Pipeline}
+% TODO (~500 words)
+%
+% Step-by-step pipeline to describe:
+%
+% 1. PostgreSQL setup:
+%    - PostgreSQL 16 installed via Homebrew on macOS.
+%    - Full LitLong dump (litlong_2022-06-21.sql, 145MB, 2.3M lines)
+%      imported directly. This is the complete official database, more
+%      recent and complete than the CSV snapshots.
+%    - Issue: api_location table depends on PostGIS geometry types
+%      (geom, poly fields). PostGIS not installed. Solution: imported
+%      api_location from CSV snapshot, retaining only id, text, lat, lon,
+%      gazref, ptype. PostGIS fields (geom, poly) not needed for current
+%      visualisation directions.
+%
+% 2. Mention order integration:
+%    - start_word field format: "w81489" (global word index).
+%    - Validated: globally unique, strictly monotonically increasing
+%      within each document (tested on documents 1, 106, 250).
+%    - New table mention_order created with fields:
+%        id, document_id, location_id, word_num (integer),
+%        mention_order (rank within document),
+%        position_pct (normalised 0-1 position).
+%    - Formula: position_pct = (word_num - min) / (max - min)
+%      per document_id group.
+%    - Validation: cross-checked against source text in api_sentence table.
+%      api_sentence contains 50,248 records (one per locationmention).
+%
+% 3. Six-table JOIN query validated:
+%    author + title + place + mention_order + position_pct + source sentence
+%    all retrievable in a single SQL query.
+%
+% 4. Key database statistics after full import:
+%    api_document: 620 records
+%    api_locationmention: 50,248 records
+%    api_sentence: 50,248 records (full source text)
+%    api_location: 2,135 records
+%    api_genre: 29 literary genres
+%    api_author: 424 authors
+%    api_posmention: 2,085,834 POS annotation records (future work)
+
+\section{Direction 1: Author Spatial Fingerprint — Implementation}
+% TODO (~800 words)
+%
+% Radar Chart:
+% - D3.lineRadial with curveLinearClosed.
+% - Y-axis scaled to data maximum (0.65) not 1.0:
+%   McCall Smith's New Town value (60.7%) is the highest;
+%   fixing to 100% left 35% of the chart empty.
+% - Hover targets: invisible circles r=14px (not r=6px) for comfortable
+%   interaction without pixel-precise cursor placement.
+% - Legend: click to show/hide individual authors.
+% - Data embedded directly in HTML (no external CSV dependency):
+%   reason: browsers block local file reads under file:// protocol.
+%
+% Bar-code Fingerprint:
+% - Per-author SVG rows; bars = top 30 place names by combined frequency.
+% - Log scale: np.log1p(value * 1000). Resolves Welsh/Leith outlier problem.
+% - Hover: place name + percentage value.
+%
+% Small Multiples:
+% - 5 panels in 3+2 flex layout.
+% - Abstract city map SVG overlay on each panel:
+%     Firth of Forth (blue water polygon)
+%     City landmass (beige polygon with approximate coastline)
+%     Arthur's Seat (ellipse + hill silhouette path)
+%     Pentland Hills (ridge-line polygon)
+%     Edinburgh Castle (rectangular tower symbol)
+%     Holyrood (diamond symbol)
+%     Water of Leith (curved blue path)
+%     Neighbourhood labels (Old Town, New Town, Leith, Morningside, Stockbridge)
+% - Coordinate range fixed to Edinburgh core:
+%     lat 55.88-56.01, lon -3.30 to -3.05.
+%     Points outside range filtered out.
+%     Reason: Scott's broad geographic range compressed city centre.
+% - Per-panel zoom (D3 zoom, scale 1-10x) on a zoomG group,
+%   allowing independent inspection of dense clusters.
+
+\section{Direction 2: Narrative Topology — Implementation}
+% TODO (~800 words)
+%
+% Force-directed Network:
+% - D3 force simulation:
+%     forceLink: distance inversely proportional to weight (stronger
+%       co-occurrence = shorter distance).
+%     forceManyBody: strength -400 (repulsion).
+%     forceCollide: radius = nodeRadius + 18 (prevents overlap).
+%     forceCenter: pulls graph to canvas centre.
+% - Node radius: log1p(total_mentions) * 2.8.
+% - Edge width: (weight/maxWeight)^2 * 12 (squared normalisation).
+% - Weight threshold slider (range 8-28): simulation re-run on change.
+% - Labels rendered BELOW nodes (y = node.y + radius + 12):
+%     Initial bug: labels rendered inside nodes with fill=white,
+%     invisible against dark background.
+% - Hover: top 5 co-occurring places for selected node.
+% - Drag nodes: D3 drag behaviour with fx/fy pinning.
+% - Zoom/pan: D3 zoom on outer SVG, transform applied to inner group.
+%
+% Linear Connection Diagram:
+% - Places ordered left-to-right by total mention frequency.
+% - Bezier arcs: M x1 y0 Q midX (y0-height) x2 y0.
+%   Arc height = horizontal distance * 0.42 (proportional).
+% - Stroke width: (weight/maxWeight)^1.5 * 6.
+% - Weight threshold slider (range 6-28).
+% - Hover arcs: source, target, weight.
+% - Hover nodes: total mention count.
+%
+% Metro-map:
+% - 8 lines, 50+ stations on manual grid (unit = 58px).
+% - Interchange stations (served by 2+ lines) marked with double-circle.
+% - Zoom/pan via D3 zoom behaviour.
+% - Hover: station name, lines served, interchange indicator.
+% - Why manual layout: algorithmic metro-map layout (Nollenburg & Wolff,
+%   2006) is a known NP-hard graph drawing problem; deferred.
+
+\section{Combined Interface}
+% TODO (~600 words)
+%
+% FUTURE WORK — to be implemented Week 6-7.
+%
+% Planned architecture:
+% - Single-page HTML application.
+% - Top navigation: toggle between "Fingerprints" and "Topology" views.
+% - Left control panel:
+%     Author selector (multi-select dropdown, all 424 authors available,
+%     default: 5 test authors).
+%     Visualisation type selector (within each direction).
+%     Parameter sliders (co-occurrence threshold, etc.).
+% - Main view: selected visualisation rendered in centre.
+% - Detail panel (right or bottom):
+%     On hover/click of any place name: display source sentences from
+%     api_sentence table — this is the "hover to read original text" feature.
+%     This requires a backend query or pre-loading sentence data.
+% - Cross-view linking:
+%     Clicking an author in the fingerprint view highlights their places
+%     in the topology view.
+%
+% Scale at combined interface stage:
+% - Expand author pool from 5 to 20-30 representative authors.
+% - No need to include all 424 — select for diversity in time period,
+%   genre, and geographic focus.
+% - Network graph: expand to top 50 high-frequency place names.
+
+\section{Technical Decisions and Constraints}
+% TODO (~300 words)
+%
+% Data embedding:
+% - All D3 HTML files embed data as JavaScript arrays.
+% - Reason: d3.csv() fails under file:// protocol (browser security).
+% - Trade-off: larger HTML files; data cannot be updated without
+%   re-embedding. Acceptable for dissertation prototype.
+%
+% D3.js version:
+% - D3 v7 loaded from CDN (d3js.org/d3.v7.min.js).
+% - Confirmed accessible (HTTP 200) from the development environment.
+%
+% PostgreSQL vs CSV:
+% - PostgreSQL used as primary data store.
+% - CSV snapshots retained as backup and for reproducibility.
+% - mention_order table exported as SQL for archiving.
+%
+% PostGIS:
+% - Not installed (geom/poly fields excluded from api_location).
+% - Impact: precise polygon boundaries for place areas not available.
+% - Mitigation: lat/lon centroids are sufficient for all current
+%   visualisation directions.
+
+
+% ============================================================
+% CHAPTER 5: EVALUATION (~2,500 words)
+% ============================================================
+\chapter{Evaluation}
+
+\section{Study Design}
+% TODO (~400 words)
+%
+% Key design decisions (decided during Week 4 meeting preparation):
+%
+% Two participant groups:
+%   Group A — Domain experts (geography / literature / digital humanities)
+%   Group B — General public
+%   Rationale: hypothesis that design preferences differ between groups.
+%   Finding from this distinction will be reported as a contribution.
+%
+% Online format:
+%   Reasons: (1) broader recruitment beyond university;
+%             (2) larger sample size;
+%             (3) saves participant and researcher time.
+%   Tool: consider Qualtrics (university licence available) or Google Forms.
+%
+% Introduction protocol (IMPORTANT):
+%   Participants will be shown visualisations WITHOUT detailed explanation
+%   of what each chart means. Only the project purpose is explained.
+%   Reason: avoids "priming" participants; tests whether designs are
+%   self-explanatory. This was Merritt's own decision, confirmed as
+%   methodologically sound.
+%
+% Two task types:
+%   Task 1 (fingerprint direction): Author identification task.
+%     Show participant a fingerprint (radar chart / bar-code / small multiples).
+%     Ask: "Which of these authors do you think this pattern belongs to?"
+%     Metric: accuracy rate (proportion of correct identifications).
+%   Task 2 (topology direction): Narrative relationship task.
+%     Show participant a network / linear diagram.
+%     Ask: "Which two places seem most narratively connected in this diagram?"
+%     Also ask: "Are these places geographically close or far apart?"
+%     Metric: accuracy + whether user perceives narrative/geographic divergence.
+%
+% Vote:
+%   After seeing all designs: "Which design felt most intuitive?"
+%   Separate votes for fingerprint direction and topology direction.
+
+\section{Participants}
+% TODO (~200 words)
+% - Recruitment method (social media, university mailing lists, etc.)
+% - Target sample size (suggest: minimum 20 per group, 40 total)
+% - Demographics collected (age range, background, prior experience
+%   with data visualisation, familiarity with Edinburgh)
+% - Inclusion/exclusion criteria
+
+\section{Study Procedure}
+% TODO (~400 words)
+% - Consent process (online consent form, based on ethics approval 446635)
+% - Introduction: project purpose explained, designs NOT explained
+% - Task sequence
+% - Estimated duration (~15-20 minutes)
+% - Data collected: task accuracy, response time (if measurable),
+%   design vote, open-ended comments
+
+\section{Results}
+% TODO (~800 words)
+%
+% Suggested structure:
+% 3.1 Task 1 results: author identification accuracy per design
+%     (which fingerprint design allowed most accurate identification?)
+% 3.2 Task 2 results: narrative relationship identification accuracy
+%     (did participants notice narrative/geographic divergence?)
+% 3.3 Design votes: most intuitive per direction
+% 3.4 Expert vs general public comparison
+% 3.5 Qualitative themes from open-ended comments
+
+\section{Discussion of Results}
+% TODO (~400 words)
+%
+% Questions to address:
+% - Which design succeeded best at the author identification task?
+%   (Prediction: radar chart, because shape differences are salient)
+% - Did participants spontaneously notice that Leith and Princes Street
+%   are strongly co-occurring but geographically separated?
+%   (This would validate the core thesis of RQ2)
+% - Were there significant differences between expert and general public?
+% - Were there any surprising results?
+
+
+% ============================================================
+% CHAPTER 6: DISCUSSION (~2,000 words)
+% ============================================================
+\chapter{Discussion}
+
+\section{Design Improvements after User Study}
+% TODO (~600 words)
+%
+% Address: what changed in the final designs based on user feedback?
+% - Which visualisations were promoted to the combined interface?
+% - Which were demoted to appendix / supplementary material?
+% - What specific visual elements were changed?
+
+\section{Narrative Topology vs Geographic Topology}
+% TODO (~500 words)
+%
+% Develop the key finding:
+% - Leith and Princes Street: co-occurrence weight 28, strongest pair.
+%   Geographically: Leith is a port district ~2.5km north of Princes Street.
+%   Narratively: they appear together in 28 different literary works.
+% - What does this mean? Authors move characters between Leith and
+%   Princes Street as a recurrent narrative pattern. The "journey" between
+%   these two places — between the working-class port and the bourgeois
+%   shopping street — is a structuring device in Edinburgh fiction.
+% - Connect to Welsh: Trainspotting explicitly dramatises this journey
+%   as a journey between social worlds, not just geographic locations.
+% - This is the kind of insight that a geographic map cannot reveal.
+%   The narrative topology visualisation makes it visible.
+
+\section{Author Spatial Languages}
+% TODO (~500 words)
+%
+% Develop the key finding:
+% - Zero shared places among 5 authors at threshold >= 3.
+%   Only 18 shared at threshold = 2.
+% - This quantifies what literary scholars have described qualitatively:
+%   each author has a distinctive imaginary Edinburgh.
+% - McCall Smith's Edinburgh is bounded by the New Town triangle
+%   (Scotland Street, Dundas Street, Drummond Place); Welsh's Edinburgh
+%   is bounded by Leith.
+% - The fingerprint visualisation makes this visible and comparable
+%   across authors simultaneously.
+% - Future work: expand to all 424 authors in the database to produce
+%   a complete "atlas of Edinburgh literary imaginations."
+
+\section{Limitations and Open Questions}
+% TODO (~400 words)
+%
+% Honest limitations to address:
+%
+% 1. Manual metro-map layout:
+%    Algorithmic schematic layout deferred (NP-hard problem).
+%    Current layout is hand-crafted, not generalisable to arbitrary data.
+%
+% 2. PostGIS not available:
+%    Precise polygon boundaries for places excluded.
+%    Lat/lon centroids used instead. Some places (e.g. "Old Town")
+%    have centroids that may not accurately represent the full area.
+%
+% 3. 5 test authors is a small sample:
+%    Sufficient for proof of concept; insufficient for generalisation.
+%    Full deployment with 424 authors would require UI scaling work
+%    (dropdown selectors, pagination, clustering).
+%
+% 4. Reader-sketch direction not fully explored:
+%    Supervisor mentioned "Reader-sketch?" with a question mark in notes.
+%    This direction (visualising reading experience / narrative time)
+%    was not fully developed in this project.
+%    The mention_order / position_pct data is ready for this.
+%    The Reader-plot timeline (linear axis showing place order across
+%    a book) was prototyped but not included in the user study.
+%
+% 5. api_posmention not used:
+%    2,085,834 POS annotation records available but not incorporated.
+%    Could support analysis of whether a place appears in dialogue
+%    vs narration (potential Direction 3 / narrative weight analysis).
+%
+% 6. Source text coverage:
+%    directus.sql contains curated source text excerpts for some places;
+%    api_sentence has full sentences for all 50,248 mentions.
+%    The "hover to read original sentence" feature is planned but not
+%    yet implemented in the combined interface.
+
+
+% ============================================================
+% CHAPTER 7: CONCLUSION (~700 words)
+% ============================================================
+\chapter{Conclusion}
+
+% TODO (~700 words)
+%
+% Structure:
+% 1. Restate the problem and why it matters.
+% 2. Summarise what was built and what was found.
+% 3. Answer the two research questions explicitly:
+%    RQ1: Yes/No/Partial — did the fingerprint allow author identification?
+%    RQ2: Yes/No/Partial — did the topology diverge from geography?
+% 4. State the three main contributions.
+% 5. Future work (2-3 paragraphs):
+%    a. Expand to all 424 authors (combined interface with dropdown).
+%    b. Implement Reader-plot timeline using position_pct data.
+%    c. Investigate Direction 3: narrative weight using api_posmention
+%       (does a place appear in dialogue vs narration? in climax vs
+%       background description?).
+%    d. Explore "literary silences" — which Edinburgh places NEVER appear
+%       in literature? (Direction 4, mentioned in proposal).
+%    e. Algorithmic metro-map layout as a graph drawing research problem.
+
+
+% ============================================================
+% BIBLIOGRAPHY
+% ============================================================
+\bibliographystyle{plain}
+\bibliography{mybibfile}
+%
+% Key references to include (start collecting now):
+% - Anderson et al. (2016): LitLong / Palimpsest project paper
+% - Westphal (2011): Geocriticism
+% - Tally (2013): Spatiality
+% - Moretti (2005): Graphs, Maps, Trees
+% - Stange & Dork (2015): Novel City Maps (CRITICAL)
+% - Nollenburg & Wolff (2006): Metro-map layout algorithm
+% - Shneiderman (1996): Information seeking mantra
+% - Tufte (1983): Envisioning Information (small multiples)
+% - Drucker (2011): Humanities approaches to graphical display
+% - Fruchterman & Reingold (1991): Force-directed layout
+% - Hinrichs & Carpendale (2011): supervisor's own work
+% - Beck (1933): London Underground map (design precedent)
+
+
+% ============================================================
+% APPENDICES
+% ============================================================
+\appendix
+
+\chapter{Study Material}
+
+\section{Participant Information Sheet}
+% TODO: insert PIS PDF
+% \includepdf[pages=-]{pis.pdf}
+
+\section{Consent Form}
+% TODO: insert Consent Form PDF
+% \includepdf[pages=-]{consent.pdf}
+
+\section{Task Questions}
+% TODO
+
+\section{Survey / Interview Questions}
+% TODO
+
+\chapter{Data and Implementation}
+
+\section{Database Schema}
+% TODO: reference or include litlong_schema.sql
+% Key tables: api_document, api_locationmention, api_sentence,
+%             api_location, api_genre, api_author,
+%             api_document_author, mention_order (custom)
+
+\section{City Sector Definitions}
+% TODO: table of lat/lon boundary ranges for 6 sectors:
+%   Leith & North:       lat > 55.97
+%   New Town:            lat >= 55.952, lon in [-3.22, -3.175]
+%   Old Town:            lat < 55.952, lon in [-3.20, -3.165]
+%   East & Arthur's Seat: lon > -3.165, lat < 55.96
+%   South Edinburgh:     lat < 55.945
+%   Outer Edinburgh:     lat < 55.92 or lon < -3.28
+
+\section{Author Selection}
+% TODO: table of 5 test authors:
+%   McCall Smith: 7,320 mentions, 17 books
+%   Welsh:        2,634 mentions, 8 books
+%   Lockhart:     3,046 mentions, 6 books
+%   Scott:        2,796 mentions, 12 books
+%   Stevenson:    1,778 mentions, 16 books
+
+\section{Co-occurrence Analysis}
+% TODO: report the 403 document-level co-occurring pairs (weight >= 2)
+% Top 10 pairs table; granularity decision table (sentence/page/document)
+
+\end{document}

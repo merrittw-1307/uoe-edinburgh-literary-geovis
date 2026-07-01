@@ -1,0 +1,16 @@
+data/raw/sql/litlong_original.sql
+.DS_Store
+__pycache__/
+*.pyc
+*.pyo
+*.aux
+*.log
+*.out
+*.toc
+*.lof
+*.lot
+*.fls
+*.fdb_latexmk
+*.synctex.gz
+dissertation/main/*.pdf
+*.zip
