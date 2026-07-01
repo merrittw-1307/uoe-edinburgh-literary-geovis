@@ -14,3 +14,4 @@ __pycache__/
 *.synctex.gz
 dissertation/main/*.pdf
 *.zip
+data/raw/sql/litlong_processed_1Jul.sql
