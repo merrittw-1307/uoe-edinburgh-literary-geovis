@@ -54,7 +54,7 @@ All D3.js files are self-contained. Double-click to open in browser (no server r
     │   ├── raw/
     │   │   ├── sql/
     │   │   │   ├── litlong_original.sql         (EXCLUDED — 145MB, too large for GitHub)
-    │   │   │   ├── litlong_processed_1Jul.sql   Custom derived tables
+    │   │   │   ├── litlong_processed_1Jul.sql   (EXCLUDED — 204MB, too large for GitHub)
     │   │   │   ├── litlong_schema.sql           Schema only, no data
     │   │   │   └── directus.sql                 CMS export
     │   │   └── csv_snapshot/                    CSV exports of core tables
@@ -84,7 +84,8 @@ All D3.js files are self-contained. Double-click to open in browser (no server r
     brew services start postgresql@16
     createdb litlong_edinburgh
     psql litlong_edinburgh < data/raw/sql/litlong_schema.sql
-    psql litlong_edinburgh < data/raw/sql/litlong_processed_1Jul.sql
+    # litlong_processed_1Jul.sql is excluded from repo (204MB)
+# Contact Merritt Wang for access to this file
 
 If you have the full dump (not in repo):
 
