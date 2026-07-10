@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Author Spatial Fingerprints — Radar Chart</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: #F8F9FC;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+  }
+  h1 { font-size: 20px; color: #21295C; margin-bottom: 6px; text-align: center; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 30px; text-align: center; }
+  #chart { position: relative; }
+  .legend {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 14px;
+    margin-top: 20px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+    padding: 4px 10px;
+    border-radius: 20px;
+    border: 1.5px solid transparent;
+    transition: all 0.2s;
+  }
+  .legend-item:hover { background: #F0F2FA; }
+  .legend-item.inactive { opacity: 0.35; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .tooltip {
+    position: fixed;
+    background: white;
+    border: 1px solid #E0E4F0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    color: #333;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: none;
+    min-width: 180px;
+    z-index: 100;
+  }
+  .tooltip .author-name { font-weight: bold; font-size: 13px; margin-bottom: 6px; }
+  .tooltip .highlight { font-weight: bold; }
+</style>
+</head>
+<body>
+<h1>Author Spatial Fingerprints</h1>
+<div class="subtitle">Edinburgh place-name distribution by city sector · hover to explore · click legend to filter</div>
+<div id="chart">
+  <div class="tooltip" id="tooltip"></div>
+</div>
+<div class="legend" id="legend"></div>
+
+<script>
+const colors = {
+  'Alexander McCall Smith': '#B85042',
+  'Irvine Welsh':           '#1C7293',
+  'John Gibson Lockhart':   '#2C5F2D',
+  'Robert Louis Stevenson': '#7F77DD',
+  'Walter Scott':           '#C9A227'
+};
+
+// 数据直接内嵌
+const rawData = [
+  { author: 'Alexander McCall Smith', 'East & Arthur\'s Seat': 0.0208, 'Leith & North': 0.0439, 'New Town': 0.6068, 'Old Town': 0.1627, 'Outer Edinburgh': 0.0509, 'South Edinburgh': 0.115 },
+  { author: 'Irvine Welsh',           'East & Arthur\'s Seat': 0.0348, 'Leith & North': 0.4105, 'New Town': 0.2232, 'Old Town': 0.1347, 'Outer Edinburgh': 0.1083, 'South Edinburgh': 0.0885 },
+  { author: 'John Gibson Lockhart',   'East & Arthur\'s Seat': 0.0917, 'Leith & North': 0.1114, 'New Town': 0.4432, 'Old Town': 0.2162, 'Outer Edinburgh': 0.131,  'South Edinburgh': 0.0066 },
+  { author: 'Robert Louis Stevenson', 'East & Arthur\'s Seat': 0.0705, 'Leith & North': 0.198,  'New Town': 0.3523, 'Old Town': 0.1879, 'Outer Edinburgh': 0.1795, 'South Edinburgh': 0.0117 },
+  { author: 'Walter Scott',           'East & Arthur\'s Seat': 0.1066, 'Leith & North': 0.2034, 'New Town': 0.212,  'Old Town': 0.3346, 'Outer Edinburgh': 0.1324, 'South Edinburgh': 0.011  },
+];
+
+const sectors = ['East & Arthur\'s Seat','Leith & North','New Town','Old Town','Outer Edinburgh','South Edinburgh'];
+const N = sectors.length;
+const angleStep = (2 * Math.PI) / N;
+const angle = i => i * angleStep - Math.PI / 2;
+const maxVal = 0.65;
+
+const W = 800, H = 720, cx = W/2, cy = H/2, R = 270;
+
+const svg = d3.select('#chart')
+  .append('svg')
+  .attr('width', W)
+  .attr('height', H);
+
+// Grid circles
+[1,2,3,4,5].forEach(l => {
+  svg.append('circle')
+    .attr('cx', cx).attr('cy', cy)
+    .attr('r', R * l / 5)
+    .attr('fill', 'none')
+    .attr('stroke', '#D0D8E8')
+    .attr('stroke-width', 0.8);
+
+  svg.append('text')
+    .attr('x', cx + 4)
+    .attr('y', cy - R * l / 5 + 3)
+    .attr('font-size', '9px')
+    .attr('fill', '#AAA')
+    .text(Math.round(maxVal * l / 5 * 100) + '%');
+});
+
+// Axes + labels
+sectors.forEach((s, i) => {
+  const a = angle(i);
+  svg.append('line')
+    .attr('x1', cx).attr('y1', cy)
+    .attr('x2', cx + R * Math.cos(a))
+    .attr('y2', cy + R * Math.sin(a))
+    .attr('stroke', '#C0C8D8').attr('stroke-width', 0.8);
+
+  svg.append('text')
+    .attr('x', cx + (R + 30) * Math.cos(a))
+    .attr('y', cy + (R + 30) * Math.sin(a))
+    .attr('text-anchor', 'middle')
+    .attr('dominant-baseline', 'central')
+    .attr('font-size', '12px')
+    .attr('fill', '#333')
+    .attr('font-weight', '600')
+    .text(s);
+});
+
+const g = svg.append('g').attr('transform', `translate(${cx},${cy})`);
+
+const line = d3.lineRadial()
+  .radius(d => d / maxVal * R)
+  .angle((d, i) => i * angleStep)
+  .curve(d3.curveLinearClosed);
+
+const paths = {}, areas = {};
+const activeAuthors = new Set(rawData.map(a => a.author));
+
+rawData.forEach(author => {
+  const vals = sectors.map(s => author[s]);
+
+  areas[author.author] = g.append('path')
+    .datum(vals)
+    .attr('d', line)
+    .attr('fill', colors[author.author])
+    .attr('fill-opacity', 0.1)
+    .attr('stroke', 'none');
+
+  paths[author.author] = g.append('path')
+    .datum(vals)
+    .attr('d', line)
+    .attr('fill', 'none')
+    .attr('stroke', colors[author.author])
+    .attr('stroke-width', 2.2)
+    .attr('stroke-linejoin', 'round');
+});
+
+// Hover dots
+const tooltip = document.getElementById('tooltip');
+
+rawData.forEach(author => {
+  sectors.forEach((sector, i) => {
+    const a = angle(i);
+    const val = author[sector];
+    const px = (val / maxVal) * R * Math.cos(a);
+    const py = (val / maxVal) * R * Math.sin(a);
+
+    g.append('circle')
+      .attr('cx', px).attr('cy', py)
+      .attr('r', 14)
+      .attr('fill', colors[author.author])
+      .attr('opacity', 0)
+      .attr('cursor', 'pointer')
+      .on('mouseover', function(event) {
+        d3.select(this).attr('opacity', 0.9).attr('r', 16);
+        tooltip.style.display = 'block';
+        tooltip.innerHTML = `
+          <div class="author-name" style="color:${colors[author.author]}">${author.author}</div>
+          <div style="display:flex;justify-content:space-between;gap:20px">
+            <span>${sector}</span>
+            <span class="highlight" style="color:${colors[author.author]}">${(val*100).toFixed(1)}%</span>
+          </div>`;
+      })
+      .on('mousemove', function(event) {
+        tooltip.style.left = (event.clientX + 14) + 'px';
+        tooltip.style.top  = (event.clientY - 10) + 'px';
+      })
+      .on('mouseout', function() {
+        d3.select(this).attr('opacity', 0).attr('r', 14);
+        tooltip.style.display = 'none';
+      });
+  });
+});
+
+// Legend
+const legend = document.getElementById('legend');
+rawData.forEach(author => {
+  const item = document.createElement('div');
+  item.className = 'legend-item';
+  item.innerHTML = `<div class="legend-dot" style="background:${colors[author.author]}"></div>${author.author}`;
+  item.addEventListener('click', () => {
+    if (activeAuthors.has(author.author)) {
+      activeAuthors.delete(author.author);
+      item.classList.add('inactive');
+      paths[author.author].attr('opacity', 0);
+      areas[author.author].attr('opacity', 0);
+    } else {
+      activeAuthors.add(author.author);
+      item.classList.remove('inactive');
+      paths[author.author].attr('opacity', 1);
+      areas[author.author].attr('opacity', 1);
+    }
+  });
+  legend.appendChild(item);
+});
+</script>
+</body>
+</html>

@@ -2,138 +2,248 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<title>Author Spatial Fingerprints — Radar Chart</title>
+<title>Author Spatial Fingerprints — Radar Chart v2</title>
 <script src="https://d3js.org/d3.v7.min.js"></script>
 <style>
   * { box-sizing: border-box; margin: 0; padding: 0; }
   body {
-    font-family: 'Helvetica Neue', Arial, sans-serif;
+    font-family: "Helvetica Neue", Arial, sans-serif;
     background: #F8F9FC;
     display: flex;
     flex-direction: column;
     align-items: center;
     padding: 30px;
   }
-  h1 { font-size: 20px; color: #21295C; margin-bottom: 6px; text-align: center; }
-  .subtitle { font-size: 13px; color: #888; margin-bottom: 30px; text-align: center; }
-  #chart { position: relative; }
+  h1 { font-size: 20px; color: #21295C; margin-bottom: 4px; text-align: center; }
+  .subtitle { font-size: 12px; color: #888; margin-bottom: 4px; text-align: center; }
+  .source { font-size: 10px; color: #BBB; margin-bottom: 20px; text-align: center; font-style: italic; }
+  .main { display: flex; gap: 24px; align-items: flex-start; justify-content: center; flex-wrap: wrap; }
+  #chart { position: relative; flex-shrink: 0; }
   .legend {
     display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    gap: 14px;
+    flex-direction: column;
+    gap: 8px;
     margin-top: 20px;
+    min-width: 180px;
   }
   .legend-item {
     display: flex;
     align-items: center;
-    gap: 7px;
+    gap: 8px;
     cursor: pointer;
     font-size: 13px;
     color: #333;
-    padding: 4px 10px;
+    padding: 6px 12px;
     border-radius: 20px;
-    border: 1.5px solid transparent;
+    border: 1.5px solid #E0E4F0;
+    background: white;
     transition: all 0.2s;
+    user-select: none;
   }
-  .legend-item:hover { background: #F0F2FA; }
+  .legend-item:hover { background: #F0F2FA; border-color: #B0B8D0; }
   .legend-item.inactive { opacity: 0.35; }
+  .legend-item.active-only { border-color: #21295C; background: #F0F2FA; }
   .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .legend-hint { font-size: 10px; color: #AAA; margin-top: 4px; padding: 0 4px; }
+
+  /* Detail panel */
+  #detail-panel {
+    min-width: 260px;
+    max-width: 300px;
+    background: white;
+    border: 1px solid #E0E4F0;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    display: none;
+    margin-top: 20px;
+  }
+  #detail-panel .dp-author {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 2px;
+  }
+  #detail-panel .dp-sector {
+    font-size: 16px;
+    font-weight: bold;
+    color: #21295C;
+    margin-bottom: 4px;
+  }
+  #detail-panel .dp-pct {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #EEE;
+  }
+  #detail-panel h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #999;
+    margin-bottom: 6px;
+    margin-top: 10px;
+  }
+  #detail-panel .place-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 0;
+    font-size: 12px;
+    border-bottom: 1px solid #F5F5F5;
+  }
+  #detail-panel .place-bar {
+    height: 4px;
+    border-radius: 2px;
+    margin-top: 2px;
+    margin-bottom: 4px;
+  }
+  #detail-panel .book-row {
+    font-size: 11px;
+    color: #555;
+    padding: 3px 0;
+    border-bottom: 1px solid #F5F5F5;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  #detail-panel .book-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #detail-panel .book-count {
+    color: #999;
+    flex-shrink: 0;
+  }
+  #detail-panel .close-btn {
+    float: right;
+    cursor: pointer;
+    color: #CCC;
+    font-size: 16px;
+    line-height: 1;
+    margin-top: -2px;
+  }
+  #detail-panel .close-btn:hover { color: #666; }
+
   .tooltip {
     position: fixed;
     background: white;
     border: 1px solid #E0E4F0;
     border-radius: 8px;
-    padding: 10px 14px;
+    padding: 8px 12px;
     font-size: 12px;
     color: #333;
     pointer-events: none;
     box-shadow: 0 4px 12px rgba(0,0,0,0.1);
     display: none;
-    min-width: 180px;
     z-index: 100;
   }
-  .tooltip .author-name { font-weight: bold; font-size: 13px; margin-bottom: 6px; }
-  .tooltip .highlight { font-weight: bold; }
 </style>
 </head>
 <body>
 <h1>Author Spatial Fingerprints</h1>
-<div class="subtitle">Edinburgh place-name distribution by city sector · hover to explore · click legend to filter</div>
-<div id="chart">
-  <div class="tooltip" id="tooltip"></div>
+<div class="subtitle">Edinburgh place-name distribution by Neighbourhood Partnership Area · click any point for details</div>
+<div class="source">Sector boundaries: City of Edinburgh Council NP Areas &amp; Natural Neighbourhoods (Open Government Licence v3.0)</div>
+
+<div class="main">
+  <div style="display:flex;flex-direction:column;align-items:center;">
+    <div id="chart">
+      <div class="tooltip" id="tooltip"></div>
+    </div>
+  </div>
+
+  <div style="display:flex;flex-direction:column;gap:16px;margin-top:20px;">
+    <div>
+      <div class="legend" id="legend"></div>
+      <div class="legend-hint">Click to show/hide · Double-click to isolate</div>
+    </div>
+    <div id="detail-panel">
+      <span class="close-btn" id="close-detail">&#x2715;</span>
+      <div class="dp-author" id="dp-author"></div>
+      <div class="dp-sector" id="dp-sector"></div>
+      <div class="dp-pct" id="dp-pct"></div>
+      <h4>Top places in this sector</h4>
+      <div id="dp-places"></div>
+      <h4>Books mentioning this sector</h4>
+      <div id="dp-books"></div>
+    </div>
+  </div>
 </div>
-<div class="legend" id="legend"></div>
 
 <script>
 const colors = {
-  'Alexander McCall Smith': '#B85042',
-  'Irvine Welsh':           '#1C7293',
-  'John Gibson Lockhart':   '#2C5F2D',
-  'Robert Louis Stevenson': '#7F77DD',
-  'Walter Scott':           '#C9A227'
+  "Alexander McCall Smith": "#B85042",
+  "Irvine Welsh":           "#1C7293",
+  "John Gibson Lockhart":   "#2C5F2D",
+  "Robert Louis Stevenson": "#7F77DD",
+  "Walter Scott":           "#C9A227"
 };
 
-// 数据直接内嵌
-const rawData = [
-  { author: 'Alexander McCall Smith', 'East & Arthur\'s Seat': 0.0208, 'Leith & North': 0.0439, 'New Town': 0.6068, 'Old Town': 0.1627, 'Outer Edinburgh': 0.0509, 'South Edinburgh': 0.115 },
-  { author: 'Irvine Welsh',           'East & Arthur\'s Seat': 0.0348, 'Leith & North': 0.4105, 'New Town': 0.2232, 'Old Town': 0.1347, 'Outer Edinburgh': 0.1083, 'South Edinburgh': 0.0885 },
-  { author: 'John Gibson Lockhart',   'East & Arthur\'s Seat': 0.0917, 'Leith & North': 0.1114, 'New Town': 0.4432, 'Old Town': 0.2162, 'Outer Edinburgh': 0.131,  'South Edinburgh': 0.0066 },
-  { author: 'Robert Louis Stevenson', 'East & Arthur\'s Seat': 0.0705, 'Leith & North': 0.198,  'New Town': 0.3523, 'Old Town': 0.1879, 'Outer Edinburgh': 0.1795, 'South Edinburgh': 0.0117 },
-  { author: 'Walter Scott',           'East & Arthur\'s Seat': 0.1066, 'Leith & North': 0.2034, 'New Town': 0.212,  'Old Town': 0.3346, 'Outer Edinburgh': 0.1324, 'South Edinburgh': 0.011  },
+const sectors = [
+  "Almond","Canongate","Craigentinny/Duddingston","Forth","Inverleith",
+  "Leith","Liberton/Gilmerton","New Town","Old Town","Pentlands",
+  "Portobello/Craigmillar","South Central","South West","Western Edinburgh"
 ];
 
-const sectors = ['East & Arthur\'s Seat','Leith & North','New Town','Old Town','Outer Edinburgh','South Edinburgh'];
+const rawData = [
+  { author: "Alexander McCall Smith", values: {"Almond":0.0065,"Canongate":0.0094,"Craigentinny/Duddingston":0.0094,"Forth":0.0010,"Inverleith":0.1655,"Leith":0.0332,"Liberton/Gilmerton":0.0098,"New Town":0.4356,"Old Town":0.0942,"Pentlands":0.0182,"Portobello/Craigmillar":0.0065,"South Central":0.1795,"South West":0.0137,"Western Edinburgh":0.0173}},
+  { author: "Irvine Welsh",           values: {"Almond":0.0250,"Canongate":0.0067,"Craigentinny/Duddingston":0.0250,"Forth":0.0298,"Inverleith":0.0211,"Leith":0.4428,"Liberton/Gilmerton":0.0259,"New Town":0.0970,"Old Town":0.0711,"Pentlands":0.0509,"Portobello/Craigmillar":0.0269,"South Central":0.0615,"South West":0.0855,"Western Edinburgh":0.0307}},
+  { author: "John Gibson Lockhart",   values: {"Almond":0.0046,"Canongate":0.1261,"Craigentinny/Duddingston":0.0344,"Forth":0.0115,"Inverleith":0.0115,"Leith":0.0917,"Liberton/Gilmerton":0.1124,"New Town":0.2592,"Old Town":0.2087,"Pentlands":0.0092,"Portobello/Craigmillar":0.0642,"South Central":0.0436,"South West":0.0092,"Western Edinburgh":0.0138}},
+  { author: "Robert Louis Stevenson", values: {"Almond":0.0498,"Canongate":0.0074,"Craigentinny/Duddingston":0.0554,"Forth":0.0111,"Inverleith":0.0424,"Leith":0.1587,"Liberton/Gilmerton":0.0074,"New Town":0.1919,"Old Town":0.2066,"Pentlands":0.1697,"Portobello/Craigmillar":0.0314,"South Central":0.0406,"South West":0.0018,"Western Edinburgh":0.0258}},
+  { author: "Walter Scott",           values: {"Almond":0.0174,"Canongate":0.1594,"Craigentinny/Duddingston":0.0536,"Forth":0.0014,"Inverleith":0.0159,"Leith":0.0957,"Liberton/Gilmerton":0.0928,"New Town":0.0725,"Old Town":0.3203,"Pentlands":0.0217,"Portobello/Craigmillar":0.0696,"South Central":0.0507,"South West":0.0101,"Western Edinburgh":0.0188}}
+];
+
+const detailData = {"Alexander McCall Smith": {"South Central": {"places": [{"name": "Bruntsfield", "count": 108}, {"name": "Morningside", "count": 98}, {"name": "Braid Hills Hotel", "count": 58}, {"name": "Merchiston Crescent", "count": 50}, {"name": "Holy Corner", "count": 48}, {"name": "Morningside Road", "count": 46}, {"name": "Church Hill", "count": 46}, {"name": "Marchmont", "count": 46}], "books": [{"title": "The Unbearable Lightness of Scones", "count": 132}, {"title": "44 Scotland Street", "count": 106}, {"title": "Espresso Tales", "count": 90}, {"title": "Friends, Lovers, Chocolate", "count": 90}, {"title": "The Importance of Being Seven", "count": 70}]}, "Almond": {"places": [{"name": "Cramond", "count": 14}, {"name": "Edinburgh Airport", "count": 12}, {"name": "Queensferry Road", "count": 6}, {"name": "River Almond", "count": 4}, {"name": "Muirhouse", "count": 2}, {"name": "Silverknowes", "count": 2}], "books": [{"title": "The Unbearable Lightness of Scones", "count": 12}, {"title": "Espresso Tales", "count": 6}, {"title": "Friends, Lovers, Chocolate", "count": 6}, {"title": "Sunshine on Scotland Street", "count": 4}, {"title": "The Revolving Door of Life", "count": 4}]}, "New Town": {"places": [{"name": "Moray Place", "count": 266}, {"name": "Dundas Street", "count": 260}, {"name": "Drummond Place", "count": 212}, {"name": "Cumberland Bar", "count": 192}, {"name": "Queen Street", "count": 170}, {"name": "India Street", "count": 152}, {"name": "New Town", "count": 146}, {"name": "Princes Street", "count": 132}], "books": [{"title": "The Unbearable Lightness of Scones", "count": 344}, {"title": "Espresso Tales", "count": 294}, {"title": "The World According to Bertie", "count": 270}, {"title": "Bertie Plays the Blues", "count": 242}, {"title": "The Importance of Being Seven", "count": 216}]}, "Craigentinny/Duddingston": {"places": [{"name": "Arthur's Seat", "count": 38}, {"name": "Duddingston Loch", "count": 8}, {"name": "Salisbury Crags", "count": 8}, {"name": "Duddingston", "count": 2}, {"name": "Jock's Lodge", "count": 2}], "books": [{"title": "The World According to Bertie", "count": 12}, {"title": "The Forgotten Affairs of Youth", "count": 10}, {"title": "The Unbearable Lightness of Scones", "count": 8}, {"title": "Bertie's Guide to Life and Mothers", "count": 6}, {"title": "Sunshine on Scotland Street", "count": 6}]}, "Western Edinburgh": {"places": [{"name": "Murrayfield", "count": 34}, {"name": "Corstorphine", "count": 16}, {"name": "Barnton", "count": 10}, {"name": "Murrayfield Stadium", "count": 10}, {"name": "Ravelston Dykes", "count": 10}, {"name": "Glasgow Road", "count": 6}, {"name": "St George's School for Girls", "count": 6}, {"name": "Edinburgh Zoo", "count": 4}], "books": [{"title": "The Importance of Being Seven", "count": 16}, {"title": "The Unbearable Lightness of Scones", "count": 16}, {"title": "44 Scotland Street", "count": 14}, {"title": "Espresso Tales", "count": 12}, {"title": "The World According to Bertie", "count": 12}]}, "Canongate": {"places": [{"name": "Scottish Parliament", "count": 20}, {"name": "Canongate Kirk", "count": 16}, {"name": "Canongate", "count": 8}, {"name": "Moray House", "count": 6}, {"name": "Holyrood Road", "count": 4}, {"name": "Scottish Poetry Library", "count": 4}], "books": [{"title": "Bertie's Guide to Life and Mothers", "count": 10}, {"title": "Friends, Lovers, Chocolate", "count": 10}, {"title": "The Forgotten Affairs of Youth", "count": 6}, {"title": "The Sunday Philosophy Club", "count": 4}, {"title": "The Unbearable Lightness of Scones", "count": 4}]}, "Pentlands": {"places": [{"name": "Balerno", "count": 18}, {"name": "Biggar Road", "count": 10}, {"name": "Colinton", "count": 8}, {"name": "Fairmilehead", "count": 8}, {"name": "Hillend", "count": 8}, {"name": "Redford", "count": 6}, {"name": "Auchendinny", "count": 4}, {"name": "Ratho", "count": 4}], "books": [{"title": "Friends, Lovers, Chocolate", "count": 20}, {"title": "The Importance of Being Seven", "count": 20}, {"title": "The Bertie Project", "count": 12}, {"title": "44 Scotland Street", "count": 8}, {"title": "The Unbearable Lightness of Scones", "count": 8}]}, "Old Town": {"places": [{"name": "The Meadows", "count": 100}, {"name": "Old Town", "count": 38}, {"name": "High Street", "count": 34}, {"name": "George Iv Bridge", "count": 34}, {"name": "Cowgate", "count": 28}, {"name": "Candlemaker Row", "count": 24}, {"name": "Chambers Street", "count": 24}, {"name": "St Giles", "count": 24}], "books": [{"title": "Friends, Lovers, Chocolate", "count": 82}, {"title": "The Forgotten Affairs of Youth", "count": 78}, {"title": "The Unbearable Lightness of Scones", "count": 72}, {"title": "Bertie's Guide to Life and Mothers", "count": 50}, {"title": "The World According to Bertie", "count": 48}]}, "South West": {"places": [{"name": "Tollcross", "count": 24}, {"name": "Fountainbridge", "count": 8}, {"name": "Napier University", "count": 8}, {"name": "Malt House", "count": 6}, {"name": "Haymarket", "count": 6}, {"name": "Craiglockhart", "count": 4}, {"name": "St Mary's Episcopal Cathedral", "count": 4}, {"name": "Harrison Gardens", "count": 4}], "books": [{"title": "Espresso Tales", "count": 26}, {"title": "The Lost Art of Gratitude", "count": 10}, {"title": "Bertie's Guide to Life and Mothers", "count": 6}, {"title": "Sunshine on Scotland Street", "count": 6}, {"title": "The Charming Quirks of Others", "count": 6}]}, "Inverleith": {"places": [{"name": "Scotland Street", "count": 554}, {"name": "Stockbridge", "count": 100}, {"name": "Clarence Street", "count": 70}, {"name": "St Stephen Street", "count": 44}, {"name": "Fettes Row", "count": 40}, {"name": "Ann Street", "count": 28}, {"name": "Royal Crescent", "count": 18}, {"name": "Comely Bank", "count": 18}], "books": [{"title": "The Unbearable Lightness of Scones", "count": 180}, {"title": "Espresso Tales", "count": 176}, {"title": "The World According to Bertie", "count": 128}, {"title": "44 Scotland Street", "count": 78}, {"title": "The Bertie Project", "count": 70}]}, "Leith": {"places": [{"name": "Leith", "count": 94}, {"name": "Water of Leith", "count": 60}, {"name": "Leith Walk", "count": 16}, {"name": "Botanic Gardens", "count": 10}, {"name": "Calton Hill", "count": 10}, {"name": "Gayfield Square", "count": 8}, {"name": "East Claremont Street", "count": 2}, {"name": "Queen Margaret College", "count": 2}], "books": [{"title": "The Unbearable Lightness of Scones", "count": 52}, {"title": "Bertie's Guide to Life and Mothers", "count": 26}, {"title": "Espresso Tales", "count": 20}, {"title": "The Bertie Project", "count": 16}, {"title": "Bertie Plays the Blues", "count": 16}]}, "Portobello/Craigmillar": {"places": [{"name": "Musselburgh", "count": 16}, {"name": "Prestonpans", "count": 10}, {"name": "Portobello", "count": 4}, {"name": "Queen Margaret University", "count": 4}, {"name": "Craigmillar", "count": 2}, {"name": "Forth Yacht Club", "count": 2}, {"name": "Longniddry", "count": 2}], "books": [{"title": "44 Scotland Street", "count": 8}, {"title": "Espresso Tales", "count": 6}, {"title": "Bertie Plays the Blues", "count": 4}, {"title": "The Forgotten Affairs of Youth", "count": 4}, {"title": "The Lost Art of Gratitude", "count": 4}]}, "Liberton/Gilmerton": {"places": [{"name": "Dalkeith", "count": 22}, {"name": "Midlothian", "count": 14}, {"name": "Rosslyn Chapel", "count": 12}, {"name": "Roslin", "count": 4}, {"name": "Carrington", "count": 2}, {"name": "Eskbank", "count": 2}, {"name": "Mortonhall Crematorium", "count": 2}, {"name": "Royal Infirmary of Edinburgh", "count": 2}], "books": [{"title": "The Lost Art of Gratitude", "count": 16}, {"title": "Bertie Plays the Blues", "count": 8}, {"title": "The Bertie Project", "count": 6}, {"title": "The Charming Quirks of Others", "count": 6}, {"title": "The Comfort of Saturdays", "count": 6}]}, "Forth": {"places": [{"name": "Granton", "count": 4}, {"name": "Newhaven", "count": 2}], "books": [{"title": "44 Scotland Street", "count": 4}, {"title": "The Revolving Door of Life", "count": 2}]}}, "Walter Scott": {"New Town": {"places": [{"name": "New Town", "count": 16}, {"name": "Nor' Loch", "count": 16}, {"name": "Princes Street", "count": 14}, {"name": "Shandwick Place", "count": 10}, {"name": "Castle Street", "count": 6}, {"name": "Princes Street Gardens", "count": 4}, {"name": "Charlotte Square", "count": 4}, {"name": "Royal Society of Edinburgh", "count": 4}], "books": [{"title": "The Journal of Walter Scott", "count": 56}, {"title": "Tales of a Grandfather, series 1-3", "count": 20}, {"title": "Chronicles of the Canongate", "count": 12}, {"title": "Guy Mannering", "count": 6}, {"title": "The Heart of Midlothian", "count": 2}]}, "Old Town": {"places": [{"name": "Holyrood", "count": 94}, {"name": "West Port", "count": 52}, {"name": "High Street", "count": 42}, {"name": "Grassmarket", "count": 36}, {"name": "Luckenbooths", "count": 26}, {"name": "Tolbooth", "count": 26}, {"name": "Cowgate", "count": 24}, {"name": "Mons Meg", "count": 20}], "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 120}, {"title": "The Heart of Midlothian", "count": 88}, {"title": "The Journal of Walter Scott", "count": 42}, {"title": "The Abbot, vol. 1", "count": 36}, {"title": "The Pirate", "count": 34}]}, "Canongate": {"places": [{"name": "Canongate", "count": 132}, {"name": "Scottish Parliament", "count": 68}, {"name": "Watergate", "count": 8}, {"name": "Chapel Royal", "count": 6}, {"name": "Holyrood Palace", "count": 4}, {"name": "Palace of Holyrood House", "count": 2}], "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 96}, {"title": "The Journal of Walter Scott", "count": 42}, {"title": "Chronicles of the Canongate", "count": 40}, {"title": "The Heart of Midlothian", "count": 16}, {"title": "Old Mortality", "count": 8}]}, "Almond": {"places": [{"name": "Cramond", "count": 10}, {"name": "Kirkliston", "count": 6}, {"name": "Cramond Bridge", "count": 4}, {"name": "Ashburnham", "count": 2}, {"name": "Hallyards", "count": 2}], "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 14}, {"title": "The Journal of Walter Scott", "count": 6}, {"title": "Redgauntlet", "count": 2}, {"title": "The Pirate", "count": 2}]}, "South Central": {"places": [{"name": "Holyrood Park", "count": 32}, {"name": "George Square", "count": 12}, {"name": "Green Mantle", "count": 8}, {"name": "University of Edinburgh", "count": 8}, {"name": "Archers' Hall", "count": 2}, {"name": "Gillespie's Hospital", "count": 2}, {"name": "Merchiston", "count": 2}, {"name": "Newington", "count": 2}], "books": [{"title": "The Journal of Walter Scott", "count": 18}, {"title": "The Heart of Midlothian", "count": 16}, {"title": "Chronicles of the Canongate", "count": 14}, {"title": "Redgauntlet", "count": 8}, {"title": "Tales of a Grandfather, series 1-3", "count": 8}]}, "Craigentinny/Duddingston": {"places": [{"name": "Arthur's Seat", "count": 30}, {"name": "Duddingston", "count": 22}, {"name": "Salisbury Crags", "count": 6}, {"name": "Restalrig", "count": 4}, {"name": "Duke's Walk", "count": 2}, {"name": "Hawkhill", "count": 2}, {"name": "Hunter's Bog", "count": 2}, {"name": "Jock's Lodge", "count": 2}], "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 24}, {"title": "The Heart of Midlothian", "count": 14}, {"title": "Chronicles of the Canongate", "count": 12}, {"title": "The Journal of Walter Scott", "count": 10}, {"title": "Waverley", "count": 10}]}, "Pentlands": {"places": [{"name": "Pentland", "count": 24}, {"name": "Colinton", "count": 4}, {"name": "Habbie's Howe", "count": 2}], "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 16}, {"title": "The Journal of Walter Scott", "count": 6}, {"title": "The Pirate", "count": 4}, {"title": "The Heart of Midlothian", "count": 2}, {"title": "Waverley", "count": 2}]}, "Portobello/Craigmillar": {"places": [{"name": "Prestonpans", "count": 26}, {"name": "Musselburgh", "count": 24}, {"name": "Portobello", "count": 14}, {"name": "Carberry", "count": 8}, {"name": "Craigmillar", "count": 6}, {"name": "Pinkie House", "count": 4}, {"name": "St Germains", "count": 4}, {"name": "Bankton", "count": 2}], "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 50}, {"title": "The Journal of Walter Scott", "count": 24}, {"title": "Waverley", "count": 8}, {"title": "The Heart of Midlothian", "count": 4}, {"title": "Chronicles of the Canongate", "count": 2}]}, "Leith": {"places": [{"name": "Leith", "count": 104}, {"name": "Broughton", "count": 10}, {"name": "Calton Hill", "count": 6}, {"name": "Water of Leith", "count": 6}, {"name": "Brunswick Street", "count": 2}, {"name": "Leith Walk", "count": 2}, {"name": "North Leith", "count": 2}], "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 84}, {"title": "The Journal of Walter Scott", "count": 14}, {"title": "The Pirate", "count": 10}, {"title": "Redgauntlet", "count": 8}, {"title": "Waverley", "count": 6}]}, "Inverleith": {"places": [{"name": "Edinburgh Academy", "count": 14}, {"name": "Blackhall", "count": 2}, {"name": "Comely Bank", "count": 2}, {"name": "Inverleith", "count": 2}, {"name": "Walker Street", "count": 2}], "books": [{"title": "The Journal of Walter Scott", "count": 18}, {"title": "Tales of a Grandfather, series 1-3", "count": 4}]}, "Liberton/Gilmerton": {"places": [{"name": "Dalkeith", "count": 52}, {"name": "Liberton", "count": 34}, {"name": "Roslin", "count": 16}, {"name": "Melville Castle", "count": 8}, {"name": "Lugton", "count": 6}, {"name": "Dalhousie Castle", "count": 4}, {"name": "Midlothian", "count": 4}, {"name": "Crichton", "count": 2}], "books": [{"title": "The Heart of Midlothian", "count": 52}, {"title": "The Journal of Walter Scott", "count": 40}, {"title": "Tales of a Grandfather, series 1-3", "count": 26}, {"title": "The Pirate", "count": 4}, {"title": "Redgauntlet", "count": 2}]}, "Western Edinburgh": {"places": [{"name": "Corstorphine", "count": 16}, {"name": "Kirklands", "count": 4}, {"name": "Ravelston", "count": 4}, {"name": "Barnton", "count": 2}], "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 12}, {"title": "The Journal of Walter Scott", "count": 12}, {"title": "The Heart of Midlothian", "count": 2}]}, "South West": {"places": [{"name": "Gray's Mill", "count": 6}, {"name": "Polwarth", "count": 6}, {"name": "Saughton", "count": 2}], "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 14}]}, "Forth": {"places": [{"name": "Granton", "count": 2}], "books": [{"title": "The Journal of Walter Scott", "count": 2}]}}, "Robert Louis Stevenson": {"Old Town": {"places": [{"name": "High Street", "count": 34}, {"name": "Old Town", "count": 26}, {"name": "Greyfriars", "count": 24}, {"name": "Edinburgh Castle", "count": 22}, {"name": "St Giles", "count": 18}, {"name": "The Tron", "count": 12}, {"name": "Tolbooth", "count": 8}, {"name": "Cowgate", "count": 8}], "books": [{"title": "Edinburgh: picturesque notes", "count": 120}, {"title": "St. Ives", "count": 28}, {"title": "Lay morals, and other papers", "count": 16}, {"title": "David Balfour", "count": 12}, {"title": "Catriona", "count": 8}]}, "New Town": {"places": [{"name": "Princes Street", "count": 46}, {"name": "Heriot Row", "count": 26}, {"name": "New Town", "count": 26}, {"name": "Lothian Road", "count": 16}, {"name": "Randolph Crescent", "count": 16}, {"name": "Waterloo Place", "count": 10}, {"name": "Queensferry Street", "count": 8}, {"name": "York Place", "count": 4}], "books": [{"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 44}, {"title": "St. Ives", "count": 42}, {"title": "Edinburgh: picturesque notes", "count": 40}, {"title": "The Misadventures of John Nicholson", "count": 34}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.2", "count": 20}]}, "Craigentinny/Duddingston": {"places": [{"name": "Arthur's Seat", "count": 30}, {"name": "Hunter's Bog", "count": 8}, {"name": "Lochend", "count": 8}, {"name": "Duddingston Loch", "count": 4}, {"name": "London Road", "count": 4}, {"name": "Salisbury Crags", "count": 4}, {"name": "Duddingston", "count": 2}], "books": [{"title": "Edinburgh: picturesque notes", "count": 24}, {"title": "David Balfour", "count": 8}, {"title": "Catriona", "count": 6}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 6}, {"title": "Across the plains with other memories and essays", "count": 4}]}, "Inverleith": {"places": [{"name": "Silvermills", "count": 34}, {"name": "Stockbridge", "count": 6}, {"name": "Bell's Mills", "count": 2}, {"name": "Dean Cemetery", "count": 2}, {"name": "India Place", "count": 2}], "books": [{"title": "David Balfour", "count": 22}, {"title": "Catriona", "count": 16}, {"title": "The Misadventures of John Nicholson", "count": 4}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 2}, {"title": "Memories and portraits", "count": 2}]}, "Western Edinburgh": {"places": [{"name": "Murrayfield", "count": 12}, {"name": "Corstorphine", "count": 8}, {"name": "Corstorphine Hill", "count": 4}, {"name": "Ravelston", "count": 4}], "books": [{"title": "The Misadventures of John Nicholson", "count": 16}, {"title": "Kidnapped", "count": 4}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.2", "count": 4}, {"title": "Catriona", "count": 2}, {"title": "David Balfour", "count": 2}]}, "Pentlands": {"places": [{"name": "Hermiston", "count": 54}, {"name": "Swanston", "count": 32}, {"name": "Swanston Cottage", "count": 24}, {"name": "Glencorse", "count": 14}, {"name": "Fairmilehead", "count": 12}, {"name": "Colinton", "count": 10}, {"name": "Fisher's Tryst", "count": 10}, {"name": "Pentland", "count": 8}], "books": [{"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.2", "count": 30}, {"title": "Weir of Hermiston", "count": 28}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 26}, {"title": "St. Ives", "count": 24}, {"title": "Edinburgh: picturesque notes", "count": 16}]}, "Portobello/Craigmillar": {"places": [{"name": "Musselburgh", "count": 10}, {"name": "Prestonpans", "count": 10}, {"name": "Portobello", "count": 8}, {"name": "Craigmillar Castle", "count": 2}, {"name": "Inveresk", "count": 2}, {"name": "Market Street", "count": 2}], "books": [{"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 10}, {"title": "Catriona", "count": 6}, {"title": "David Balfour", "count": 6}, {"title": "Edinburgh: picturesque notes", "count": 4}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 4}]}, "Leith": {"places": [{"name": "Leith", "count": 72}, {"name": "Calton Hill", "count": 32}, {"name": "Pilrig", "count": 26}, {"name": "Leith Walk", "count": 14}, {"name": "Broughton", "count": 8}, {"name": "Water of Leith", "count": 6}, {"name": "Royal Terrace", "count": 4}, {"name": "Customs House", "count": 2}], "books": [{"title": "David Balfour", "count": 38}, {"title": "Catriona", "count": 26}, {"title": "Edinburgh: picturesque notes", "count": 24}, {"title": "The Misadventures of John Nicholson", "count": 24}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 14}]}, "South Central": {"places": [{"name": "George Square", "count": 8}, {"name": "University of Edinburgh", "count": 6}, {"name": "Bruntsfield", "count": 4}, {"name": "Bruntsfield Links", "count": 4}, {"name": "Comiston", "count": 4}, {"name": "Morningside", "count": 4}, {"name": "Buccleuch Place", "count": 2}, {"name": "Gladstone Terrace", "count": 2}], "books": [{"title": "Edinburgh: picturesque notes", "count": 8}, {"title": "St. Ives", "count": 6}, {"title": "Across the plains with other memories and essays", "count": 4}, {"title": "Catriona", "count": 4}, {"title": "David Balfour", "count": 4}]}, "Almond": {"places": [{"name": "Cramond", "count": 42}, {"name": "Hawes Inn", "count": 8}, {"name": "Cramond Bridge", "count": 2}, {"name": "Queensferry Road", "count": 2}], "books": [{"title": "St. Ives", "count": 24}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 12}, {"title": "Kidnapped", "count": 10}, {"title": "Edinburgh: picturesque notes", "count": 2}, {"title": "Essays by Robert Louis Stevenson", "count": 2}]}, "Liberton/Gilmerton": {"places": [{"name": "Academy Lane", "count": 2}, {"name": "Gilmerton", "count": 2}, {"name": "Lasswade", "count": 2}, {"name": "Midlothian", "count": 2}], "books": [{"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 6}, {"title": "The Misadventures of John Nicholson", "count": 2}]}, "Canongate": {"places": [{"name": "Canongate", "count": 4}, {"name": "Canongate Tolbooth", "count": 2}, {"name": "Holyrood Palace", "count": 2}], "books": [{"title": "Catriona", "count": 2}, {"title": "Edinburgh: picturesque notes", "count": 2}, {"title": "Lay morals, and other papers", "count": 2}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.2", "count": 2}]}, "Forth": {"places": [{"name": "Granton", "count": 6}, {"name": "Newhaven", "count": 6}], "books": [{"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 4}, {"title": "Essays by Robert Louis Stevenson", "count": 2}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 2}, {"title": "St. Ives", "count": 2}, {"title": "Virginibus puerisque, and other papers", "count": 2}]}, "South West": {"places": [{"name": "China Town", "count": 2}], "books": [{"title": "The Wrecker", "count": 2}]}}, "John Gibson Lockhart": {"Portobello/Craigmillar": {"places": [{"name": "Musselburgh", "count": 22}, {"name": "Prestonpans", "count": 18}, {"name": "Portobello", "count": 16}], "books": [{"title": "Life of Walter Scott", "count": 40}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 8}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 8}]}, "New Town": {"places": [{"name": "Castle Street", "count": 98}, {"name": "Princes Street", "count": 28}, {"name": "Hanover Street", "count": 22}, {"name": "Royal Society of Edinburgh", "count": 18}, {"name": "New Town", "count": 16}, {"name": "North Castle Street", "count": 10}, {"name": "Shandwick Place", "count": 6}, {"name": "Queen Street", "count": 4}], "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 96}, {"title": "Life of Walter Scott", "count": 66}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 40}, {"title": "Peter's letters to his kinsfolk, vol. 1", "count": 10}, {"title": "Peter's letters to his kinsfolk, vol. 2", "count": 10}]}, "South Central": {"places": [{"name": "University of Edinburgh", "count": 28}, {"name": "Blackford Hill", "count": 4}, {"name": "George Square", "count": 2}, {"name": "Marchmont", "count": 2}, {"name": "Newington", "count": 2}], "books": [{"title": "Life of Walter Scott", "count": 12}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 10}, {"title": "Peter's letters to his kinsfolk, vol. 1", "count": 10}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 6}]}, "Leith": {"places": [{"name": "Leith", "count": 48}, {"name": "Calton Hill", "count": 16}, {"name": "Lord Nelson", "count": 12}, {"name": "Broughton", "count": 2}, {"name": "Leith Walk", "count": 2}], "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 30}, {"title": "Life of Walter Scott", "count": 18}, {"title": "Peter's letters to his kinsfolk, vol. 1", "count": 14}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 12}, {"title": "Peter's letters to his kinsfolk, vol. 3", "count": 6}]}, "Liberton/Gilmerton": {"places": [{"name": "Lasswade", "count": 40}, {"name": "Dalkeith", "count": 12}, {"name": "Polton", "count": 12}, {"name": "Melville Castle", "count": 6}, {"name": "Roslin", "count": 6}, {"name": "Borthwick Castle", "count": 4}, {"name": "New Cemetery", "count": 4}, {"name": "Crichton", "count": 2}], "books": [{"title": "Life of Walter Scott", "count": 56}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 24}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 10}, {"title": "Peter's letters to his kinsfolk, vol. 2", "count": 4}, {"title": "Peter's letters to his kinsfolk, vol. 3", "count": 4}]}, "Canongate": {"places": [{"name": "Canongate", "count": 108}, {"name": "Canongate Churchyard", "count": 2}], "books": [{"title": "Life of Walter Scott", "count": 44}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 44}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 18}, {"title": "Peter's letters to his kinsfolk, vol. 1", "count": 4}]}, "Old Town": {"places": [{"name": "Holyrood", "count": 34}, {"name": "Old Town", "count": 20}, {"name": "St Giles", "count": 18}, {"name": "High Street", "count": 16}, {"name": "Advocates' Library", "count": 14}, {"name": "Grassmarket", "count": 12}, {"name": "Mons Meg", "count": 12}, {"name": "Parliament Square", "count": 10}], "books": [{"title": "Life of Walter Scott", "count": 48}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 46}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 44}, {"title": "Peter's letters to his kinsfolk, vol. 3", "count": 18}, {"title": "Peter's letters to his kinsfolk, vol. 2", "count": 14}]}, "Forth": {"places": [{"name": "Newhaven", "count": 10}], "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 6}, {"title": "Life of Walter Scott", "count": 2}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, "Craigentinny/Duddingston": {"places": [{"name": "Arthur's Seat", "count": 18}, {"name": "Salisbury Crags", "count": 6}, {"name": "Duddingston", "count": 4}, {"name": "Spring Gardens", "count": 2}], "books": [{"title": "Life of Walter Scott", "count": 10}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 8}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 6}, {"title": "Peter's letters to his kinsfolk, vol. 3", "count": 4}, {"title": "Peter's letters to his kinsfolk, vol. 1", "count": 2}]}, "Inverleith": {"places": [{"name": "Edinburgh Academy", "count": 6}, {"name": "Walker Street", "count": 4}], "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 6}, {"title": "Life of Walter Scott", "count": 4}]}, "South West": {"places": [{"name": "Haymarket", "count": 4}, {"name": "Grosvenor Street", "count": 2}, {"name": "Polwarth", "count": 2}], "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 6}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, "Pentlands": {"places": [{"name": "Auchendinny", "count": 4}, {"name": "Colinton House", "count": 2}, {"name": "Swanston", "count": 2}], "books": [{"title": "Life of Walter Scott", "count": 6}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, "Western Edinburgh": {"places": [{"name": "Kirklands", "count": 4}, {"name": "Ravelston", "count": 4}, {"name": "Corstorphine", "count": 2}, {"name": "The Skerries", "count": 2}], "books": [{"title": "Life of Walter Scott", "count": 6}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 4}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, "Almond": {"places": [{"name": "Cramond", "count": 2}, {"name": "Hallyards", "count": 2}], "books": [{"title": "Life of Walter Scott", "count": 2}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}}, "Irvine Welsh": {"Old Town": {"places": [{"name": "The Meadows", "count": 18}, {"name": "Royal Mile", "count": 14}, {"name": "George Iv Bridge", "count": 10}, {"name": "Cockburn Street", "count": 10}, {"name": "South Bridge", "count": 10}, {"name": "Grassmarket", "count": 10}, {"name": "The Tron", "count": 8}, {"name": "City Chambers", "count": 8}], "books": [{"title": "Porno", "count": 46}, {"title": "Skagboys", "count": 30}, {"title": "Filth", "count": 28}, {"title": "Trainspotting", "count": 20}, {"title": "Reheated Cabbage", "count": 10}]}, "Craigentinny/Duddingston": {"places": [{"name": "Lochend", "count": 32}, {"name": "Arthur's Seat", "count": 12}, {"name": "Seafield", "count": 4}, {"name": "London Road", "count": 2}, {"name": "Meadowbank", "count": 2}], "books": [{"title": "Skagboys", "count": 24}, {"title": "Ecstasy: Three Tales of Chemical Romance", "count": 10}, {"title": "Porno", "count": 10}, {"title": "Trainspotting", "count": 4}, {"title": "Crime", "count": 2}]}, "Pentlands": {"places": [{"name": "Wester Hailes", "count": 44}, {"name": "Kirkgate", "count": 20}, {"name": "Oxgangs", "count": 14}, {"name": "Colinton", "count": 10}, {"name": "Penicuik", "count": 10}, {"name": "Heriot-Watt University", "count": 6}, {"name": "Baberton Mains", "count": 2}], "books": [{"title": "Skagboys", "count": 32}, {"title": "Filth", "count": 22}, {"title": "Trainspotting", "count": 20}, {"title": "Porno", "count": 16}, {"title": "Crime", "count": 12}]}, "New Town": {"places": [{"name": "West End", "count": 36}, {"name": "Waverley Station", "count": 32}, {"name": "Princes Street", "count": 32}, {"name": "Lothian Road", "count": 22}, {"name": "New Town", "count": 16}, {"name": "Princes Street Gardens", "count": 10}, {"name": "Hanover Street", "count": 6}, {"name": "Queen Street", "count": 6}], "books": [{"title": "Skagboys", "count": 68}, {"title": "Porno", "count": 36}, {"title": "Trainspotting", "count": 26}, {"title": "Filth", "count": 20}, {"title": "Reheated Cabbage", "count": 18}]}, "South West": {"places": [{"name": "Tollcross", "count": 60}, {"name": "Gorgie", "count": 24}, {"name": "Haymarket", "count": 14}, {"name": "Scottish Office", "count": 14}, {"name": "Dalry Road", "count": 12}, {"name": "Saughton", "count": 10}, {"name": "Dalry", "count": 8}, {"name": "Gorgie Road", "count": 6}], "books": [{"title": "Skagboys", "count": 74}, {"title": "Porno", "count": 26}, {"title": "Crime", "count": 22}, {"title": "Filth", "count": 22}, {"title": "Ecstasy: Three Tales of Chemical Romance", "count": 14}]}, "Leith": {"places": [{"name": "Leith", "count": 650}, {"name": "Leith Walk", "count": 56}, {"name": "Pilrig", "count": 30}, {"name": "Montgomery Street", "count": 30}, {"name": "Ocean Drive", "count": 22}, {"name": "Water of Leith", "count": 14}, {"name": "Lorne Street", "count": 12}, {"name": "Duke Street", "count": 10}], "books": [{"title": "Porno", "count": 384}, {"title": "Skagboys", "count": 256}, {"title": "Trainspotting", "count": 86}, {"title": "Filth", "count": 58}, {"title": "Ecstasy: Three Tales of Chemical Romance", "count": 48}]}, "Almond": {"places": [{"name": "Muirhouse", "count": 14}, {"name": "Silverknowes", "count": 8}, {"name": "The Gunner", "count": 8}, {"name": "Cramond", "count": 4}, {"name": "Cramond Island", "count": 4}, {"name": "Martello Court", "count": 4}, {"name": "Cammo", "count": 2}, {"name": "Dalmeny", "count": 2}], "books": [{"title": "Marabou Stork Nightmares", "count": 28}, {"title": "Porno", "count": 6}, {"title": "Skagboys", "count": 6}, {"title": "Crime", "count": 4}, {"title": "Filth", "count": 4}]}, "Portobello/Craigmillar": {"places": [{"name": "Niddrie", "count": 40}, {"name": "Market Street", "count": 4}, {"name": "Monktonhall", "count": 4}, {"name": "Portobello", "count": 4}, {"name": "Musselburgh", "count": 2}, {"name": "Newcraighall", "count": 2}], "books": [{"title": "Filth", "count": 20}, {"title": "Porno", "count": 10}, {"title": "Reheated Cabbage", "count": 10}, {"title": "Skagboys", "count": 6}, {"title": "Trainspotting", "count": 6}]}, "Forth": {"places": [{"name": "Pilton", "count": 22}, {"name": "Ferry Road", "count": 16}, {"name": "Granton", "count": 10}, {"name": "West Granton Road", "count": 6}, {"name": "Newhaven", "count": 4}, {"name": "Hawthornvale", "count": 2}, {"name": "South Park", "count": 2}], "books": [{"title": "Skagboys", "count": 32}, {"title": "Marabou Stork Nightmares", "count": 8}, {"title": "Ecstasy: Three Tales of Chemical Romance", "count": 6}, {"title": "Porno", "count": 6}, {"title": "Filth", "count": 4}]}, "Liberton/Gilmerton": {"places": [{"name": "Midlothian", "count": 18}, {"name": "Rosewell", "count": 14}, {"name": "Bonnyrigg", "count": 8}, {"name": "Gracemount", "count": 4}, {"name": "Bilston Glen", "count": 2}, {"name": "Liberton", "count": 2}, {"name": "Little France", "count": 2}, {"name": "Moredun", "count": 2}], "books": [{"title": "Reheated Cabbage", "count": 22}, {"title": "Skagboys", "count": 10}, {"title": "Marabou Stork Nightmares", "count": 6}, {"title": "Porno", "count": 6}, {"title": "Trainspotting", "count": 6}]}, "South Central": {"places": [{"name": "Southside", "count": 62}, {"name": "Morningside", "count": 8}, {"name": "Bruntsfield", "count": 6}, {"name": "King's Theatre", "count": 6}, {"name": "Marchmont", "count": 6}, {"name": "Pear Tree", "count": 6}, {"name": "St Leonard's Street", "count": 4}, {"name": "Royal Edinburgh Hospital", "count": 4}], "books": [{"title": "Filth", "count": 38}, {"title": "Porno", "count": 30}, {"title": "Reheated Cabbage", "count": 20}, {"title": "Crime", "count": 18}, {"title": "Skagboys", "count": 14}]}, "Inverleith": {"places": [{"name": "Drylaw", "count": 14}, {"name": "Stockbridge", "count": 14}, {"name": "Blackhall", "count": 2}, {"name": "Comely Bank Avenue", "count": 2}, {"name": "Danube Street", "count": 2}, {"name": "Edinburgh Academy", "count": 2}, {"name": "Raeburn Place", "count": 2}, {"name": "Stockbridge Restaurant", "count": 2}], "books": [{"title": "Filth", "count": 12}, {"title": "Skagboys", "count": 10}, {"title": "Crime", "count": 8}, {"title": "Marabou Stork Nightmares", "count": 8}, {"title": "Porno", "count": 4}]}, "Canongate": {"places": [{"name": "Scottish Parliament", "count": 6}, {"name": "Abbeyhill", "count": 4}, {"name": "Calton Road", "count": 2}, {"name": "Moray House", "count": 2}], "books": [{"title": "Porno", "count": 6}, {"title": "Ecstasy: Three Tales of Chemical Romance", "count": 2}, {"title": "Filth", "count": 2}, {"title": "Skagboys", "count": 2}, {"title": "Trainspotting", "count": 2}]}, "Western Edinburgh": {"places": [{"name": "Corstorphine", "count": 12}, {"name": "Barnton", "count": 8}, {"name": "Murrayfield", "count": 8}, {"name": "Ravelston Dykes", "count": 8}, {"name": "Clermiston", "count": 6}, {"name": "Carrick Knowe", "count": 4}, {"name": "Murrayfield Ice Rink", "count": 4}, {"name": "Broomhouse", "count": 2}], "books": [{"title": "Filth", "count": 20}, {"title": "Skagboys", "count": 18}, {"title": "Crime", "count": 10}, {"title": "Ecstasy: Three Tales of Chemical Romance", "count": 4}, {"title": "Marabou Stork Nightmares", "count": 4}]}}};
+
 const N = sectors.length;
 const angleStep = (2 * Math.PI) / N;
 const angle = i => i * angleStep - Math.PI / 2;
-const maxVal = 0.65;
+const maxVal = d3.max(rawData, d => d3.max(sectors, s => d.values[s]));
+const W = 680, H = 680, cx = W/2, cy = H/2, R = 250;
 
-const W = 800, H = 720, cx = W/2, cy = H/2, R = 270;
+const svg = d3.select("#chart")
+  .append("svg")
+  .attr("width", W)
+  .attr("height", H);
 
-const svg = d3.select('#chart')
-  .append('svg')
-  .attr('width', W)
-  .attr('height', H);
-
-// Grid circles
 [1,2,3,4,5].forEach(l => {
-  svg.append('circle')
-    .attr('cx', cx).attr('cy', cy)
-    .attr('r', R * l / 5)
-    .attr('fill', 'none')
-    .attr('stroke', '#D0D8E8')
-    .attr('stroke-width', 0.8);
-
-  svg.append('text')
-    .attr('x', cx + 4)
-    .attr('y', cy - R * l / 5 + 3)
-    .attr('font-size', '9px')
-    .attr('fill', '#AAA')
-    .text(Math.round(maxVal * l / 5 * 100) + '%');
+  svg.append("circle")
+    .attr("cx", cx).attr("cy", cy)
+    .attr("r", R * l / 5)
+    .attr("fill", "none")
+    .attr("stroke", "#D0D8E8")
+    .attr("stroke-width", 0.8);
+  svg.append("text")
+    .attr("x", cx + 4)
+    .attr("y", cy - R * l / 5 + 3)
+    .attr("font-size", "9px")
+    .attr("fill", "#AAA")
+    .text(Math.round(maxVal * l / 5 * 100) + "%");
 });
 
-// Axes + labels
 sectors.forEach((s, i) => {
   const a = angle(i);
-  svg.append('line')
-    .attr('x1', cx).attr('y1', cy)
-    .attr('x2', cx + R * Math.cos(a))
-    .attr('y2', cy + R * Math.sin(a))
-    .attr('stroke', '#C0C8D8').attr('stroke-width', 0.8);
+  svg.append("line")
+    .attr("x1", cx).attr("y1", cy)
+    .attr("x2", cx + R * Math.cos(a))
+    .attr("y2", cy + R * Math.sin(a))
+    .attr("stroke", "#C0C8D8").attr("stroke-width", 0.8);
 
-  svg.append('text')
-    .attr('x', cx + (R + 30) * Math.cos(a))
-    .attr('y', cy + (R + 30) * Math.sin(a))
-    .attr('text-anchor', 'middle')
-    .attr('dominant-baseline', 'central')
-    .attr('font-size', '12px')
-    .attr('fill', '#333')
-    .attr('font-weight', '600')
+  const lx = cx + (R + 34) * Math.cos(a);
+  const ly = cy + (R + 34) * Math.sin(a);
+  svg.append("text")
+    .attr("x", lx).attr("y", ly)
+    .attr("text-anchor", "middle")
+    .attr("dominant-baseline", "central")
+    .attr("font-size", "9.5px")
+    .attr("fill", "#333")
+    .attr("font-weight", "600")
     .text(s);
 });
 
-const g = svg.append('g').attr('transform', `translate(${cx},${cy})`);
+const g = svg.append("g").attr("transform", `translate(${cx},${cy})`);
 
 const line = d3.lineRadial()
   .radius(d => d / maxVal * R)
@@ -144,80 +254,144 @@ const paths = {}, areas = {};
 const activeAuthors = new Set(rawData.map(a => a.author));
 
 rawData.forEach(author => {
-  const vals = sectors.map(s => author[s]);
-
-  areas[author.author] = g.append('path')
-    .datum(vals)
-    .attr('d', line)
-    .attr('fill', colors[author.author])
-    .attr('fill-opacity', 0.1)
-    .attr('stroke', 'none');
-
-  paths[author.author] = g.append('path')
-    .datum(vals)
-    .attr('d', line)
-    .attr('fill', 'none')
-    .attr('stroke', colors[author.author])
-    .attr('stroke-width', 2.2)
-    .attr('stroke-linejoin', 'round');
+  const vals = sectors.map(s => author.values[s]);
+  areas[author.author] = g.append("path")
+    .datum(vals).attr("d", line)
+    .attr("fill", colors[author.author])
+    .attr("fill-opacity", 0.1)
+    .attr("stroke", "none");
+  paths[author.author] = g.append("path")
+    .datum(vals).attr("d", line)
+    .attr("fill", "none")
+    .attr("stroke", colors[author.author])
+    .attr("stroke-width", 2.2)
+    .attr("stroke-linejoin", "round");
 });
 
-// Hover dots
-const tooltip = document.getElementById('tooltip');
+// Detail panel
+const panel = document.getElementById("detail-panel");
+const tooltip = document.getElementById("tooltip");
 
+function showDetail(author, sector, val) {
+  const color = colors[author];
+  document.getElementById("dp-author").textContent = author;
+  document.getElementById("dp-author").style.color = color;
+  document.getElementById("dp-sector").textContent = sector;
+  document.getElementById("dp-pct").textContent = (val * 100).toFixed(1) + "% of mentions in this sector";
+
+  const info = (detailData[author] || {})[sector];
+  const placesDiv = document.getElementById("dp-places");
+  const booksDiv = document.getElementById("dp-books");
+  placesDiv.innerHTML = "";
+  booksDiv.innerHTML = "";
+
+  if (info) {
+    const maxCount = info.places[0] ? info.places[0].count : 1;
+    info.places.forEach(p => {
+      const row = document.createElement("div");
+      row.className = "place-row";
+      row.innerHTML = `<span>${p.name}</span><span style="color:${color};font-weight:bold">${p.count}</span>`;
+      placesDiv.appendChild(row);
+      const bar = document.createElement("div");
+      bar.className = "place-bar";
+      bar.style.background = color;
+      bar.style.opacity = "0.3";
+      bar.style.width = (p.count / maxCount * 100) + "%";
+      placesDiv.appendChild(bar);
+    });
+    info.books.forEach(b => {
+      const row = document.createElement("div");
+      row.className = "book-row";
+      row.innerHTML = `<span class="book-title" title="${b.title}">${b.title}</span><span class="book-count">${b.count}</span>`;
+      booksDiv.appendChild(row);
+    });
+  } else {
+    placesDiv.innerHTML = "<div style=\"color:#AAA;font-size:11px\">No data</div>";
+  }
+  panel.style.display = "block";
+}
+
+document.getElementById("close-detail").addEventListener("click", () => {
+  panel.style.display = "none";
+});
+
+// Hover + click dots
 rawData.forEach(author => {
   sectors.forEach((sector, i) => {
     const a = angle(i);
-    const val = author[sector];
+    const val = author.values[sector];
     const px = (val / maxVal) * R * Math.cos(a);
     const py = (val / maxVal) * R * Math.sin(a);
 
-    g.append('circle')
-      .attr('cx', px).attr('cy', py)
-      .attr('r', 14)
-      .attr('fill', colors[author.author])
-      .attr('opacity', 0)
-      .attr('cursor', 'pointer')
-      .on('mouseover', function(event) {
-        d3.select(this).attr('opacity', 0.9).attr('r', 16);
-        tooltip.style.display = 'block';
-        tooltip.innerHTML = `
-          <div class="author-name" style="color:${colors[author.author]}">${author.author}</div>
-          <div style="display:flex;justify-content:space-between;gap:20px">
-            <span>${sector}</span>
-            <span class="highlight" style="color:${colors[author.author]}">${(val*100).toFixed(1)}%</span>
-          </div>`;
+    g.append("circle")
+      .attr("cx", px).attr("cy", py)
+      .attr("r", 14)
+      .attr("fill", colors[author.author])
+      .attr("opacity", 0)
+      .attr("cursor", "pointer")
+      .on("mouseover", function(event) {
+        if (!activeAuthors.has(author.author)) return;
+        d3.select(this).attr("opacity", 0.85).attr("r", 16);
+        tooltip.style.display = "block";
+        tooltip.innerHTML = `<strong style="color:${colors[author.author]}">${author.author}</strong><br>${sector}: <strong>${(val*100).toFixed(1)}%</strong><br><span style="color:#AAA;font-size:10px">Click for details</span>`;
       })
-      .on('mousemove', function(event) {
-        tooltip.style.left = (event.clientX + 14) + 'px';
-        tooltip.style.top  = (event.clientY - 10) + 'px';
+      .on("mousemove", function(event) {
+        tooltip.style.left = (event.clientX + 14) + "px";
+        tooltip.style.top  = (event.clientY - 10) + "px";
       })
-      .on('mouseout', function() {
-        d3.select(this).attr('opacity', 0).attr('r', 14);
-        tooltip.style.display = 'none';
+      .on("mouseout", function() {
+        d3.select(this).attr("opacity", 0).attr("r", 14);
+        tooltip.style.display = "none";
+      })
+      .on("click", function(event) {
+        if (!activeAuthors.has(author.author)) return;
+        tooltip.style.display = "none";
+        showDetail(author.author, sector, val);
       });
   });
 });
 
 // Legend
-const legend = document.getElementById('legend');
+const legend = document.getElementById("legend");
 rawData.forEach(author => {
-  const item = document.createElement('div');
-  item.className = 'legend-item';
+  const item = document.createElement("div");
+  item.className = "legend-item";
   item.innerHTML = `<div class="legend-dot" style="background:${colors[author.author]}"></div>${author.author}`;
-  item.addEventListener('click', () => {
+
+  item.addEventListener("click", () => {
     if (activeAuthors.has(author.author)) {
       activeAuthors.delete(author.author);
-      item.classList.add('inactive');
-      paths[author.author].attr('opacity', 0);
-      areas[author.author].attr('opacity', 0);
+      item.classList.add("inactive");
+      paths[author.author].attr("opacity", 0);
+      areas[author.author].attr("opacity", 0);
     } else {
       activeAuthors.add(author.author);
-      item.classList.remove('inactive');
-      paths[author.author].attr('opacity', 1);
-      areas[author.author].attr('opacity', 1);
+      item.classList.remove("inactive");
+      paths[author.author].attr("opacity", 1);
+      areas[author.author].attr("opacity", 1);
     }
   });
+
+  item.addEventListener("dblclick", () => {
+    rawData.forEach(a => {
+      if (a.author === author.author) {
+        activeAuthors.add(a.author);
+        paths[a.author].attr("opacity", 1);
+        areas[a.author].attr("opacity", 1);
+        document.querySelectorAll(".legend-item").forEach((el, idx) => {
+          if (rawData[idx].author === a.author) el.classList.remove("inactive");
+        });
+      } else {
+        activeAuthors.delete(a.author);
+        paths[a.author].attr("opacity", 0);
+        areas[a.author].attr("opacity", 0);
+        document.querySelectorAll(".legend-item").forEach((el, idx) => {
+          if (rawData[idx].author === a.author) el.classList.add("inactive");
+        });
+      }
+    });
+  });
+
   legend.appendChild(item);
 });
 </script>

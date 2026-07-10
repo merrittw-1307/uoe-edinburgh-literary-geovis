@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Author Spatial Fingerprints — Bar-code</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: 'Helvetica Neue', Arial, sans-serif;
+    background: #F8F9FC;
+    padding: 40px 60px;
+  }
+  h1 { font-size: 20px; color: #21295C; margin-bottom: 6px; }
+  .subtitle { font-size: 13px; color: #888; margin-bottom: 40px; }
+  .author-row { margin-bottom: 28px; }
+  .author-label {
+    font-size: 13px;
+    font-weight: 600;
+    margin-bottom: 6px;
+  }
+  .bar-container { position: relative; }
+  .tooltip {
+    position: fixed;
+    background: white;
+    border: 1px solid #E0E4F0;
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 12px;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: none;
+    z-index: 100;
+  }
+  .tooltip .place { font-weight: bold; margin-bottom: 4px; }
+</style>
+</head>
+<body>
+<h1>Author Spatial Fingerprints — Bar-code Style</h1>
+<div class="subtitle">Each bar = one place name · height = mention frequency (log scale) · hover to explore</div>
+<div id="chart"></div>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const colors = {
+  'Alexander McCall Smith': '#B85042',
+  'Irvine Welsh':           '#1C7293',
+  'John Gibson Lockhart':   '#2C5F2D',
+  'Robert Louis Stevenson': '#7F77DD',
+  'Walter Scott':           '#C9A227'
+};
+
+const rawData = [
+  { author: 'Alexander McCall Smith', values: [{"place":"Arthur's Seat","value":0.0230442692540933},{"place":"Bruntsfield","value":0.0327471194663432},{"place":"Canongate","value":0.0048514251061249},{"place":"Castle Street","value":0.0018192844147968},{"place":"Cumberland Bar","value":0.058217101273499},{"place":"Dalkeith","value":0.0133414190418435},{"place":"Drummond Place","value":0.0642813826561552},{"place":"Dundas Street","value":0.07883565797453},{"place":"Forth","value":0.0181928441479684},{"place":"Grassmarket","value":0.0121285627653123},{"place":"Heriot Row","value":0.0260764099454214},{"place":"High Street","value":0.0103092783505154},{"place":"Holyrood","value":0.0072771376591873},{"place":"Howe Street","value":0.0291085506367495},{"place":"India Street","value":0.0460885385081867},{"place":"Leith","value":0.0285021224984839},{"place":"Leith Walk","value":0.0097028502122498},{"place":"Moray Place","value":0.0806549423893268},{"place":"Morningside","value":0.0297149787750151},{"place":"New Town","value":0.0442692540933899},{"place":"Old Town","value":0.0115221346270466},{"place":"Princes Street","value":0.0400242571255306},{"place":"Queen Street","value":0.0515463917525773},{"place":"Scotland Street","value":0.1679805942995755},{"place":"Scottish Parliament","value":0.0060642813826561},{"place":"Stockbridge","value":0.0303214069132807},{"place":"The Meadows","value":0.0303214069132807},{"place":"Tollcross","value":0.0072771376591873},{"place":"Water of Leith","value":0.0181928441479684},{"place":"Waverley Station","value":0.0175864160097028}] },
+  { author: 'Irvine Welsh', values: [{"place":"Arthur's Seat","value":0.0123203285420944},{"place":"Bruntsfield","value":0.0061601642710472},{"place":"Canongate","value":0.0},{"place":"Castle Street","value":0.002053388090349},{"place":"Cumberland Bar","value":0.0},{"place":"Dalkeith","value":0.0},{"place":"Drummond Place","value":0.0},{"place":"Dundas Street","value":0.0},{"place":"Forth","value":0.0205338809034907},{"place":"Grassmarket","value":0.0102669404517453},{"place":"Heriot Row","value":0.0},{"place":"High Street","value":0.0082135523613963},{"place":"Holyrood","value":0.0},{"place":"Howe Street","value":0.0},{"place":"India Street","value":0.0},{"place":"Leith","value":0.6673511293634496},{"place":"Leith Walk","value":0.0574948665297741},{"place":"Moray Place","value":0.0},{"place":"Morningside","value":0.0082135523613963},{"place":"New Town","value":0.0164271047227926},{"place":"Old Town","value":0.0041067761806981},{"place":"Princes Street","value":0.0328542094455852},{"place":"Queen Street","value":0.0061601642710472},{"place":"Scotland Street","value":0.0},{"place":"Scottish Parliament","value":0.0061601642710472},{"place":"Stockbridge","value":0.0143737166324435},{"place":"The Meadows","value":0.0184804928131416},{"place":"Tollcross","value":0.0616016427104722},{"place":"Water of Leith","value":0.0143737166324435},{"place":"Waverley Station","value":0.0328542094455852}] },
+  { author: 'John Gibson Lockhart', values: [{"place":"Arthur's Seat","value":0.041860465116279},{"place":"Bruntsfield","value":0.0},{"place":"Canongate","value":0.2511627906976744},{"place":"Castle Street","value":0.227906976744186},{"place":"Cumberland Bar","value":0.0},{"place":"Dalkeith","value":0.027906976744186},{"place":"Drummond Place","value":0.0},{"place":"Dundas Street","value":0.0},{"place":"Forth","value":0.027906976744186},{"place":"Grassmarket","value":0.027906976744186},{"place":"Heriot Row","value":0.0046511627906976},{"place":"High Street","value":0.0372093023255813},{"place":"Holyrood","value":0.0790697674418604},{"place":"Howe Street","value":0.0},{"place":"India Street","value":0.0},{"place":"Leith","value":0.1116279069767441},{"place":"Leith Walk","value":0.0046511627906976},{"place":"Moray Place","value":0.0},{"place":"Morningside","value":0.0},{"place":"New Town","value":0.0372093023255813},{"place":"Old Town","value":0.0465116279069767},{"place":"Princes Street","value":0.0651162790697674},{"place":"Queen Street","value":0.0093023255813953},{"place":"Scotland Street","value":0.0},{"place":"Scottish Parliament","value":0.0},{"place":"Stockbridge","value":0.0},{"place":"The Meadows","value":0.0},{"place":"Tollcross","value":0.0},{"place":"Water of Leith","value":0.0},{"place":"Waverley Station","value":0.0}] },
+  { author: 'Robert Louis Stevenson', values: [{"place":"Arthur's Seat","value":0.0547445255474452},{"place":"Bruntsfield","value":0.0072992700729927},{"place":"Canongate","value":0.0072992700729927},{"place":"Castle Street","value":0.0145985401459854},{"place":"Cumberland Bar","value":0.0},{"place":"Dalkeith","value":0.0},{"place":"Drummond Place","value":0.0},{"place":"Dundas Street","value":0.0072992700729927},{"place":"Forth","value":0.1131386861313868},{"place":"Grassmarket","value":0.010948905109489},{"place":"Heriot Row","value":0.0948905109489051},{"place":"High Street","value":0.0620437956204379},{"place":"Holyrood","value":0.0291970802919708},{"place":"Howe Street","value":0.0145985401459854},{"place":"India Street","value":0.0072992700729927},{"place":"Leith","value":0.1313868613138686},{"place":"Leith Walk","value":0.0255474452554744},{"place":"Moray Place","value":0.0072992700729927},{"place":"Morningside","value":0.0145985401459854},{"place":"New Town","value":0.0948905109489051},{"place":"Old Town","value":0.0948905109489051},{"place":"Princes Street","value":0.1678832116788321},{"place":"Queen Street","value":0.0072992700729927},{"place":"Scotland Street","value":0.0},{"place":"Scottish Parliament","value":0.0},{"place":"Stockbridge","value":0.010948905109489},{"place":"The Meadows","value":0.0},{"place":"Tollcross","value":0.0},{"place":"Water of Leith","value":0.0218978102189781},{"place":"Waverley Station","value":0.0}] },
+  { author: 'Walter Scott', values: [{"place":"Arthur's Seat","value":0.0402144772117962},{"place":"Bruntsfield","value":0.0},{"place":"Canongate","value":0.1769436997319035},{"place":"Castle Street","value":0.0080428954423592},{"place":"Cumberland Bar","value":0.0},{"place":"Dalkeith","value":0.0697050938337801},{"place":"Drummond Place","value":0.0},{"place":"Dundas Street","value":0.0},{"place":"Forth","value":0.1769436997319035},{"place":"Grassmarket","value":0.0482573726541554},{"place":"Heriot Row","value":0.002680965147453},{"place":"High Street","value":0.0563002680965147},{"place":"Holyrood","value":0.1260053619302949},{"place":"Howe Street","value":0.0},{"place":"India Street","value":0.0},{"place":"Leith","value":0.1394101876675603},{"place":"Leith Walk","value":0.002680965147453},{"place":"Moray Place","value":0.0},{"place":"Morningside","value":0.0},{"place":"New Town","value":0.0214477211796246},{"place":"Old Town","value":0.0107238605898123},{"place":"Princes Street","value":0.0187667560321715},{"place":"Queen Street","value":0.002680965147453},{"place":"Scotland Street","value":0.0},{"place":"Scottish Parliament","value":0.0911528150134048},{"place":"Stockbridge","value":0.0},{"place":"The Meadows","value":0.0},{"place":"Tollcross","value":0.0},{"place":"Water of Leith","value":0.0080428954423592},{"place":"Waverley Station","value":0.0}] }
+];
+
+const tooltip = document.getElementById('tooltip');
+const chart = document.getElementById('chart');
+const W = 900;
+const barW = W / 30;
+const H = 90;
+
+rawData.forEach(author => {
+  const maxLog = Math.max(...author.values.map(d => Math.log1p(d.value * 1000)));
+
+  const row = document.createElement('div');
+  row.className = 'author-row';
+
+  const label = document.createElement('div');
+  label.className = 'author-label';
+  label.style.color = colors[author.author];
+  label.textContent = author.author;
+  row.appendChild(label);
+
+  const container = document.createElement('div');
+  container.className = 'bar-container';
+
+  const svg = d3.select(container)
+    .append('svg')
+    .attr('width', W)
+    .attr('height', H);
+
+  const yScale = d3.scaleLinear()
+    .domain([0, maxLog])
+    .range([0, H]);
+
+  author.values.forEach((d, i) => {
+    const logVal = Math.log1p(d.value * 1000);
+    const barH = yScale(logVal);
+
+    svg.append('rect')
+      .attr('x', i * barW)
+      .attr('y', H - barH)
+      .attr('width', barW - 1)
+      .attr('height', barH)
+      .attr('fill', colors[author.author])
+      .attr('opacity', 0.85)
+      .attr('cursor', 'pointer')
+      .on('mouseover', function(event) {
+        d3.select(this).attr('opacity', 1);
+        tooltip.style.display = 'block';
+        tooltip.innerHTML = `
+          <div class="place" style="color:${colors[author.author]}">${d.place}</div>
+          <div>${(d.value * 100).toFixed(2)}% of mentions</div>`;
+      })
+      .on('mousemove', function(event) {
+        tooltip.style.left = (event.clientX + 14) + 'px';
+        tooltip.style.top  = (event.clientY - 10) + 'px';
+      })
+      .on('mouseout', function() {
+        d3.select(this).attr('opacity', 0.85);
+        tooltip.style.display = 'none';
+      });
+  });
+
+  // Place labels on x-axis
+  const labelSvg = d3.select(container)
+    .append('svg')
+    .attr('width', W)
+    .attr('height', 80);
+
+  author.values.forEach((d, i) => {
+    labelSvg.append('text')
+      .attr('x', i * barW + barW / 2)
+      .attr('y', 70)
+      .attr('text-anchor', 'end')
+      .attr('transform', `rotate(-45, ${i * barW + barW / 2}, 70)`)
+      .attr('font-size', '9px')
+      .attr('fill', '#666')
+      .text(d.place);
+  });
+
+  row.appendChild(container);
+  chart.appendChild(row);
+});
+</script>
+</body>
+</html>

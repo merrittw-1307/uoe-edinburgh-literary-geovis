@@ -1,0 +1,608 @@
+% MSc Dissertation - A Visual Trace Map of Edinburgh Place Names in Literature
+% Merritt Wang | Supervisor: Uta Hinrichs | University of Edinburgh | 2026
+ 
+\documentclass[logo,msc]{infthesis}
+\usepackage{msccheck}
+\usepackage{graphicx}
+\usepackage{subcaption}
+\usepackage{float}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{wasysym}
+\usepackage{tikz}
+\usepackage{pdfpages}
+\usepackage{microtype}
+\usepackage[hidelinks]{hyperref}
+\usepackage{booktabs}
+\usepackage{xcolor}
+\usepackage{array}
+\usepackage{enumitem}
+ 
+\begin{document}
+\begin{preliminary}
+ 
+\title{A Visual Trace Map of Edinburgh Place Names in Literature}
+\author{Merritt Wang}
+\date{\today}
+ 
+\abstract{
+% TODO (~200-300 words) — write after user study is complete
+% Suggested structure:
+%   Sentence 1-2: the problem — existing tools treat literary place names
+%     as geographic data, but literary meaning is narrative, not spatial.
+%   Sentence 3-4: the data — LitLong Edinburgh database,
+%     620 works (1687-2015), 2,135 place names, 50,248 mention records.
+%   Sentence 5-6: the two research directions.
+%   Sentence 7-8: method — interactive D3.js visualisations, user study.
+%   Sentence 9-10: key findings and contribution.
+}
+ 
+\maketitle
+ 
+\newenvironment{ethics}
+   {\begin{frontenv}{Research Ethics Approval}{\LARGE}}
+   {\end{frontenv}\newpage}
+ 
+\begin{ethics}
+This project obtained approval from the Informatics Research Ethics committee.\\
+Ethics application number: 446635\\
+Date when approval was obtained: % TODO: fill in date\\
+The participants' information sheet and a consent form are included in the appendix.\\
+\standarddeclaration
+\end{ethics}
+ 
+\begin{acknowledgements}
+% TODO
+\end{acknowledgements}
+ 
+\tableofcontents
+\listoffigures
+ 
+\end{preliminary}
+ 
+ 
+% ============================================================
+% CHAPTER 1: INTRODUCTION
+% ============================================================
+\chapter{Introduction}
+ 
+\section{Motivation}
+ 
+Edinburgh is among the most literarily documented cities in the world. The Palimpsest project at the University of Edinburgh systematically extracted place-name mentions from hundreds of literary works spanning three centuries, producing the LitLong Edinburgh database: 620 documents published between 1687 and 2015, 2,135 distinct place names, and 50,248 geo-referenced mention records \cite{anderson2016}. The project made this corpus publicly accessible through a web interface that plots place mentions on an interactive geographic map.
+ 
+Geographic maps are a natural starting point for literary data of this kind, but they carry an implicit assumption: that the meaning of a place name is determined by its location. In geography, this is uncontroversial. In literature, it is not. When Irvine Welsh names Leith in \textit{Trainspotting}, the word does not primarily refer to a set of coordinates north of Edinburgh city centre. It evokes a social world, a class position, a political history. When Walter Scott names the Canongate, he is invoking a specific stratum of Edinburgh's past. A geographic map can show \emph{where} these places are. It cannot show \emph{when} in the narrative they appear, \emph{how often} they recur, \emph{which other places} surround them, or \emph{whose authorial voice} has chosen them.
+ 
+This project proceeds from the observation that place names in literary text are data about narrative structure as much as about geographic space. The visualisation problem, accordingly, is not how to render literary geography more accurately on a map, but how to represent narrative structure in a form that reveals patterns invisible to geographic tools.
+ 
+\section{Problem Statement}
+ 
+The core question this dissertation addresses is: can place names in literary text be visualised as an independent narrative structure, rather than as a rendering of geographic information?
+ 
+This question divides into two sub-problems corresponding to two distinct dimensions of narrative structure. The first concerns \emph{authorial spatial attention}: does each author's distribution of place-name mentions across Edinburgh constitute a distinctive pattern that can be recognised without prior knowledge of the author? The second concerns \emph{narrative co-occurrence}: do places that appear together across literary works form a topology that differs systematically from their geographic arrangement?
+ 
+Existing tools do not address either question. They do not separate literary space from geographic space. They do not support comparison of authorial spatial styles. And they do not reveal which places are narratively proximate, as opposed to geographically proximate.
+ 
+\section{Research Questions}
+ 
+Two formal research questions guide the project:
+ 
+\textbf{RQ1} (Author Spatial Fingerprint): Does each author's distribution of place-name mentions across Edinburgh's official neighbourhood sectors form a visually distinctive spatial signature, sufficient for users to identify authors from their fingerprint alone?
+ 
+\textbf{RQ2} (Narrative Topology): Does the co-occurrence of place names within literary works reveal a narrative topology that diverges meaningfully from the geographic topology of Edinburgh?
+ 
+The success criterion for RQ1, established in discussion with the supervisor, is that different authors must produce visually distinct fingerprint shapes on a one-to-one basis: no two authors should produce shapes that are indistinguishable to a naive user. The success criterion for RQ2 is that the visualisation should surface cases where narrative proximity contradicts geographic proximity---places that are spatially distant yet repeatedly appear together in the same literary works.
+ 
+\section{Contributions}
+ 
+This dissertation makes the following contributions:
+ 
+\begin{enumerate}[leftmargin=*, label=\arabic*.]
+  \item A novel interactive visualisation system for literary place-name data that represents narrative structure rather than geographic location, implemented in D3.js and delivered as self-contained, deployable HTML files.
+ 
+  \item Two complementary visualisation directions: author spatial fingerprints (three designs) and narrative topology networks (three designs), each driven by real data from the LitLong Edinburgh corpus.
+ 
+  \item A validated spatial classification of Edinburgh place names using official administrative boundary data from the City of Edinburgh Council, comprising 14 sectors derived from the Neighbourhood Partnership Areas and Natural Neighbourhoods datasets (Open Government Licence v3.0).
+ 
+  \item An empirical finding with implications for literary geography: among five representative Edinburgh authors, no single place name is mentioned by three or more authors, and only 18 are shared by any two. Each author constructs an almost entirely private imaginary Edinburgh.
+ 
+  \item A method for extracting narrative reading order from the LitLong database by treating the \texttt{start\_word} field as a globally monotonic index, enabling position-normalised analysis of when and where in a narrative each place appears.
+ 
+  \item A user evaluation comparing domain expert and general public responses to the six visualisation designs, informing the final design selection.
+\end{enumerate}
+ 
+\section{Dissertation Overview}
+ 
+Chapter~\ref{chap:lit} situates the project within three bodies of literature: literary geography and geocriticism, existing visualisation approaches for literary corpora, and information visualisation principles for humanities data. Chapter~\ref{chap:design} describes the data exploration process, the design decisions made for each of the six visualisation candidates, and the rationale for the choices made. Chapter~\ref{chap:impl} covers the technical implementation, from database setup through to the D3.js interactive prototypes. Chapter~\ref{chap:eval} describes the user study design and reports its results. Chapter~\ref{chap:discussion} discusses the findings in relation to the research questions and reflects on the project's limitations. Chapter~\ref{chap:conclusion} concludes and outlines directions for future work.
+ 
+ 
+% ============================================================
+% CHAPTER 2: LITERATURE REVIEW
+% ============================================================
+\chapter{Literature Review}
+\label{chap:lit}
+ 
+\section{Literary Geography and Geocriticism}
+ 
+The relationship between literature and place has been a concern of literary scholarship since at least the late twentieth century, but the theoretical grounding for a spatially-oriented reading of fiction consolidated around what is now called the ``spatial turn'' in the humanities \cite{tally2013}. Bertrand Westphal's geocriticism argues that literary places are not simple reflections of real geographies but active constructions: representations that reshape the reader's understanding of space and that exist in dialogue with the physical world rather than merely depicting it \cite{westphal2011}. On this account, the place names in a novel are not pointers to locations on a map but nodes in a narrative network.
+ 
+Franco Moretti's quantitative approach to literary geography offered a different perspective \cite{moretti2005}. By mapping the settings of hundreds of European novels, Moretti demonstrated that literature does not distribute itself uniformly across geographic space: certain places are obsessively returned to, others systematically avoided. He coined the phrase ``literary silences'' to describe the latter---absences that are as informative as presences. Moretti's maps are geographic, but his interpretive framing is already narrative: he reads the maps for patterns of attention and neglect, not for spatial accuracy.
+ 
+Both traditions converge on a point that motivates this project: place in fiction is a narrative construction, not a geographic fact. The visualisation problem is therefore not how to represent the geography of literary Edinburgh more faithfully, but how to make the narrative dimensions of that geography---frequency, authorial style, co-occurrence, temporal position---visible.
+ 
+\section{The LitLong Edinburgh Project}
+ 
+The empirical foundation of this project is the LitLong Edinburgh corpus, produced by the Palimpsest project at the University of Edinburgh \cite{anderson2016}. Using natural language processing pipelines, the project extracted geo-referenced place-name mentions from a curated selection of literary works set in or concerning Edinburgh, spanning the period 1687 to 2015. The full database---accessed here via a PostgreSQL dump released in 2022---contains 620 documents, 2,135 distinct place names, 50,248 mention records, and 424 authors, across 29 literary genre classifications.
+ 
+Several features of the database are particularly relevant to this project. The \texttt{api\_sentence} table stores the complete source sentence for every mention, enabling retrieval of the exact literary context in which a place name appears. The \texttt{start\_word} field in \texttt{api\_locationmention} encodes a global word index that is strictly monotonically increasing within each document, providing a proxy for narrative position without requiring full text parsing. The \texttt{api\_posmention} table contains over two million part-of-speech annotations, potentially supporting future analysis of whether a place name appears in dialogue, narration, or description---a dimension not explored in this dissertation.
+ 
+The original LitLong web interface renders place mentions as dots on an interactive geographic map. This design, while intuitive and technically accomplished, makes the assumptions critiqued above: it positions geographic location as the primary axis of literary meaning. The present project treats the LitLong data as the raw material for an alternative representational strategy.
+ 
+\section{Visualising Place in Literary Corpora}
+ 
+The closest antecedent to the present project is the work of Stange and D{\"o}rk on visualising literary place mentions in novels set in Berlin and New York \cite{stange2015}. Their ``Novel City Maps'' approach generated fingerprint-like representations of each novel's spatial distribution across the city, using street-map coordinates as the positional axis. The present work extends this approach in a significant direction: rather than retaining geographic coordinates, it replaces them entirely with an abstract categorical axis (city sectors), allowing the fingerprint shape to represent authorial spatial attention without the perceptual noise introduced by real-world topography. This shift is motivated by the data: as Section~\ref{sec:dataexploration} reports, place names in the LitLong corpus are too sparsely shared across authors for individual place names to serve as meaningful axes.
+ 
+Other digital literary geography projects have largely retained the geographic map as their primary interface. Literary Atlas, Google's Literary Trips, and various GIS-based academic projects all plot textual mentions against spatial coordinates. While these tools are valuable for exploring the geographic distribution of literary references, they cannot address questions about authorial style, narrative co-occurrence, or the divergence between spatial proximity and narrative proximity.
+ 
+The information visualisation literature offers relevant precedents for the two directions pursued here. Shneiderman's small multiples principle \cite{tufte1983}---presenting multiple instances of the same visual form side by side for comparison---underlies the Small Multiples design in Direction~1. The force-directed graph layout used in Direction~2 follows Fruchterman and Reingold's energy-minimisation algorithm \cite{fruchterman1991}. The metro-style map adapts Beck's insight that functional topology---the traveller's need to know which line and which direction---can be more usefully represented than geographic accuracy \cite{beck1933}.
+ 
+\section{Information Visualisation for Humanities Data}
+ 
+Shneiderman's information-seeking mantra---``overview first, zoom and filter, details on demand'' \cite{shneiderman1996}---provides a structural principle for the interaction design in this project. All six visualisation prototypes follow this pattern: an overview of the full dataset (all authors, all co-occurrence pairs) is presented by default, with interactive mechanisms for filtering and zooming, and detail panels that surface place-specific and book-specific information on demand.
+ 
+Drucker argues that humanistic data should be understood as \emph{capta}---actively interpreted and constructed---rather than as objectively given \cite{drucker2011}. This perspective is relevant to several design decisions documented in Chapter~\ref{chap:design}: the choice of sectors as axes reflects an interpretive act (what counts as a meaningful spatial unit for literary analysis?), and the choice of document-level co-occurrence as the granularity for the topology network reflects a judgment about what constitutes meaningful narrative co-presence.
+ 
+Tufte's principle of small multiples \cite{tufte1983} provides the theoretical foundation for the side-by-side comparison panel in Direction~1, where five maps of the same spatial extent but different author-specific bubble distributions enable direct visual comparison of authorial spatial patterns.
+ 
+\section{Graph and Network Visualisation}
+ 
+The force-directed network visualisation in Direction~2 follows the Fruchterman-Reingold algorithm \cite{fruchterman1991}, which models graph layout as a physical simulation in which nodes repel each other and edges act as springs. The critical property of force-directed layouts for this project is that node positions are determined entirely by the topology of the co-occurrence network, not by geographic coordinates. A node's position in the final layout reflects its narrative connectivity, not its map location.
+ 
+N{\"o}llenburg and Wolff's work on algorithmic metro-map layout \cite{nollenburg2006} is relevant to the metro-style visualisation as a precedent and as a justification for the decision to use manual rather than algorithmic layout: schematic metro-map drawing, which requires placing nodes on an octilinear grid while preserving topological correctness and legibility, is a known computationally hard problem. The manually constructed metro map in this project is therefore an intentional simplification, appropriate for prototyping but not scalable to the full author corpus.
+ 
+\section{Gap and Contribution}
+ 
+The literature reviewed above identifies three gaps that this project addresses. First, while literary geography theory has established that place in fiction is a narrative construction, existing digital tools continue to render literary place names as geographic data. Second, no existing tool supports direct visual comparison of authorial spatial styles as abstract fingerprints. Third, no existing tool visualises the co-occurrence topology of literary place names as a structure distinct from geographic proximity. This project addresses all three gaps through a system of interactive visualisations grounded in real corpus data and evaluated through a user study.
+ 
+ 
+% ============================================================
+% CHAPTER 3: DESIGN
+% ============================================================
+\chapter{Design}
+\label{chap:design}
+ 
+\section{Design Rationale}
+ 
+The project brief specified D3.js as the implementation technology, and this choice aligns with the requirements of the visualisation task. D3.js is web-native, requiring no installation or server infrastructure for end users; this matters for sharing prototypes with supervisors and study participants. It provides fine-grained control over visual encoding, enabling the custom interactive designs required by both research directions. It is the standard tool in digital humanities visualisation practice, ensuring that the implementation approach is reproducible by others in the field.
+ 
+The choice between static and interactive visualisation was settled early in the project. The LitLong corpus contains 620 documents, 2,135 place names, and 424 authors. A static visualisation that attempted to show all of this simultaneously would be unreadable. Interactivity is necessary to support the ``overview first, zoom and filter, details on demand'' pattern \cite{shneiderman1996} that allows a reader to form a general impression and then drill into specific authors, sectors, or co-occurrence pairs.
+ 
+The overarching design philosophy is that narrative structure should take precedence over geographic accuracy. Where geographic coordinates are used (the Small Multiples view), they serve as a spatial anchor to help users orient themselves, not as a claim that geographic position determines literary meaning. All other designs deliberately abandon coordinates in favour of abstract encodings that foreground narrative properties: sector-based fingerprints for Direction~1, and co-occurrence networks for Direction~2.
+ 
+\section{Data Exploration and Key Findings}
+\label{sec:dataexploration}
+ 
+Before designing the visualisations, a series of exploratory analyses of the LitLong data were conducted to establish what the data could support. These analyses produced five findings that directly shaped the design decisions documented below.
+ 
+\textbf{Finding 1: Author spatial languages are highly individual.} Among the five test authors selected for prototyping (Alexander McCall Smith, Irvine Welsh, John Gibson Lockhart, Walter Scott, and Robert Louis Stevenson), no single place name is mentioned by three or more authors. Only 18 place names are shared by any two. This near-total absence of overlap confirms the literary-geographic intuition that each author constructs a largely private imaginary Edinburgh, and it has a direct implication for visualisation design: individual place names cannot serve as comparable axes across authors, because most axes would be zero for most authors. This finding motivated the decision to use city sectors as the radar chart axes.
+ 
+\textbf{Finding 2: Sector distributions cross-validate against literary knowledge.} The sector-based analysis yields distributions that align with established literary-geographic knowledge for all five test authors: McCall Smith concentrates in New Town (43.6\%), consistent with his Scotland Street series; Welsh concentrates in Leith (44.3\%), consistent with \textit{Trainspotting}; Scott concentrates in Old Town (32.0\%), consistent with his historical fiction; and Stevenson shows a notable Pentlands component (17.0\%), consistent with his documented connection to Swanston. This cross-validation strengthens confidence in the sector classification methodology.
+ 
+\textbf{Finding 3: Co-occurrence granularity requires document-level analysis.} Sentence-level co-occurrence analysis yields zero pairs, because no sentence in the LitLong corpus contains more than one location mention. Page-level co-occurrence yields up to 92 co-occurring places on a single page, producing graphs too dense to be readable. Document-level co-occurrence---counting pairs of places that appear in the same work---yields 403 pairs with weight $\geq 2$, where weight counts the number of distinct works in which both places appear. This granularity was selected as the appropriate level of analysis for the topology network.
+ 
+\textbf{Finding 4: Narrative topology diverges from geographic topology.} The strongest co-occurring place pair is Leith and Princes Street, with a co-occurrence weight of 28: they appear together in 28 distinct literary works. Geographically, Leith and Princes Street are separated by approximately 2.5 kilometres; Leith is a port district to the north, Princes Street the main commercial thoroughfare of the city centre. Their narrative proximity is not a reflection of their spatial proximity. This finding provides the clearest empirical illustration of the central claim of Research Question~2.
+ 
+\textbf{Finding 5: Walter Scott's broad geographic range creates a display problem.} Scott's works reference locations far outside the Edinburgh city centre, including Forth (latitude 56.05), Haddington (longitude $-2.80$), and Linlithgow (longitude $-3.58$). When these points are plotted against a common coordinate scale in the Small Multiples view, they compress the city-centre data for all five authors into an unreadable band. The decision was made to fix the display range to the Edinburgh core area (latitude 55.85--56.02, longitude $-3.35$ to $-3.05$) and exclude out-of-range points from the map panel, while retaining them in the sector-based analyses.
+ 
+\section{Spatial Classification: Neighbourhood Sectors}
+\label{sec:sectors}
+ 
+A key methodological decision in Direction~1 was how to define the spatial units (sectors) that serve as axes in the radar chart and as ordering categories in the bar-code view. Three requirements guided this decision: the sectors must be few enough to serve as legible visual axes; they must be grounded in an authoritative external source so that the classification can be justified independently of the visualisation; and they must carry cultural and historical meaning relevant to literary analysis.
+ 
+The solution adopted is a two-level framework derived entirely from official City of Edinburgh Council data, accessed via the Council's Open Spatial Data Portal (Open Government Licence v3.0). The primary layer is the \textbf{Neighbourhood Partnership Areas} (NP Areas), a set of 12 administratively defined zones used by the Council and its statutory partners for service planning and community consultation. These boundaries are legally established and publicly documented.
+ 
+One NP Area---City Centre---was subdivided using a second official dataset, the \textbf{Natural Neighbourhoods} layer. Natural Neighbourhoods are resident-defined neighbourhood boundaries, created in 2004 as part of a ward boundary review and updated through a public online consultation in 2014. The City Centre NP Area encompasses two zones that are historically and culturally distinct in the Edinburgh literary tradition: Old Town (the medieval city, characterised by the High Street, the Canongate, and the closes of the Royal Mile) and New Town (the Georgian planned city built to the north from the 1760s onwards). These two areas are jointly inscribed as a UNESCO World Heritage Site, and their literary characters differ substantially: Old Town is the setting for the historical fiction of Scott and the Gothic sensibility of Stevenson and Hogg; New Town is the milieu of McCall Smith's contemporary domestic fiction and Lockhart's nineteenth-century biography. Conflating them into a single City Centre sector would erase the most significant literary-geographic distinction in the corpus. A third Natural Neighbourhood unit, Canongate, was also retained as a separate sector, as it forms the eastern end of the Royal Mile and carries distinct historical significance.
+ 
+The resulting framework comprises \textbf{14 sectors}: 11 unchanged NP Areas (Almond, Craigentinny/Duddingston, Forth, Inverleith, Leith, Liberton/Gilmerton, Pentlands, Portobello/Craigmillar, South Central, South West, and Western Edinburgh) plus Old Town, New Town, and Canongate derived from Natural Neighbourhoods. Place-name assignment proceeds by point-in-polygon intersection using the Shapely library. Of the 2,135 place names, 1,480 (69\%) fall precisely within a sector polygon; 423 (20\%) lie in inter-polygon gaps within the Edinburgh bounding box and are assigned to the nearest sector; and 232 (11\%) lie outside Edinburgh entirely and are excluded from sector-based analyses. The resulting classification is cited as: ``Copyright City of Edinburgh Council, contains Ordnance Survey data \copyright\ Crown copyright.''
+ 
+\section{Direction 1: Author Spatial Fingerprint}
+ 
+Three visualisation designs were developed and implemented for Direction~1.
+ 
+\textbf{Radar chart (primary design).} The radar chart represents each author as a polygon across the 14 sector axes, where the radius at each axis encodes the proportion of that author's total mentions that fall within the corresponding sector. The polygon shape is the author's spatial fingerprint. The chart was scaled to the maximum value in the dataset (0.436, McCall Smith's New Town proportion) rather than to 1.0, because fixing the axis to 100\% leaves over 60\% of the radial space empty and compresses the meaningful variation into a small central region.
+ 
+The primary interaction is point-level: hovering over any vertex reveals the sector percentage and a ranked list of the places and books that contribute to it. This responds directly to the supervisor's feedback that the visualisation should provide ``low-level information upon interaction.'' A detail panel opens on click, listing the top place names and top books in the selected sector for the selected author. The legend supports filtering by author (click to hide/show) and isolation (double-click to show only one author), enabling the user to compare any pair or subset of authors.
+ 
+\textbf{Bar-code fingerprint (secondary design).} The bar-code view represents each author as a horizontal row of vertical bars, one bar per place name, ordered from left to right by sector (north to south). The height of each bar encodes the proportion of that author's total mentions attributable to the corresponding place.
+ 
+A key design decision concerned the Y-axis scaling. Welsh's Leith accounts for 44.3\% of his total mentions, substantially more than any single place for any other author. On a shared linear Y-axis scaled to this maximum, all other authors' distributions are compressed into a band occupying less than a quarter of the chart height, rendering within-author variation imperceptible. The solution adopted is a per-author independent Y-axis, where each row is scaled to its own maximum. This design choice prioritises the visibility of within-author spatial structure---the \emph{shape} of each author's distribution---over cross-author magnitude comparison. The trade-off is that bar heights cannot be directly compared across rows; this is made explicit by a warning note in the interface. A shared-axis mode (scaling to the global maximum) remains available via a toggle, allowing users to make cross-author magnitude comparisons when needed. The bar-code view underwent three iterations of scale design before reaching its final form. The first prototype used a logarithmic scale, following standard practice for long-tail frequency distributions. However, supervisor feedback noted that logarithmic scales are difficult for non-specialist users to interpret intuitively, and that the shape of the distribution---not its absolute magnitude---was the primary object of interest. The second prototype adopted a linear scale shared across all five authors, but this introduced a new problem: Welsh's Leith accounts for 44.3\% of his total mentions, substantially more than any single place for any other author. On a shared linear Y-axis, all other authors' distributions were compressed into a band occupying less than a quarter of the chart height, rendering within-author variation imperceptible. The per-author independent Y-axis adopted in the final design resolves this tension.
+ 
+The bar-code view provides three ordering modes (by sector, by frequency, alphabetical) and two scale modes (percentage, absolute mention count), all switchable via controls at the top of the page. A text search field highlights the bars corresponding to a searched place name across all authors simultaneously, and a sector legend allows individual sectors to be hidden, narrowing the display to a subset of the city.
+ 
+\textbf{Small multiples (tertiary design).} The small multiples view renders five side-by-side maps using Leaflet.js with a CartoDB Positron basemap. Bubble size encodes mention frequency (log scale by default, switchable to linear); bubble colour identifies the author. An optional synchronised-zoom mode locks all five panels to the same viewport, enabling direct spatial comparison. Clicking any bubble opens a popup with the place name and mention count.
+ 
+The CartoDB Positron style was selected over standard OpenStreetMap tiles because its reduced visual complexity (lighter colours, fewer labels) allows the data bubbles to remain visually prominent. The coordinate range is fixed to the Edinburgh core area as described in Finding~5 above.
+ 
+\section{Direction 2: Narrative Topology Networks}
+ 
+Three visualisation designs were developed and implemented for Direction~2.
+ 
+\textbf{Force-directed network (primary design).} The force-directed network renders the document-level co-occurrence structure as a node-link diagram. Each node represents a place name; node size encodes total mention frequency across all authors. Each edge represents a co-occurrence pair; edge width encodes co-occurrence weight using the function $w' = (w / w_{\max})^2 \times 12$. The squared normalisation was chosen after testing linear and square-root mappings: linear mapping produced edges that were visually indistinguishable in width; square-root mapping improved discrimination but still left the strongest edges insufficiently salient. The squared function produces a clear visual hierarchy while still rendering weaker connections as visible, thin lines. This function was reached after testing two earlier mappings. A linear mapping ($w' = w \times 0.3$) produced edges that were visually indistinguishable across the full weight range 1--28. A square-root mapping ($w' = \sqrt{w/w_{\max}} \times 8$) improved discrimination marginally but left the strongest connections insufficiently prominent relative to weaker ones.
+ 
+Node positions are determined entirely by the force simulation (Fruchterman-Reingold via D3's \texttt{forceSimulation}), with no geographic component. A node's position in the layout reflects its pattern of co-occurrence connections, not its map location. This is a deliberate design choice: the diagram is meant to show narrative topology, and importing geographic position would conflate the two.
+ 
+An interactive weight-threshold slider (range 1--28) allows the user to progressively reveal weaker connections, from the sparsest high-confidence view (threshold 28, showing only the single strongest pair) to the densest view (threshold 1, showing all 403 pairs). Nodes are draggable, and the diagram supports scroll-to-zoom and pan. Hovering over a node reveals a tooltip listing the five places most strongly co-occurring with it.
+ 
+\textbf{Linear connection diagram (secondary design).} The linear connection diagram arranges place names along a horizontal axis, ordered left to right by total mention frequency. Bézier arcs connect co-occurring pairs above the axis; arc height is proportional to the horizontal distance between the two connected nodes, and stroke width is proportional to co-occurrence weight. A weight-threshold slider (range 1--28) controls which pairs are shown.
+ 
+The choice of a linear rather than circular layout followed a specific piece of supervisor feedback: a circular arrangement (as in a chord diagram) implies that the structure being represented is cyclical or symmetrical, which is inappropriate for literary narratives, which have a definite beginning and end. The linear axis does not make this implication. The leftmost position (highest-frequency place) corresponds loosely to centrality in the corpus, and the arrangement from left to right can be read as a rough ordering by narrative salience.
+
+\paragraph{Designs considered but not selected.} Two Direction-1 candidates were explored but ultimately deprioritised. A colour map silhouette design used a simplified Edinburgh coastline with area shading proportional to mention frequency; initial data analysis showed that all five authors concentrate their mentions in the city centre, producing visually similar heatmaps with limited discriminability between authors. A chord diagram was explored for Direction~2 but replaced by the linear connection diagram following supervisor feedback that a circular arrangement implies cyclical or symmetrical structure, inappropriate for literary narratives with a definite beginning and end.
+
+Two further directions considered during early design were prototyped but deferred. A \emph{Reader-plot timeline} would represent the sequence of place-name appearances across a single text on a horizontal narrative axis, directly exploiting the \texttt{position\_pct} field in the \texttt{mention\_order} table; the data infrastructure for this direction is complete, and it is identified as future work in Chapter~\ref{chap:conclusion}. A \emph{literary silences map} would visualise Edinburgh places that never appear in the corpus, following Moretti's concept of literary silences \cite{moretti2005}; this direction was deferred on methodological grounds, as the LitLong corpus's coverage is not comprehensive enough to treat absence as meaningful evidence.
+ 
+\textbf{Metro-style map (illustrative design).} The metro-style map arranges place names as stations on eight named lines, following the visual language of the London Underground map. The London Tube map, designed by Harry Beck in 1933, replaced geographic accuracy with functional topology: it told travellers which line to take and where to change, rather than where stations were physically located. This project applies the same substitution to literary geography: the lines represent narrative corridors (clusters of places that appear together in a thematic or geographic tradition), not physical routes.
+ 
+Eight lines are defined, each named for a geographic or cultural axis: North Line (coastal north Edinburgh, from Granton to Cramond), Old Town Line (the Royal Mile from Grassmarket to Duddingston), South Line (the southern residential belt from Colinton to Musselburgh), East-West Line (cross-city from Corstorphine to Portobello), Circle Line (the inner-city loop through Tollcross, Bruntsfield, and back via the Old and New Towns), North-South Line (a meridional axis from Leith to Fairmilehead), Outer Line (suburban and satellite towns), and West Line (the western approach via Cramond and Murrayfield). Interchange stations---served by two or more lines---are marked with a double-circle symbol.
+ 
+The layout is manually constructed on a regular grid (unit spacing 58 pixels) rather than generated algorithmically. This decision reflects the state of the art in metro-map drawing: algorithmic schematic layout, which requires placing nodes at octilinear angles while preserving topological correctness, is a known computationally hard problem \cite{nollenburg2006}. A manually constructed map is appropriate for the five-author prototype; automated layout would be required for a system scaled to the full 424-author corpus.
+ 
+\section{Design Summary}
+ 
+Table~\ref{tab:design-summary} summarises the six visualisation designs and their key properties.
+ 
+\begin{table}[h]
+\centering
+\caption{Summary of the six visualisation prototypes.}
+\label{tab:design-summary}
+\small
+\begin{tabular}{llp{5cm}p{4cm}}
+\toprule
+Direction & Design & Primary encoding & Key interaction \\
+\midrule
+1 & Radar chart & Polygon shape across 14 sector axes & Click vertex for sector detail panel \\
+1 & Bar-code & Bar height = mention share per place & Sector/frequency/alpha ordering; per-author Y-axis \\
+1 & Small multiples & Bubble size on real map & Sync zoom; log/linear toggle \\
+2 & Force-directed network & Node size = frequency; edge width = co-occurrence & Weight slider; drag nodes \\
+2 & Linear connection & Arc height = node distance; arc width = weight & Weight slider; ordering \\
+2 & Metro-style map & Line membership = narrative corridor & Zoom/pan; hover for line info \\
+\bottomrule
+\end{tabular}
+\end{table}
+ 
+ 
+% ============================================================
+% CHAPTER 4: IMPLEMENTATION
+% ============================================================
+\chapter{Implementation}
+\label{chap:impl}
+ 
+\section{Data Pipeline}
+ 
+\subsection*{Database setup}
+ 
+PostgreSQL 16 was installed via Homebrew on macOS and a database named \texttt{litlong\_edinburgh} was created. The full LitLong dump (\texttt{litlong\_2022-06-21.sql}, 145\,MB, approximately 2.3 million lines) was imported directly using \texttt{psql}. This dump is more complete than the four CSV snapshots provided with the project brief: it contains 620 documents (versus 548 in the CSV), 50,248 mention records (versus 48,056), and 27 tables not present in the CSV export, including \texttt{api\_sentence} (full source text for every mention), \texttt{api\_genre} (29 literary genre classifications), and \texttt{api\_posmention} (2,085,834 part-of-speech annotation records).
+ 
+One table failed to import from the dump: \texttt{api\_location}, which uses PostGIS geometry types (\texttt{geom}, \texttt{poly} fields) that require the PostGIS extension. Since PostGIS was not installed, \texttt{api\_location} was instead imported from the CSV snapshot using Python/pandas, retaining only the fields \texttt{id}, \texttt{text}, \texttt{lat}, \texttt{lon}, \texttt{gazref}, and \texttt{ptype}, and discarding the PostGIS-dependent geometry fields. These geometry fields are not required for any of the current visualisation directions, which use latitude/longitude centroids throughout.
+ 
+The database name conflicts with user role assumptions in the dump (which was originally owned by user \texttt{palimpsest} on a remote server). Import warnings about missing roles are harmless and do not affect the data.
+ 
+\subsection*{Narrative order extraction}
+ 
+The \texttt{api\_locationmention} table contains a field \texttt{start\_word} encoding a global word index for each mention (format: \texttt{w81489}). This field was validated to be strictly monotonically increasing within each document by extracting the integer values and checking for violations across a sample of documents. No violations were found. This property means that \texttt{start\_word} can be used directly to reconstruct the reading order of place-name mentions within any document, without parsing the source text.
+ 
+A custom table \texttt{mention\_order} was constructed with the following fields: \texttt{id} (foreign key to \texttt{api\_locationmention}), \texttt{document\_id}, \texttt{location\_id}, \texttt{word\_num} (integer extracted from \texttt{start\_word}), \texttt{mention\_order} (rank of this mention within its document, $1$ = earliest), and \texttt{position\_pct} (normalised position within the document, computed as $(\text{word\_num} - \min) / (\max - \min)$ per document). The \texttt{position\_pct} field enables Reader-plot style timeline visualisations and will support future work on narrative sequence analysis.
+ 
+\subsection*{Sector classification}
+ 
+The sector classification procedure is described in Section~\ref{sec:sectors}. The implementation uses the \texttt{shapely} Python library (version 2.0.1) for point-in-polygon intersection. The two GeoJSON boundary files were downloaded from the City of Edinburgh Council's ArcGIS REST API:
+ 
+\begin{itemize}
+  \item Neighbourhood Partnership Areas: Layer ID 28 at \texttt{edinburghcouncilmaps.info}
+  \item Natural Neighbourhoods: Layer ID 188 at the same endpoint
+\end{itemize}
+ 
+Each place in \texttt{api\_location} with a valid latitude and longitude was tested against the 14 sector polygons in order. If a point fell within a polygon, it was assigned to that sector (exact match). If it fell within the Edinburgh bounding box but outside all polygons---due to gaps between polygon boundaries---it was assigned to the nearest polygon by Euclidean distance in projected coordinates (nearest-neighbour assignment). Points outside the bounding box were assigned to a catch-all category, ``Outer Scotland,'' and excluded from sector-based analyses. The results were written to a derived table \texttt{location\_sectors} and exported as a CSV for use in the D3 visualisations.
+ 
+\subsection*{Co-occurrence computation}
+ 
+Document-level co-occurrence between place names was computed in Python using the \texttt{itertools.combinations} function. For each document, the set of distinct place names mentioned in that document was extracted; for every pair in that set, the pair's co-occurrence count was incremented by one. The resulting co-occurrence matrix was filtered to retain only pairs with weight $\geq 2$ (appearing together in at least two documents), yielding 403 pairs. The top co-occurring pairs were exported as \texttt{network\_edges.csv} and \texttt{network\_nodes.csv}.
+ 
+\section{Direction 1: Author Spatial Fingerprints --- Implementation}
+ 
+\subsection*{Radar chart}
+ 
+The radar chart is implemented using D3's \texttt{lineRadial} function with \texttt{curveLinearClosed}, which produces a closed polygon across the 14 angular positions. The angular spacing is $2\pi / 14$ radians per sector. The radial scale maps sector proportion to a radius between 0 and $R = 250$ pixels, where the scale maximum is set to the observed data maximum (0.436) rather than to 1.0.
+ 
+Hover interaction is implemented using invisible \texttt{circle} elements of radius 14 pixels centred on each vertex. This radius was chosen after testing smaller values: a radius of 6 pixels requires pixel-precise cursor placement and is difficult to target reliably. At radius 14, hovering is comfortable without the targets overlapping each other. On hover, a tooltip shows the sector name and percentage; on click, a detail panel opens showing the top eight place names in that sector for the selected author, ordered by mention count, together with a bar chart and the top five books.
+ 
+Data is embedded directly as JavaScript arrays in the HTML file. This is necessary because browsers block \texttt{XMLHttpRequest} calls to local files under the \texttt{file://} protocol; a \texttt{d3.csv()} call would silently fail. The same embedding approach is used for all six D3 visualisations.
+ 
+\subsection*{Bar-code fingerprint}
+ 
+Each author's row is rendered as an SVG element appended to a container div. The Y-axis domain is \texttt{[0, maxVal]}, where \texttt{maxVal} is the maximum proportion value for that author across all place names---not the global maximum across all authors. This per-author scaling is a deliberate design decision, as justified in Section~\ref{chap:design}.
+ 
+Sector boundaries are visualised using two complementary encodings: a low-opacity background rectangle in the sector's colour spans the bars belonging to each sector, and a narrow colour strip below the bar area identifies the sector. Text labels are rendered below the colour strip only when the sector is wide enough to accommodate them without overlap (threshold: 40 pixels); narrower sectors are identified by colour alone. This approach avoids the text-stacking problem that arose in earlier versions when 14 sector labels were displayed regardless of available width.
+ 
+Switching between ordering modes (sector, frequency, alphabetical) and scale modes (percentage, absolute) is implemented by re-rendering the SVG elements in JavaScript with the new ordering applied to the place-name array, rather than by animating existing elements. This approach is simpler to implement correctly and avoids the complexity of D3 transition management across multiple SVG groups.
+ 
+\subsection*{Small multiples}
+ 
+Each of the five panels is implemented as an independent Leaflet.js map instance, initialised with the CartoDB Positron tile layer. Place-name bubbles are rendered as Leaflet \texttt{CircleMarker} objects, whose \texttt{radius} property is recomputed whenever the scale mode changes. The two-stage Leaflet/D3 overlay approach used in earlier prototypes (in which D3 SVG elements were positioned over the map using screen-coordinate projection) was replaced with native Leaflet \texttt{CircleMarker} objects, which correctly handle map pan and zoom without requiring manual coordinate projection.
+ 
+Synchronised zoom is implemented by attaching a \texttt{moveend} event listener to each map; when the listener fires and the sync toggle is enabled, it calls \texttt{setView} on all other maps with the current centre and zoom level. A boolean \texttt{isSyncing} flag prevents the listener from triggering cascading updates.
+ 
+\section{Direction 2: Narrative Topology --- Implementation}
+ 
+\subsection*{Force-directed network}
+ 
+The simulation uses four forces: \texttt{forceLink} (spring attraction between connected nodes, with link distance inversely proportional to co-occurrence weight), \texttt{forceManyBody} (uniform repulsion, strength $-400$), \texttt{forceCollide} (collision avoidance with radius equal to node radius plus 18 pixels), and \texttt{forceCenter} (gentle attraction to the canvas centre). The simulation is re-run from scratch whenever the weight threshold is changed, because the set of active nodes and edges changes and a smooth transition between graph topologies is not meaningful.
+ 
+Node labels are positioned at $y = \text{node.y} + r + 12$ pixels, placing them below each node. An earlier version positioned labels at the node centroid with white fill, expecting the text to appear inside the node; in practice, the labels were invisible because the white text was rendered against the dark node background. Repositioning labels below the node boundary resolved this issue.
+ 
+\subsection*{Linear connection diagram}
+ 
+Each arc is drawn as a quadratic Bézier path: \texttt{M x1 y0 Q midX (y0 - h) x2 y0}, where \texttt{midX} $= (x1 + x2) / 2$ and \texttt{h} $= |x2 - x1| \times 0.42$. The coefficient 0.42 was chosen to produce arcs that are visually distinct without extending beyond the SVG canvas for the longest connections. Stroke width is computed as $(w / w_{\max})^{1.5} \times 6$.
+ 
+\subsection*{Metro-style map}
+ 
+The map is rendered as a static SVG with eight polyline paths (one per line), \texttt{circleMarker} elements for stations, and text labels. Interchange stations (those served by two or more lines) are marked with an outer white circle of radius 10 and an inner dark circle of radius 4, following the London Underground convention. All other stations use a smaller white circle with a coloured stroke matching the line colour. D3 zoom behaviour is attached to the SVG to support scroll-to-zoom and drag-to-pan.
+ 
+\section{Technical Decisions and Constraints}
+ 
+\textbf{Data embedding.} All six D3 HTML files embed their data as JavaScript object literals. The trade-off is larger file sizes and the need to regenerate the HTML file when the underlying data changes. For a research prototype evaluated with a fixed dataset, this is an acceptable constraint.
+ 
+\textbf{Versioning.} Each HTML file is versioned by maintaining previous versions under filenames such as \texttt{radar\_v1.html}, \texttt{network\_v1.html}, etc. This preserves the design evolution as a record for the dissertation and for the supervisor.
+ 
+\textbf{Browser compatibility.} All files have been tested in Safari and Chrome on macOS. D3.js v7 and Leaflet.js 1.9.4 are both loaded from CDN at runtime, requiring an internet connection.
+ 
+\textbf{PostGIS.} The PostGIS extension was not installed, and the geometry fields of \texttt{api\_location} (\texttt{geom}, \texttt{poly}) are excluded from all analyses. Latitude/longitude centroid coordinates are used throughout. For the current visualisation directions, centroid coordinates are sufficient; more precise polygon representations of place areas would be needed only for overlay analyses that are not part of the current scope.
+ 
+\section{Combined Interface}
+% TODO: implement in Week 6-7 then write this section
+%
+% Planned architecture:
+% - Single-page HTML application with top navigation (Fingerprints / Topology)
+% - Left control panel: author selector (all 424 authors), visualisation type,
+%   parameter sliders
+% - Main view: selected visualisation
+% - Detail panel: source text from api_sentence on hover/click
+% - Cross-view linking: selecting an author in fingerprint view highlights
+%   their places in topology view
+% - Scale: expand to 20-30 representative authors for final submission
+ 
+ 
+% ============================================================
+% CHAPTER 5: EVALUATION
+% ============================================================
+\chapter{Evaluation}
+\label{chap:eval}
+ 
+\section{Study Design}
+ 
+The user study is designed to evaluate whether the six visualisation prototypes support the tasks implied by the two research questions: author identification (RQ1) and narrative-relationship identification (RQ2).
+ 
+\textbf{Participant groups.} Two groups are recruited: domain experts (literary scholars, digital humanists, and researchers with familiarity with Edinburgh's literary geography) and general public (participants without specialist knowledge of Edinburgh literature or information visualisation). Recruiting two groups allows the study to test the hypothesis that expert and non-expert users differ in which design they find most legible, and in whether they spontaneously perceive the divergence between narrative and geographic proximity.
+ 
+\textbf{Format.} The study is conducted online to maximise recruitment reach and sample size. An online format also ensures that participants interact with the visualisations in a browser environment that reflects real-world usage conditions.
+ 
+\textbf{Introduction protocol.} Participants are shown each visualisation with only a brief description of the project's purpose (``We are studying how literary place names can be visualised'') but without an explanation of what each visual encoding means. This ``cold'' presentation is methodologically important: it tests whether the designs are self-explanatory, rather than testing participants' ability to apply an explanation they have been given. Participants who require the designs to be explained before they can use them are, in effect, revealing a usability problem.
+ 
+\textbf{Tasks.} Two task types are used. Task~1 (fingerprint direction): participants are shown a fingerprint visualisation (radar chart, bar-code, or small multiples) and asked which of the five authors they believe it represents. This is a forced-choice identification task; accuracy is the primary metric. Task~2 (topology direction): participants are shown a topology visualisation (force-directed network, linear connection diagram, or metro map) and asked to identify the two places that appear most strongly connected, and to judge whether those two places are geographically close or far apart in Edinburgh. The secondary question tests whether the visualisation spontaneously communicates the narrative/geographic divergence finding. After completing all tasks, participants vote for the most intuitive design in each direction.
+ 
+\textbf{Ethics.} The study has received ethics approval from the Informatics Research Ethics Committee (application number 446635). Participants complete an online consent form before beginning the study. The participant information sheet and consent form are included in Appendix~A.
+ 
+\section{Participants}
+% TODO: complete after study is run
+% Target: minimum 20 per group (40 total)
+% Demographics: age range, background, familiarity with Edinburgh,
+%               prior experience with data visualisation
+ 
+\section{Study Procedure}
+% TODO: complete after study is run
+ 
+\section{Results}
+% TODO: complete after study is run
+ 
+\section{Discussion of Results}
+% TODO: complete after study is run
+ 
+ 
+% ============================================================
+% CHAPTER 6: DISCUSSION
+% ============================================================
+\chapter{Discussion}
+\label{chap:discussion}
+ 
+\section{Design Improvements after User Study}
+% TODO: complete after user study results are available
+ 
+\section{Narrative Topology vs Geographic Topology}
+ 
+The most striking finding from the data analysis is the co-occurrence of Leith and Princes Street across 28 distinct literary works---the strongest co-occurrence pair in the entire corpus. Geographically, these two places are separated by approximately 2.5 kilometres. Leith is a port district historically associated with trade, working-class communities, and political radicalism; Princes Street is the principal commercial artery of the Georgian New Town, associated with bourgeois Edinburgh. On a geographic map, they appear as two points in the same city. In the narrative topology visualisation, they are the closest pair in the entire network.
+ 
+This is not coincidental. The journey between Leith and Princes Street is a recurrent structuring device in Edinburgh fiction precisely because it traverses a social as well as a spatial boundary. Irvine Welsh's \textit{Trainspotting} makes this explicit: the characters move between Leith and the city centre as a movement between social worlds, between the margins and the mainstream of Edinburgh life. Walter Scott's historical novels stage similar journeys between the Old Town closes and the wider city as crossings between historical strata. The narrative topology visualisation makes this pattern visible in a way that a geographic map cannot: it shows that these two places are \emph{narratively adjacent}, regardless of their spatial distance.
+ 
+This finding speaks directly to the theoretical framing of the project. Westphal's geocriticism argues that literary space is relational and constructed, not a reflection of physical geography \cite{westphal2011}. The Leith/Princes Street co-occurrence is a concrete, quantitative instance of this argument: the places that are most strongly connected in Edinburgh's literary imagination are not the places that are nearest to each other on a map.
+ 
+\section{Author Spatial Languages}
+ 
+The near-total absence of shared place names across the five test authors---zero places shared by three or more, only 18 shared by any two---is a finding that can be stated as a simple number but deserves fuller interpretation. It means that each author has constructed, across their body of work, an Edinburgh that is almost entirely their own. McCall Smith's Edinburgh is bounded by the triangle formed by Scotland Street, Dundas Street, and Drummond Place in the New Town. Welsh's Edinburgh is bounded by Leith. Scott's Edinburgh is centred on the Canongate and the Old Town closes. Stevenson's Edinburgh extends south towards the Pentlands, reflecting his childhood at Swanston Cottage, and west towards the Firth of Forth, reflecting his father's lighthouse engineering work.
+ 
+The radar chart and bar-code fingerprint make these private geographies comparable at a glance. A user who knows nothing of these authors' biographies can see, from the shape of the radar chart polygon, that McCall Smith and Welsh occupy different spatial territories within the same city. The visualisation encodes, in its geometry, a literary-geographic argument that would otherwise require paragraphs of prose.
+ 
+\section{Limitations and Open Questions}
+ 
+\textbf{Corpus size confound.} McCall Smith contributed 17 works to the corpus, Stevenson 16, Scott 12. Welsh contributed only 8, Lockhart 6. Because sector distributions are normalised as proportions of each author's total mentions, a large corpus and a small corpus with identical spatial habits would produce identical fingerprints. However, this normalisation also means that the results are best interpreted as measures of \emph{spatial attention}---what fraction of each author's narrative geography is allocated to each sector---rather than absolute output. The consistency of the spatial patterns across works within each author's corpus (which is visible when individual books are examined) suggests that these are genuine authorial preferences rather than corpus-size artefacts.
+ 
+\textbf{Five-author prototype.} The current system uses five test authors, selected for contrast and representativeness. Whether the fingerprint approach scales to the full 424-author corpus---whether distinct fingerprints remain legible when 424 polygons are overlaid on a single radar chart, or 424 bar-code rows are presented on a single page---is an open question that will be addressed in the combined interface (Section~\ref{chap:impl}).
+ 
+\textbf{Manual metro-map layout.} The metro-map layout is manually constructed and is not generalisable to arbitrary data. A system that assigned stations to lines algorithmically, and laid the map out on an octilinear grid, would be required to scale this design to the full corpus or to allow users to define their own line groupings.
+ 
+\textbf{PostGIS and polygon precision.} The \texttt{api\_location} table records places as latitude/longitude centroids, not polygons. For a place like ``Old Town,'' the centroid may not accurately represent the full extent of the area referenced in the text. PostGIS polygon data is available in the original database schema but requires the PostGIS extension, which was not installed in this project. Future work could install PostGIS and use the polygon representations for more precise sector assignment.
+ 
+\textbf{Source text integration.} The \texttt{api\_sentence} table contains the full source sentence for every mention, but this data has not yet been integrated into the interactive visualisations. The supervisor identified this as a priority: being able to read the actual literary sentence in which a place appears is the most direct form of ``details on demand'' the data supports. This feature is planned for the combined interface.
+ 
+\textbf{Reader-sketch and narrative time.} The supervisor noted a direction labelled ``Reader-sketch?'' in early meetings, referring to visualisations that represent the reading experience---the sequence in which places are encountered as the reader moves through a text. The \texttt{position\_pct} field in \texttt{mention\_order} provides the necessary data for this, and Reader-plot timeline visualisations were prototyped but not included in the user study. This remains an open direction.
+ 
+ 
+% ============================================================
+% CHAPTER 7: CONCLUSION
+% ============================================================
+\chapter{Conclusion}
+\label{chap:conclusion}
+ 
+This dissertation has argued that place names in literary text are data about narrative structure, not merely about geographic location, and has demonstrated that this argument can be operationalised as a set of interactive visualisations grounded in real corpus data. The LitLong Edinburgh database---620 literary works spanning three centuries, 2,135 place names, 50,248 mention records---provided the empirical foundation. Six visualisation prototypes were developed across two research directions, implemented in D3.js, and evaluated through a user study.
+ 
+% TODO: fill in after user study — answer RQ1 and RQ2 explicitly
+% RQ1: [YES/PARTIAL] — the radar chart / bar-code / small multiples
+%      allowed users to identify authors at [X]% accuracy.
+% RQ2: [YES] — the force-directed network and linear connection diagram
+%      revealed that Leith and Princes Street are the most narratively
+%      proximate pair (weight 28) despite geographic separation.
+ 
+The project's contributions include: a validated spatial classification of Edinburgh place names using official City of Edinburgh Council administrative boundary data; an empirical finding that each of five representative Edinburgh authors constructs an almost entirely private imaginary geography of the city; a method for extracting narrative reading order from the LitLong database using the \texttt{start\_word} field as a monotonic index; and a suite of interactive visualisation prototypes that make authorial spatial patterns and narrative co-occurrence structure visible in forms not previously available.
+ 
+Several directions for future work are identified. Scaling the system to the full 424-author corpus would require a combined interface with author-selection controls and a layout strategy for the radar chart and network visualisations that remains legible at large author counts. Integrating the \texttt{api\_sentence} source text into the interactive detail panels would provide the most direct form of ``details on demand'' and would ground the abstract visualisation encodings in the literary language itself. The \texttt{api\_posmention} table, containing over two million part-of-speech annotations, would support a third research direction: narrative weight analysis, examining whether a place name appears in dialogue, narration, or description, and whether this varies systematically across authors or genres. Finally, the concept of ``literary silences''---Edinburgh places that appear in the gazetteer but never in any literary work---would complement the current analysis by revealing what Edinburgh's literary imagination systematically excludes.
+ 
+ 
+% ============================================================
+% BIBLIOGRAPHY
+% ============================================================
+\bibliographystyle{plain}
+\bibliography{mybibfile}
+ 
+ 
+% ============================================================
+% APPENDICES
+% ============================================================
+\appendix
+ 
+\chapter{Study Material}
+ 
+\section{Participant Information Sheet}
+% TODO: insert PIS PDF
+% \includepdf[pages=-]{pis.pdf}
+ 
+\section{Consent Form}
+% TODO: insert Consent Form PDF
+% \includepdf[pages=-]{consent.pdf}
+ 
+\section{Task Questions}
+% TODO: finalise after study design is confirmed
+ 
+\section{Survey Questions}
+% TODO: finalise after study design is confirmed
+ 
+\chapter{Data and Implementation}
+ 
+\section{Database Schema}
+ 
+The LitLong Edinburgh PostgreSQL database contains 27 tables after full import. The tables most relevant to this project are listed in Table~\ref{tab:db-schema}.
+ 
+\begin{table}[h]
+\centering
+\caption{Key tables in the LitLong Edinburgh database.}
+\label{tab:db-schema}
+\small
+\begin{tabular}{lrl}
+\toprule
+Table & Rows & Description \\
+\midrule
+\texttt{api\_document} & 620 & Literary works (title, publication date, type) \\
+\texttt{api\_author} & 424 & Authors (name, gender, Open Library ID) \\
+\texttt{api\_document\_author} & 1,232 & Many-to-many: documents $\leftrightarrow$ authors \\
+\texttt{api\_location} & 2,135 & Place names (text, latitude, longitude) \\
+\texttt{api\_locationmention} & 50,248 & Mention records (start\_word, page\_id, sentence\_id) \\
+\texttt{api\_sentence} & 50,248 & Full source text for each mention \\
+\texttt{api\_genre} & 29 & Literary genre classifications \\
+\texttt{api\_posmention} & 2,085,834 & Part-of-speech annotations \\
+\texttt{mention\_order} & 50,248 & Custom: narrative order and position (derived) \\
+\bottomrule
+\end{tabular}
+\end{table}
+ 
+\section{Sector Definitions}
+ 
+Table~\ref{tab:sectors} lists the 14 sectors used in the spatial classification, their data sources, and their place-name counts.
+ 
+\begin{table}[h]
+\centering
+\caption{The 14 spatial sectors and their place-name counts.}
+\label{tab:sectors}
+\small
+\begin{tabular}{llrr}
+\toprule
+Sector & Source & Exact matches & Nearest-neighbour \\
+\midrule
+Old Town & Natural Neighbourhoods & 296 & --- \\
+South Central & NP Areas & 255 & --- \\
+New Town & Natural Neighbourhoods & 217 & --- \\
+Leith & NP Areas & 152 & --- \\
+Inverleith & NP Areas & 140 & --- \\
+Craigentinny/Duddingston & NP Areas & 73 & --- \\
+Pentlands & NP Areas & 66 & --- \\
+Canongate & Natural Neighbourhoods & 64 & --- \\
+Almond & NP Areas & 64 & --- \\
+South West & NP Areas & 44 & --- \\
+Western Edinburgh & NP Areas & 43 & --- \\
+Portobello/Craigmillar & NP Areas & 38 & --- \\
+Liberton/Gilmerton & NP Areas & 36 & --- \\
+Forth & NP Areas & 27 & --- \\
+\midrule
+Outer Scotland (excluded) & --- & 232 & --- \\
+\bottomrule
+\end{tabular}
+\end{table}
+ 
+\noindent\small\textit{Note: Nearest-neighbour counts are included in the exact-match totals above. Source: City of Edinburgh Council Open Spatial Data Portal (Open Government Licence v3.0). ``Copyright City of Edinburgh Council, contains Ordnance Survey data \copyright\ Crown copyright.''}
+ 
+\section{Author Selection}
+ 
+The five test authors were selected on the basis of mention count, number of works in the corpus, and thematic contrast. Table~\ref{tab:authors} summarises their corpus statistics and dominant sectors.
+ 
+\begin{table}[h]
+\centering
+\caption{Five test authors and their corpus statistics.}
+\label{tab:authors}
+\small
+\begin{tabular}{lrrlr}
+\toprule
+Author & Mentions & Works & Dominant sector & \% \\
+\midrule
+Alexander McCall Smith & 7,320 & 17 & New Town & 43.6 \\
+Irvine Welsh & 2,634 & 8 & Leith & 44.3 \\
+John Gibson Lockhart & 3,046 & 6 & New Town & 25.9 \\
+Walter Scott & 2,796 & 12 & Old Town & 32.0 \\
+Robert Louis Stevenson & 1,778 & 16 & Old Town & 20.7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+ 
+\section{Co-occurrence Analysis}
+ 
+Table~\ref{tab:cooccurrence} lists the ten strongest document-level co-occurrence pairs in the corpus, computed across the five test authors.
+ 
+\begin{table}[h]
+\centering
+\caption{Top 10 document-level co-occurrence pairs (five test authors).}
+\label{tab:cooccurrence}
+\small
+\begin{tabular}{llr}
+\toprule
+Place A & Place B & Weight (documents) \\
+\midrule
+Leith & Princes Street & 28 \\
+New Town & Princes Street & 18 \\
+Dundas Street & Princes Street & 17 \\
+Bruntsfield & Dundas Street & 16 \\
+Bruntsfield & Princes Street & 16 \\
+Dundas Street & New Town & 16 \\
+Dundas Street & Morningside & 15 \\
+Morningside & Stockbridge & 15 \\
+Princes Street & Stockbridge & 15 \\
+Dundas Street & The Meadows & 15 \\
+\bottomrule
+\end{tabular}
+\end{table}
+ 
+\end{document}
