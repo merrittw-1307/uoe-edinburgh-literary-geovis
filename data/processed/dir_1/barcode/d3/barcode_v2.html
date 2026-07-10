@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Author Spatial Fingerprints — Bar-code v3</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #F8F9FC;
+    padding: 30px 40px;
+  }
+  h1 { font-size: 20px; color: #21295C; margin-bottom: 4px; }
+  .subtitle { font-size: 12px; color: #888; margin-bottom: 4px; }
+  .source { font-size: 10px; color: #BBB; margin-bottom: 16px; font-style: italic; }
+  .note { font-size: 10px; color: #C9A227; background: #FFF8E7;
+           border-left: 3px solid #C9A227; padding: 6px 10px;
+           margin-bottom: 16px; border-radius: 0 4px 4px 0; }
+  .controls {
+    display: flex; gap: 12px; align-items: center;
+    flex-wrap: wrap; margin-bottom: 16px;
+  }
+  .ctrl-group { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; }
+  .btn {
+    padding: 4px 12px; border-radius: 14px;
+    border: 1.5px solid #C0C8D8; background: white;
+    font-size: 11px; cursor: pointer; color: #333; transition: all 0.15s;
+  }
+  .btn:hover { background: #E8EAF6; border-color: #21295C; }
+  .btn.active { background: #21295C; color: white; border-color: #21295C; }
+  .search-box {
+    padding: 4px 12px; border-radius: 14px;
+    border: 1.5px solid #C0C8D8; font-size: 11px;
+    outline: none; width: 160px;
+  }
+  .search-box:focus { border-color: #21295C; }
+  .sector-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+  .sector-tag {
+    font-size: 10px; padding: 3px 10px; border-radius: 10px;
+    color: white; cursor: pointer; transition: opacity 0.2s; user-select: none;
+  }
+  .sector-tag.muted { opacity: 0.25; }
+  .author-block { margin-bottom: 28px; }
+  .author-header {
+    display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px;
+  }
+  .author-label { font-size: 13px; font-weight: bold; }
+  .author-maxval { font-size: 10px; color: #AAA; }
+  .tooltip {
+    position: fixed; background: white;
+    border: 1px solid #E0E4F0; border-radius: 8px;
+    padding: 8px 12px; font-size: 12px; pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; z-index: 100;
+  }
+  #detail-panel {
+    position: fixed; right: 24px; top: 80px; width: 260px;
+    background: white; border: 1px solid #E0E4F0; border-radius: 12px;
+    padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    display: none; z-index: 200; max-height: 80vh; overflow-y: auto;
+  }
+  #detail-panel .dp-close { float: right; cursor: pointer; color: #CCC; font-size: 16px; }
+  #detail-panel .dp-close:hover { color: #666; }
+  #detail-panel .dp-place { font-size: 16px; font-weight: bold; color: #21295C; margin-bottom: 2px; }
+  #detail-panel .dp-meta { font-size: 11px; color: #888; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #EEE; }
+  #detail-panel h4 { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #999; margin: 10px 0 5px; }
+  #detail-panel .stat { font-size: 22px; font-weight: bold; margin-bottom: 2px; }
+  #detail-panel .book-row {
+    font-size: 11px; padding: 3px 0; border-bottom: 1px solid #F5F5F5;
+    display: flex; justify-content: space-between; gap: 8px;
+  }
+  #detail-panel .book-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #444; }
+  #detail-panel .book-count { color: #999; flex-shrink: 0; }
+</style>
+</head>
+<body>
+<h1>Author Spatial Fingerprints — Bar-code Style</h1>
+<div class="subtitle">Each bar = one place · height = % of this author's total mentions · Y-axis is per-author (not comparable across rows)</div>
+<div class="source">Sector classification: City of Edinburgh Council NP Areas & Natural Neighbourhoods (OGL v3.0)</div>
+<div class="note">⚠ Each author has an independent Y-axis scaled to their own maximum value. This highlights within-author spatial distribution rather than cross-author comparison. Hover or click any bar for details.</div>
+
+<div class="controls">
+  <div class="ctrl-group">
+    <span>Order:</span>
+    <button class="btn active" id="btn-sector">By sector</button>
+    <button class="btn" id="btn-freq">By frequency</button>
+    <button class="btn" id="btn-alpha">Alphabetical</button>
+  </div>
+  <div class="ctrl-group">
+    <span>Scale:</span>
+    <button class="btn active" id="btn-pct">Percentage</button>
+    <button class="btn" id="btn-abs">Absolute count</button>
+  </div>
+  <div class="ctrl-group">
+    <input type="text" class="search-box" id="search" placeholder="🔍 Search place...">
+  </div>
+</div>
+
+<div class="sector-legend" id="sector-legend"></div>
+<div id="chart"></div>
+
+<div id="detail-panel">
+  <span class="dp-close" id="dp-close">&#x2715;</span>
+  <div class="dp-place" id="dp-place"></div>
+  <div class="dp-meta" id="dp-meta"></div>
+  <h4>Mention count</h4>
+  <div class="stat" id="dp-stat"></div>
+  <h4>Books</h4>
+  <div id="dp-books"></div>
+</div>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const authorsData = [{"author": "Alexander McCall Smith", "values": [{"place": "Leith", "value": 0.0249, "sector": "Leith", "abs": 94, "books": [{"title": "The Unbearable Lightness of Scones", "count": 48}, {"title": "Espresso Tales", "count": 10}, {"title": "Bertie Plays the Blues", "count": 6}, {"title": "The Importance of Being Seven", "count": 6}, {"title": "The Sunday Philosophy Club", "count": 6}]}, {"place": "Leith Walk", "value": 0.0085, "sector": "Leith", "abs": 16, "books": [{"title": "The World According to Bertie", "count": 8}, {"title": "Espresso Tales", "count": 6}, {"title": "The Comfort of Saturdays", "count": 2}]}, {"place": "Water of Leith", "value": 0.0159, "sector": "Leith", "abs": 60, "books": [{"title": "Bertie's Guide to Life and Mothers", "count": 24}, {"title": "Bertie Plays the Blues", "count": 10}, {"title": "The Bertie Project", "count": 6}, {"title": "Sunshine on Scotland Street", "count": 4}, {"title": "The Careful Use of Compliments", "count": 4}]}, {"place": "Calton Hill", "value": 0.0053, "sector": "Leith", "abs": 10, "books": [{"title": "The Unbearable Lightness of Scones", "count": 4}, {"title": "Bertie's Guide to Life and Mothers", "count": 2}, {"title": "Espresso Tales", "count": 2}, {"title": "The Sunday Philosophy Club", "count": 2}]}, {"place": "Scotland Street", "value": 0.1466, "sector": "Inverleith", "abs": 554, "books": [{"title": "Espresso Tales", "count": 94}, {"title": "The World According to Bertie", "count": 82}, {"title": "The Unbearable Lightness of Scones", "count": 80}, {"title": "44 Scotland Street", "count": 64}, {"title": "The Importance of Being Seven", "count": 54}]}, {"place": "Stockbridge", "value": 0.0265, "sector": "Inverleith", "abs": 100, "books": [{"title": "Espresso Tales", "count": 16}, {"title": "The Revolving Door of Life", "count": 10}, {"title": "Bertie Plays the Blues", "count": 8}, {"title": "Bertie's Guide to Life and Mothers", "count": 8}, {"title": "Sunshine on Scotland Street", "count": 8}]}, {"place": "Clarence Street", "value": 0.0371, "sector": "Inverleith", "abs": 70, "books": [{"title": "The Unbearable Lightness of Scones", "count": 68}, {"title": "The Right Attitude to Rain", "count": 2}]}, {"place": "Moray Place", "value": 0.0704, "sector": "New Town", "abs": 266, "books": [{"title": "The Importance of Being Seven", "count": 80}, {"title": "Espresso Tales", "count": 68}, {"title": "Bertie Plays the Blues", "count": 38}, {"title": "The Revolving Door of Life", "count": 18}, {"title": "The World According to Bertie", "count": 16}]}, {"place": "Dundas Street", "value": 0.0688, "sector": "New Town", "abs": 260, "books": [{"title": "Espresso Tales", "count": 58}, {"title": "The Unbearable Lightness of Scones", "count": 48}, {"title": "The World According to Bertie", "count": 36}, {"title": "The Importance of Being Seven", "count": 16}, {"title": "Sunshine on Scotland Street", "count": 14}]}, {"place": "Princes Street", "value": 0.0349, "sector": "New Town", "abs": 132, "books": [{"title": "Espresso Tales", "count": 24}, {"title": "The Unbearable Lightness of Scones", "count": 20}, {"title": "The Comfort of Saturdays", "count": 12}, {"title": "The World According to Bertie", "count": 12}, {"title": "Bertie's Guide to Life and Mothers", "count": 10}]}, {"place": "New Town", "value": 0.0386, "sector": "New Town", "abs": 146, "books": [{"title": "The World According to Bertie", "count": 20}, {"title": "The Unbearable Lightness of Scones", "count": 20}, {"title": "44 Scotland Street", "count": 18}, {"title": "The Importance of Being Seven", "count": 14}, {"title": "The Sunday Philosophy Club", "count": 10}]}, {"place": "Drummond Place", "value": 0.0561, "sector": "New Town", "abs": 212, "books": [{"title": "The Unbearable Lightness of Scones", "count": 44}, {"title": "Bertie Plays the Blues", "count": 32}, {"title": "Sunshine on Scotland Street", "count": 28}, {"title": "44 Scotland Street", "count": 26}, {"title": "The World According to Bertie", "count": 18}]}, {"place": "Cumberland Bar", "value": 0.0508, "sector": "New Town", "abs": 192, "books": [{"title": "44 Scotland Street", "count": 42}, {"title": "The World According to Bertie", "count": 36}, {"title": "Espresso Tales", "count": 28}, {"title": "Bertie's Guide to Life and Mothers", "count": 22}, {"title": "The Bertie Project", "count": 18}]}, {"place": "Queen Street", "value": 0.045, "sector": "New Town", "abs": 170, "books": [{"title": "Sunshine on Scotland Street", "count": 30}, {"title": "The Unbearable Lightness of Scones", "count": 24}, {"title": "Bertie Plays the Blues", "count": 16}, {"title": "The Bertie Project", "count": 16}, {"title": "The Revolving Door of Life", "count": 14}]}, {"place": "India Street", "value": 0.0402, "sector": "New Town", "abs": 152, "books": [{"title": "The Importance of Being Seven", "count": 42}, {"title": "Bertie Plays the Blues", "count": 26}, {"title": "The Unbearable Lightness of Scones", "count": 24}, {"title": "Sunshine on Scotland Street", "count": 18}, {"title": "The Revolving Door of Life", "count": 16}]}, {"place": "Castle Street", "value": 0.0016, "sector": "New Town", "abs": 6, "books": [{"title": "The Right Attitude to Rain", "count": 4}, {"title": "The Revolving Door of Life", "count": 2}]}, {"place": "Heriot Row", "value": 0.0228, "sector": "New Town", "abs": 86, "books": [{"title": "The World According to Bertie", "count": 14}, {"title": "The Right Attitude to Rain", "count": 12}, {"title": "Sunshine on Scotland Street", "count": 10}, {"title": "The Revolving Door of Life", "count": 10}, {"title": "The Unbearable Lightness of Scones", "count": 8}]}, {"place": "Howe Street", "value": 0.0254, "sector": "New Town", "abs": 96, "books": [{"title": "The Unbearable Lightness of Scones", "count": 40}, {"title": "The Bertie Project", "count": 26}, {"title": "The World According to Bertie", "count": 20}, {"title": "The Right Attitude to Rain", "count": 4}, {"title": "Bertie Plays the Blues", "count": 2}]}, {"place": "Waverley Station", "value": 0.0154, "sector": "New Town", "abs": 58, "books": [{"title": "Bertie Plays the Blues", "count": 24}, {"title": "Espresso Tales", "count": 12}, {"title": "44 Scotland Street", "count": 4}, {"title": "The Revolving Door of Life", "count": 4}, {"title": "The Unbearable Lightness of Scones", "count": 4}]}, {"place": "Lothian Road", "value": 0.0116, "sector": "New Town", "abs": 44, "books": [{"title": "The Uncommon Appeal of Clouds", "count": 10}, {"title": "The Importance of Being Seven", "count": 8}, {"title": "Bertie Plays the Blues", "count": 6}, {"title": "Espresso Tales", "count": 4}, {"title": "The Charming Quirks of Others", "count": 4}]}, {"place": "Jenners", "value": 0.0196, "sector": "New Town", "abs": 74, "books": [{"title": "44 Scotland Street", "count": 22}, {"title": "Chance Developments", "count": 14}, {"title": "Espresso Tales", "count": 12}, {"title": "The Unbearable Lightness of Scones", "count": 12}, {"title": "Sunshine on Scotland Street", "count": 4}]}, {"place": "Great King Street", "value": 0.0175, "sector": "New Town", "abs": 66, "books": [{"title": "The Bertie Project", "count": 14}, {"title": "The Sunday Philosophy Club", "count": 12}, {"title": "The Unbearable Lightness of Scones", "count": 12}, {"title": "Bertie Plays the Blues", "count": 8}, {"title": "Bertie's Guide to Life and Mothers", "count": 4}]}, {"place": "Cramond", "value": 0.0074, "sector": "Almond", "abs": 14, "books": [{"title": "Espresso Tales", "count": 6}, {"title": "The Unbearable Lightness of Scones", "count": 4}, {"title": "Sunshine on Scotland Street", "count": 2}, {"title": "The Uncommon Appeal of Clouds", "count": 2}]}, {"place": "Holyrood", "value": 0.0064, "sector": "Old Town", "abs": 24, "books": [{"title": "The Unbearable Lightness of Scones", "count": 8}, {"title": "The Revolving Door of Life", "count": 4}, {"title": "Bertie's Guide to Life and Mothers", "count": 2}, {"title": "Friends, Lovers, Chocolate", "count": 2}, {"title": "The Forgotten Affairs of Youth", "count": 2}]}, {"place": "High Street", "value": 0.009, "sector": "Old Town", "abs": 34, "books": [{"title": "The Revolving Door of Life", "count": 8}, {"title": "The Unbearable Lightness of Scones", "count": 8}, {"title": "Friends, Lovers, Chocolate", "count": 4}, {"title": "The Careful Use of Compliments", "count": 4}, {"title": "Bertie's Guide to Life and Mothers", "count": 2}]}, {"place": "The Meadows", "value": 0.0265, "sector": "Old Town", "abs": 100, "books": [{"title": "The Unbearable Lightness of Scones", "count": 28}, {"title": "Friends, Lovers, Chocolate", "count": 8}, {"title": "The Bertie Project", "count": 8}, {"title": "The World According to Bertie", "count": 8}, {"title": "The Comfort of Saturdays", "count": 6}]}, {"place": "Old Town", "value": 0.0101, "sector": "Old Town", "abs": 38, "books": [{"title": "Bertie's Guide to Life and Mothers", "count": 8}, {"title": "The Forgotten Affairs of Youth", "count": 6}, {"title": "44 Scotland Street", "count": 4}, {"title": "The Revolving Door of Life", "count": 4}, {"title": "Bertie Plays the Blues", "count": 2}]}, {"place": "Grassmarket", "value": 0.0106, "sector": "Old Town", "abs": 20, "books": [{"title": "Friends, Lovers, Chocolate", "count": 8}, {"title": "The Forgotten Affairs of Youth", "count": 6}, {"title": "The Lost Art of Gratitude", "count": 2}, {"title": "The Uncommon Appeal of Clouds", "count": 2}, {"title": "The World According to Bertie", "count": 2}]}, {"place": "Cowgate", "value": 0.0074, "sector": "Old Town", "abs": 28, "books": [{"title": "The Forgotten Affairs of Youth", "count": 12}, {"title": "Friends, Lovers, Chocolate", "count": 8}, {"title": "Bertie's Guide to Life and Mothers", "count": 2}, {"title": "The Bertie Project", "count": 2}, {"title": "The Sunday Philosophy Club", "count": 2}]}, {"place": "St Giles", "value": 0.0127, "sector": "Old Town", "abs": 24, "books": [{"title": "The World According to Bertie", "count": 8}, {"title": "Espresso Tales", "count": 6}, {"title": "44 Scotland Street", "count": 4}, {"title": "The Careful Use of Compliments", "count": 2}, {"title": "The Forgotten Affairs of Youth", "count": 2}]}, {"place": "Canongate", "value": 0.0042, "sector": "Canongate", "abs": 8, "books": [{"title": "Bertie's Guide to Life and Mothers", "count": 4}, {"title": "The Charming Quirks of Others", "count": 2}, {"title": "The Uncommon Appeal of Clouds", "count": 2}]}, {"place": "Scottish Parliament", "value": 0.0053, "sector": "Canongate", "abs": 20, "books": [{"title": "The Forgotten Affairs of Youth", "count": 4}, {"title": "44 Scotland Street", "count": 2}, {"title": "Bertie Plays the Blues", "count": 2}, {"title": "Bertie's Guide to Life and Mothers", "count": 2}, {"title": "Espresso Tales", "count": 2}]}, {"place": "Arthur's Seat", "value": 0.0201, "sector": "Craigentinny/Duddingston", "abs": 38, "books": [{"title": "The World According to Bertie", "count": 10}, {"title": "The Unbearable Lightness of Scones", "count": 8}, {"title": "The Forgotten Affairs of Youth", "count": 6}, {"title": "44 Scotland Street", "count": 2}, {"title": "Bertie's Guide to Life and Mothers", "count": 2}]}, {"place": "Musselburgh", "value": 0.0042, "sector": "Portobello/Craigmillar", "abs": 16, "books": [{"title": "Espresso Tales", "count": 6}, {"title": "The World According to Bertie", "count": 4}, {"title": "Bertie Plays the Blues", "count": 2}, {"title": "The Forgotten Affairs of Youth", "count": 2}, {"title": "The Revolving Door of Life", "count": 2}]}, {"place": "Bruntsfield", "value": 0.0286, "sector": "South Central", "abs": 108, "books": [{"title": "The Sunday Philosophy Club", "count": 20}, {"title": "Friends, Lovers, Chocolate", "count": 12}, {"title": "The Right Attitude to Rain", "count": 10}, {"title": "The Careful Use of Compliments", "count": 10}, {"title": "The Uncommon Appeal of Clouds", "count": 8}]}, {"place": "Morningside", "value": 0.0259, "sector": "South Central", "abs": 98, "books": [{"title": "44 Scotland Street", "count": 18}, {"title": "The Unbearable Lightness of Scones", "count": 12}, {"title": "Sunshine on Scotland Street", "count": 10}, {"title": "Friends, Lovers, Chocolate", "count": 8}, {"title": "The Bertie Project", "count": 8}]}, {"place": "University of Edinburgh", "value": 0.0159, "sector": "South Central", "abs": 30, "books": [{"title": "The Unbearable Lightness of Scones", "count": 8}, {"title": "Bertie Plays the Blues", "count": 4}, {"title": "The Importance of Being Seven", "count": 4}, {"title": "Bertie's Guide to Life and Mothers", "count": 2}, {"title": "Espresso Tales", "count": 2}]}, {"place": "Southside", "value": 0.0042, "sector": "South Central", "abs": 8, "books": [{"title": "Bertie Plays the Blues", "count": 2}, {"title": "Espresso Tales", "count": 2}, {"title": "Sunshine on Scotland Street", "count": 2}, {"title": "The World According to Bertie", "count": 2}]}, {"place": "Tollcross", "value": 0.0064, "sector": "South West", "abs": 24, "books": [{"title": "The Charming Quirks of Others", "count": 6}, {"title": "Sunshine on Scotland Street", "count": 4}, {"title": "Bertie's Guide to Life and Mothers", "count": 2}, {"title": "Espresso Tales", "count": 2}, {"title": "The Bertie Project", "count": 2}]}, {"place": "Dalkeith", "value": 0.0116, "sector": "Liberton/Gilmerton", "abs": 22, "books": [{"title": "The Lost Art of Gratitude", "count": 14}, {"title": "The Comfort of Saturdays", "count": 6}, {"title": "The Forgotten Affairs of Youth", "count": 2}]}]}, {"author": "Irvine Welsh", "values": [{"place": "Leith", "value": 0.6121, "sector": "Leith", "abs": 650, "books": [{"title": "Porno", "count": 320}, {"title": "Skagboys", "count": 152}, {"title": "Trainspotting", "count": 60}, {"title": "Ecstasy: Three Tales of Chemical Romance", "count": 46}, {"title": "Filth", "count": 30}]}, {"place": "Leith Walk", "value": 0.0527, "sector": "Leith", "abs": 56, "books": [{"title": "Marabou Stork Nightmares", "count": 14}, {"title": "Filth", "count": 10}, {"title": "Skagboys", "count": 10}, {"title": "Porno", "count": 8}, {"title": "Reheated Cabbage", "count": 6}]}, {"place": "Water of Leith", "value": 0.0132, "sector": "Leith", "abs": 14, "books": [{"title": "Filth", "count": 4}, {"title": "Porno", "count": 4}, {"title": "Crime", "count": 2}, {"title": "Skagboys", "count": 2}, {"title": "Trainspotting", "count": 2}]}, {"place": "Calton Hill", "value": 0.0075, "sector": "Leith", "abs": 8, "books": [{"title": "Filth", "count": 6}, {"title": "Reheated Cabbage", "count": 2}]}, {"place": "Scotland Street", "value": 0.0, "sector": "Inverleith", "abs": 0, "books": []}, {"place": "Stockbridge", "value": 0.0132, "sector": "Inverleith", "abs": 14, "books": [{"title": "Crime", "count": 6}, {"title": "Filth", "count": 6}, {"title": "Porno", "count": 2}]}, {"place": "Clarence Street", "value": 0.0, "sector": "Inverleith", "abs": 0, "books": []}, {"place": "Moray Place", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Dundas Street", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Princes Street", "value": 0.0301, "sector": "New Town", "abs": 32, "books": [{"title": "Trainspotting", "count": 8}, {"title": "Marabou Stork Nightmares", "count": 6}, {"title": "Reheated Cabbage", "count": 6}, {"title": "Porno", "count": 4}, {"title": "Skagboys", "count": 4}]}, {"place": "New Town", "value": 0.0151, "sector": "New Town", "abs": 16, "books": [{"title": "Porno", "count": 8}, {"title": "Crime", "count": 2}, {"title": "Filth", "count": 2}, {"title": "Marabou Stork Nightmares", "count": 2}, {"title": "Reheated Cabbage", "count": 2}]}, {"place": "Drummond Place", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Cumberland Bar", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Queen Street", "value": 0.0056, "sector": "New Town", "abs": 6, "books": [{"title": "Porno", "count": 4}, {"title": "Ecstasy: Three Tales of Chemical Romance", "count": 2}]}, {"place": "India Street", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Castle Street", "value": 0.0019, "sector": "New Town", "abs": 2, "books": [{"title": "Reheated Cabbage", "count": 2}]}, {"place": "Heriot Row", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Howe Street", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Waverley Station", "value": 0.0301, "sector": "New Town", "abs": 32, "books": [{"title": "Skagboys", "count": 14}, {"title": "Trainspotting", "count": 10}, {"title": "Porno", "count": 4}, {"title": "Reheated Cabbage", "count": 4}]}, {"place": "Lothian Road", "value": 0.0207, "sector": "New Town", "abs": 22, "books": [{"title": "Skagboys", "count": 12}, {"title": "Filth", "count": 4}, {"title": "Crime", "count": 2}, {"title": "Porno", "count": 2}, {"title": "Trainspotting", "count": 2}]}, {"place": "Jenners", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Great King Street", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Cramond", "value": 0.0038, "sector": "Almond", "abs": 4, "books": [{"title": "Marabou Stork Nightmares", "count": 4}]}, {"place": "Holyrood", "value": 0.0, "sector": "Old Town", "abs": 0, "books": []}, {"place": "High Street", "value": 0.0075, "sector": "Old Town", "abs": 8, "books": [{"title": "Skagboys", "count": 4}, {"title": "Filth", "count": 2}, {"title": "Trainspotting", "count": 2}]}, {"place": "The Meadows", "value": 0.0169, "sector": "Old Town", "abs": 18, "books": [{"title": "Trainspotting", "count": 10}, {"title": "Porno", "count": 4}, {"title": "Skagboys", "count": 4}]}, {"place": "Old Town", "value": 0.0038, "sector": "Old Town", "abs": 4, "books": [{"title": "Filth", "count": 2}, {"title": "Skagboys", "count": 2}]}, {"place": "Grassmarket", "value": 0.0094, "sector": "Old Town", "abs": 10, "books": [{"title": "Porno", "count": 10}]}, {"place": "Cowgate", "value": 0.0075, "sector": "Old Town", "abs": 8, "books": [{"title": "Porno", "count": 6}, {"title": "Filth", "count": 2}]}, {"place": "St Giles", "value": 0.0, "sector": "Old Town", "abs": 0, "books": []}, {"place": "Canongate", "value": 0.0, "sector": "Canongate", "abs": 0, "books": []}, {"place": "Scottish Parliament", "value": 0.0056, "sector": "Canongate", "abs": 6, "books": [{"title": "Filth", "count": 2}, {"title": "Porno", "count": 2}, {"title": "Skagboys", "count": 2}]}, {"place": "Arthur's Seat", "value": 0.0113, "sector": "Craigentinny/Duddingston", "abs": 12, "books": [{"title": "Ecstasy: Three Tales of Chemical Romance", "count": 10}, {"title": "Porno", "count": 2}]}, {"place": "Musselburgh", "value": 0.0019, "sector": "Portobello/Craigmillar", "abs": 2, "books": [{"title": "Trainspotting", "count": 2}]}, {"place": "Bruntsfield", "value": 0.0056, "sector": "South Central", "abs": 6, "books": [{"title": "Crime", "count": 6}]}, {"place": "Morningside", "value": 0.0075, "sector": "South Central", "abs": 8, "books": [{"title": "Crime", "count": 2}, {"title": "Filth", "count": 2}, {"title": "Porno", "count": 2}, {"title": "Trainspotting", "count": 2}]}, {"place": "University of Edinburgh", "value": 0.0019, "sector": "South Central", "abs": 2, "books": [{"title": "Skagboys", "count": 2}]}, {"place": "Southside", "value": 0.0584, "sector": "South Central", "abs": 62, "books": [{"title": "Filth", "count": 26}, {"title": "Reheated Cabbage", "count": 12}, {"title": "Porno", "count": 10}, {"title": "Crime", "count": 6}, {"title": "Skagboys", "count": 6}]}, {"place": "Tollcross", "value": 0.0565, "sector": "South West", "abs": 60, "books": [{"title": "Skagboys", "count": 36}, {"title": "Porno", "count": 14}, {"title": "Filth", "count": 6}, {"title": "Crime", "count": 2}, {"title": "Trainspotting", "count": 2}]}, {"place": "Dalkeith", "value": 0.0, "sector": "Liberton/Gilmerton", "abs": 0, "books": []}]}, {"author": "John Gibson Lockhart", "values": [{"place": "Leith", "value": 0.0938, "sector": "Leith", "abs": 48, "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 22}, {"title": "Life of Walter Scott", "count": 8}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 8}, {"title": "Peter's letters to his kinsfolk, vol. 1", "count": 6}, {"title": "Peter's letters to his kinsfolk, vol. 3", "count": 4}]}, {"place": "Leith Walk", "value": 0.0039, "sector": "Leith", "abs": 2, "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 2}]}, {"place": "Water of Leith", "value": 0.0, "sector": "Leith", "abs": 0, "books": []}, {"place": "Calton Hill", "value": 0.0312, "sector": "Leith", "abs": 16, "books": [{"title": "Peter's letters to his kinsfolk, vol. 1", "count": 6}, {"title": "Life of Walter Scott", "count": 4}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 4}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, {"place": "Scotland Street", "value": 0.0, "sector": "Inverleith", "abs": 0, "books": []}, {"place": "Stockbridge", "value": 0.0, "sector": "Inverleith", "abs": 0, "books": []}, {"place": "Clarence Street", "value": 0.0, "sector": "Inverleith", "abs": 0, "books": []}, {"place": "Moray Place", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Dundas Street", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Princes Street", "value": 0.0547, "sector": "New Town", "abs": 28, "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 10}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 6}, {"title": "Peter's letters to his kinsfolk, vol. 2", "count": 4}, {"title": "Peter's letters to his kinsfolk, vol. 3", "count": 4}, {"title": "Life of Walter Scott", "count": 2}]}, {"place": "New Town", "value": 0.0312, "sector": "New Town", "abs": 16, "books": [{"title": "Peter's letters to his kinsfolk, vol. 1", "count": 8}, {"title": "Peter's letters to his kinsfolk, vol. 2", "count": 6}, {"title": "Life of Walter Scott", "count": 2}]}, {"place": "Drummond Place", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Cumberland Bar", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Queen Street", "value": 0.0078, "sector": "New Town", "abs": 4, "books": [{"title": "Life of Walter Scott", "count": 2}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, {"place": "India Street", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Castle Street", "value": 0.1914, "sector": "New Town", "abs": 98, "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 54}, {"title": "Life of Walter Scott", "count": 32}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 12}]}, {"place": "Heriot Row", "value": 0.0039, "sector": "New Town", "abs": 2, "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, {"place": "Howe Street", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Waverley Station", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Lothian Road", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Jenners", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Great King Street", "value": 0.0039, "sector": "New Town", "abs": 2, "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 2}]}, {"place": "Cramond", "value": 0.0039, "sector": "Almond", "abs": 2, "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, {"place": "Holyrood", "value": 0.0664, "sector": "Old Town", "abs": 34, "books": [{"title": "Life of Walter Scott", "count": 14}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 10}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 6}, {"title": "Peter's letters to his kinsfolk, vol. 1", "count": 2}, {"title": "Peter's letters to his kinsfolk, vol. 3", "count": 2}]}, {"place": "High Street", "value": 0.0312, "sector": "Old Town", "abs": 16, "books": [{"title": "Life of Walter Scott", "count": 6}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 6}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 4}]}, {"place": "The Meadows", "value": 0.0, "sector": "Old Town", "abs": 0, "books": []}, {"place": "Old Town", "value": 0.0391, "sector": "Old Town", "abs": 20, "books": [{"title": "Peter's letters to his kinsfolk, vol. 1", "count": 10}, {"title": "Peter's letters to his kinsfolk, vol. 2", "count": 6}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}, {"title": "Peter's letters to his kinsfolk, vol. 3", "count": 2}]}, {"place": "Grassmarket", "value": 0.0234, "sector": "Old Town", "abs": 12, "books": [{"title": "Life of Walter Scott", "count": 6}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 4}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, {"place": "Cowgate", "value": 0.0117, "sector": "Old Town", "abs": 6, "books": [{"title": "Life of Walter Scott", "count": 2}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 2}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, {"place": "St Giles", "value": 0.0352, "sector": "Old Town", "abs": 18, "books": [{"title": "Peter's letters to his kinsfolk, vol. 3", "count": 8}, {"title": "Peter's letters to his kinsfolk, vol. 2", "count": 6}, {"title": "Life of Walter Scott", "count": 2}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 2}]}, {"place": "Canongate", "value": 0.2109, "sector": "Canongate", "abs": 108, "books": [{"title": "Life of Walter Scott", "count": 44}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 44}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 16}, {"title": "Peter's letters to his kinsfolk, vol. 1", "count": 4}]}, {"place": "Scottish Parliament", "value": 0.0, "sector": "Canongate", "abs": 0, "books": []}, {"place": "Arthur's Seat", "value": 0.0352, "sector": "Craigentinny/Duddingston", "abs": 18, "books": [{"title": "Life of Walter Scott", "count": 4}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 4}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 4}, {"title": "Peter's letters to his kinsfolk, vol. 3", "count": 4}, {"title": "Peter's letters to his kinsfolk, vol. 1", "count": 2}]}, {"place": "Musselburgh", "value": 0.043, "sector": "Portobello/Craigmillar", "abs": 22, "books": [{"title": "Life of Walter Scott", "count": 18}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 4}]}, {"place": "Bruntsfield", "value": 0.0, "sector": "South Central", "abs": 0, "books": []}, {"place": "Morningside", "value": 0.0, "sector": "South Central", "abs": 0, "books": []}, {"place": "University of Edinburgh", "value": 0.0547, "sector": "South Central", "abs": 28, "books": [{"title": "Peter's letters to his kinsfolk, vol. 1", "count": 10}, {"title": "Life of Walter Scott", "count": 8}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 8}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, {"place": "Southside", "value": 0.0, "sector": "South Central", "abs": 0, "books": []}, {"place": "Tollcross", "value": 0.0, "sector": "South West", "abs": 0, "books": []}, {"place": "Dalkeith", "value": 0.0234, "sector": "Liberton/Gilmerton", "abs": 12, "books": [{"title": "Life of Walter Scott", "count": 8}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 2}, {"title": "Peter's letters to his kinsfolk, vol. 2", "count": 2}]}]}, {"author": "Robert Louis Stevenson", "values": [{"place": "Leith", "value": 0.1081, "sector": "Leith", "abs": 72, "books": [{"title": "David Balfour", "count": 18}, {"title": "Catriona", "count": 14}, {"title": "Edinburgh: picturesque notes", "count": 14}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 6}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 6}]}, {"place": "Leith Walk", "value": 0.021, "sector": "Leith", "abs": 14, "books": [{"title": "Catriona", "count": 4}, {"title": "Memories and portraits", "count": 4}, {"title": "Essays by Robert Louis Stevenson", "count": 2}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 2}, {"title": "The Misadventures of John Nicholson", "count": 2}]}, {"place": "Water of Leith", "value": 0.018, "sector": "Leith", "abs": 6, "books": [{"title": "Memories and portraits", "count": 4}, {"title": "Essays by Robert Louis Stevenson", "count": 2}]}, {"place": "Calton Hill", "value": 0.048, "sector": "Leith", "abs": 32, "books": [{"title": "The Misadventures of John Nicholson", "count": 12}, {"title": "Edinburgh: picturesque notes", "count": 8}, {"title": "Catriona", "count": 2}, {"title": "David Balfour", "count": 2}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 2}]}, {"place": "Scotland Street", "value": 0.0, "sector": "Inverleith", "abs": 0, "books": []}, {"place": "Stockbridge", "value": 0.009, "sector": "Inverleith", "abs": 6, "books": [{"title": "Catriona", "count": 2}, {"title": "David Balfour", "count": 2}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 2}]}, {"place": "Clarence Street", "value": 0.0, "sector": "Inverleith", "abs": 0, "books": []}, {"place": "Moray Place", "value": 0.006, "sector": "New Town", "abs": 2, "books": [{"title": "The Misadventures of John Nicholson", "count": 2}]}, {"place": "Dundas Street", "value": 0.006, "sector": "New Town", "abs": 2, "books": [{"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 2}]}, {"place": "Princes Street", "value": 0.1381, "sector": "New Town", "abs": 46, "books": [{"title": "St. Ives", "count": 16}, {"title": "Edinburgh: picturesque notes", "count": 12}, {"title": "Lay morals, and other papers", "count": 6}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 6}, {"title": "The Misadventures of John Nicholson", "count": 4}]}, {"place": "New Town", "value": 0.0781, "sector": "New Town", "abs": 26, "books": [{"title": "Edinburgh: picturesque notes", "count": 20}, {"title": "St. Ives", "count": 6}]}, {"place": "Drummond Place", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Cumberland Bar", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Queen Street", "value": 0.006, "sector": "New Town", "abs": 2, "books": [{"title": "Lay morals, and other papers", "count": 2}]}, {"place": "India Street", "value": 0.006, "sector": "New Town", "abs": 2, "books": [{"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 2}]}, {"place": "Castle Street", "value": 0.012, "sector": "New Town", "abs": 4, "books": [{"title": "St. Ives", "count": 4}]}, {"place": "Heriot Row", "value": 0.0781, "sector": "New Town", "abs": 26, "books": [{"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 22}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 4}]}, {"place": "Howe Street", "value": 0.012, "sector": "New Town", "abs": 4, "books": [{"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 4}]}, {"place": "Waverley Station", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Lothian Road", "value": 0.048, "sector": "New Town", "abs": 16, "books": [{"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.2", "count": 8}, {"title": "St. Ives", "count": 4}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 2}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 2}]}, {"place": "Jenners", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Great King Street", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Cramond", "value": 0.0631, "sector": "Almond", "abs": 42, "books": [{"title": "St. Ives", "count": 22}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 12}, {"title": "Kidnapped", "count": 6}, {"title": "Edinburgh: picturesque notes", "count": 2}]}, {"place": "Holyrood", "value": 0.024, "sector": "Old Town", "abs": 8, "books": [{"title": "Edinburgh: picturesque notes", "count": 6}, {"title": "Weir of Hermiston", "count": 2}]}, {"place": "High Street", "value": 0.0511, "sector": "Old Town", "abs": 34, "books": [{"title": "Edinburgh: picturesque notes", "count": 22}, {"title": "The Misadventures of John Nicholson", "count": 4}, {"title": "Across the plains with other memories and essays", "count": 2}, {"title": "Catriona", "count": 2}, {"title": "David Balfour", "count": 2}]}, {"place": "The Meadows", "value": 0.0, "sector": "Old Town", "abs": 0, "books": []}, {"place": "Old Town", "value": 0.0781, "sector": "Old Town", "abs": 26, "books": [{"title": "Edinburgh: picturesque notes", "count": 22}, {"title": "St. Ives", "count": 4}]}, {"place": "Grassmarket", "value": 0.009, "sector": "Old Town", "abs": 6, "books": [{"title": "Kidnapped", "count": 4}, {"title": "St. Ives", "count": 2}]}, {"place": "Cowgate", "value": 0.024, "sector": "Old Town", "abs": 8, "books": [{"title": "Edinburgh: picturesque notes", "count": 8}]}, {"place": "St Giles", "value": 0.0541, "sector": "Old Town", "abs": 18, "books": [{"title": "Edinburgh: picturesque notes", "count": 16}, {"title": "Lay morals, and other papers", "count": 2}]}, {"place": "Canongate", "value": 0.006, "sector": "Canongate", "abs": 4, "books": [{"title": "Catriona", "count": 2}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.2", "count": 2}]}, {"place": "Scottish Parliament", "value": 0.0, "sector": "Canongate", "abs": 0, "books": []}, {"place": "Arthur's Seat", "value": 0.045, "sector": "Craigentinny/Duddingston", "abs": 30, "books": [{"title": "Edinburgh: picturesque notes", "count": 18}, {"title": "Lay morals, and other papers", "count": 4}, {"title": "Catriona", "count": 2}, {"title": "David Balfour", "count": 2}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 2}]}, {"place": "Musselburgh", "value": 0.015, "sector": "Portobello/Craigmillar", "abs": 10, "books": [{"title": "Catriona", "count": 4}, {"title": "David Balfour", "count": 4}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 2}]}, {"place": "Bruntsfield", "value": 0.006, "sector": "South Central", "abs": 4, "books": [{"title": "Catriona", "count": 2}, {"title": "David Balfour", "count": 2}]}, {"place": "Morningside", "value": 0.012, "sector": "South Central", "abs": 4, "books": [{"title": "Edinburgh: picturesque notes", "count": 4}]}, {"place": "University of Edinburgh", "value": 0.018, "sector": "South Central", "abs": 6, "books": [{"title": "Memories and portraits", "count": 4}, {"title": "Essays by Robert Louis Stevenson", "count": 2}]}, {"place": "Southside", "value": 0.0, "sector": "South Central", "abs": 0, "books": []}, {"place": "Tollcross", "value": 0.0, "sector": "South West", "abs": 0, "books": []}, {"place": "Dalkeith", "value": 0.0, "sector": "Liberton/Gilmerton", "abs": 0, "books": []}]}, {"author": "Walter Scott", "values": [{"place": "Leith", "value": 0.1486, "sector": "Leith", "abs": 104, "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 68}, {"title": "Redgauntlet", "count": 8}, {"title": "The Journal of Walter Scott", "count": 8}, {"title": "The Pirate", "count": 6}, {"title": "Waverley", "count": 6}]}, {"place": "Leith Walk", "value": 0.0029, "sector": "Leith", "abs": 2, "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 2}]}, {"place": "Water of Leith", "value": 0.0086, "sector": "Leith", "abs": 6, "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 4}, {"title": "The Pirate", "count": 2}]}, {"place": "Calton Hill", "value": 0.0086, "sector": "Leith", "abs": 6, "books": [{"title": "The Journal of Walter Scott", "count": 4}, {"title": "Chronicles of the Canongate", "count": 2}]}, {"place": "Scotland Street", "value": 0.0, "sector": "Inverleith", "abs": 0, "books": []}, {"place": "Stockbridge", "value": 0.0, "sector": "Inverleith", "abs": 0, "books": []}, {"place": "Clarence Street", "value": 0.0, "sector": "Inverleith", "abs": 0, "books": []}, {"place": "Moray Place", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Dundas Street", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Princes Street", "value": 0.02, "sector": "New Town", "abs": 14, "books": [{"title": "The Journal of Walter Scott", "count": 14}]}, {"place": "New Town", "value": 0.0229, "sector": "New Town", "abs": 16, "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 8}, {"title": "Chronicles of the Canongate", "count": 6}, {"title": "Guy Mannering", "count": 2}]}, {"place": "Drummond Place", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Cumberland Bar", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Queen Street", "value": 0.0029, "sector": "New Town", "abs": 2, "books": [{"title": "The Journal of Walter Scott", "count": 2}]}, {"place": "India Street", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Castle Street", "value": 0.0086, "sector": "New Town", "abs": 6, "books": [{"title": "The Journal of Walter Scott", "count": 6}]}, {"place": "Heriot Row", "value": 0.0029, "sector": "New Town", "abs": 2, "books": [{"title": "The Journal of Walter Scott", "count": 2}]}, {"place": "Howe Street", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Waverley Station", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Lothian Road", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Jenners", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Great King Street", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Cramond", "value": 0.0143, "sector": "Almond", "abs": 10, "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 8}, {"title": "The Journal of Walter Scott", "count": 2}]}, {"place": "Holyrood", "value": 0.1343, "sector": "Old Town", "abs": 94, "books": [{"title": "The Abbot, vol. 1", "count": 36}, {"title": "Tales of a Grandfather, series 1-3", "count": 24}, {"title": "Chronicles of the Canongate", "count": 16}, {"title": "The Journal of Walter Scott", "count": 4}, {"title": "The Pirate", "count": 4}]}, {"place": "High Street", "value": 0.06, "sector": "Old Town", "abs": 42, "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 8}, {"title": "The Antiquary", "count": 8}, {"title": "The Heart of Midlothian", "count": 8}, {"title": "Redgauntlet", "count": 6}, {"title": "Guy Mannering", "count": 4}]}, {"place": "The Meadows", "value": 0.0, "sector": "Old Town", "abs": 0, "books": []}, {"place": "Old Town", "value": 0.0114, "sector": "Old Town", "abs": 8, "books": [{"title": "Chronicles of the Canongate", "count": 2}, {"title": "Guy Mannering", "count": 2}, {"title": "Tales of a Grandfather, series 1-3", "count": 2}, {"title": "The Antiquary", "count": 2}]}, {"place": "Grassmarket", "value": 0.0514, "sector": "Old Town", "abs": 36, "books": [{"title": "The Heart of Midlothian", "count": 18}, {"title": "Tales of a Grandfather, series 1-3", "count": 10}, {"title": "Old Mortality", "count": 6}, {"title": "The Pirate", "count": 2}]}, {"place": "Cowgate", "value": 0.0343, "sector": "Old Town", "abs": 24, "books": [{"title": "The Heart of Midlothian", "count": 8}, {"title": "Tales of a Grandfather, series 1-3", "count": 6}, {"title": "Guy Mannering", "count": 4}, {"title": "Redgauntlet", "count": 2}, {"title": "The Antiquary", "count": 2}]}, {"place": "St Giles", "value": 0.02, "sector": "Old Town", "abs": 14, "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 4}, {"title": "The Journal of Walter Scott", "count": 4}, {"title": "The Pirate", "count": 4}, {"title": "Redgauntlet", "count": 2}]}, {"place": "Canongate", "value": 0.1886, "sector": "Canongate", "abs": 132, "books": [{"title": "The Journal of Walter Scott", "count": 40}, {"title": "Chronicles of the Canongate", "count": 32}, {"title": "Tales of a Grandfather, series 1-3", "count": 24}, {"title": "The Heart of Midlothian", "count": 14}, {"title": "The Abbot, vol. 1", "count": 8}]}, {"place": "Scottish Parliament", "value": 0.0971, "sector": "Canongate", "abs": 68, "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 68}]}, {"place": "Arthur's Seat", "value": 0.0429, "sector": "Craigentinny/Duddingston", "abs": 30, "books": [{"title": "The Heart of Midlothian", "count": 10}, {"title": "Chronicles of the Canongate", "count": 8}, {"title": "Tales of a Grandfather, series 1-3", "count": 4}, {"title": "Waverley", "count": 4}, {"title": "The Journal of Walter Scott", "count": 2}]}, {"place": "Musselburgh", "value": 0.0343, "sector": "Portobello/Craigmillar", "abs": 24, "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 20}, {"title": "The Heart of Midlothian", "count": 2}, {"title": "Waverley", "count": 2}]}, {"place": "Bruntsfield", "value": 0.0, "sector": "South Central", "abs": 0, "books": []}, {"place": "Morningside", "value": 0.0, "sector": "South Central", "abs": 0, "books": []}, {"place": "University of Edinburgh", "value": 0.0114, "sector": "South Central", "abs": 8, "books": [{"title": "Tales of a Grandfather, series 1-3", "count": 4}, {"title": "Chronicles of the Canongate", "count": 2}, {"title": "The Journal of Walter Scott", "count": 2}]}, {"place": "Southside", "value": 0.0, "sector": "South Central", "abs": 0, "books": []}, {"place": "Tollcross", "value": 0.0, "sector": "South West", "abs": 0, "books": []}, {"place": "Dalkeith", "value": 0.0743, "sector": "Liberton/Gilmerton", "abs": 52, "books": [{"title": "The Journal of Walter Scott", "count": 18}, {"title": "Tales of a Grandfather, series 1-3", "count": 16}, {"title": "The Heart of Midlothian", "count": 12}, {"title": "The Pirate", "count": 4}, {"title": "The Fortunes of Nigel", "count": 2}]}]}];
+const sectorColors = {"Forth": "#4A90D9", "Leith": "#1C7293", "Inverleith": "#2980B9", "New Town": "#8E44AD", "Almond": "#5D6D7E", "Old Town": "#C0392B", "Canongate": "#E74C3C", "Western Edinburgh": "#7F8C8D", "Craigentinny/Duddingston": "#D35400", "Portobello/Craigmillar": "#E67E22", "South Central": "#27AE60", "South West": "#1E8449", "Liberton/Gilmerton": "#2ECC71", "Pentlands": "#196F3D"};
+const authorColors = {"Alexander McCall Smith": "#B85042", "Irvine Welsh": "#1C7293", "John Gibson Lockhart": "#2C5F2D", "Robert Louis Stevenson": "#7F77DD", "Walter Scott": "#C9A227"};
+const sectorGroupsBase = [{"sector": "Leith", "start": 0, "color": "#1C7293"}, {"sector": "Inverleith", "start": 4, "color": "#2980B9"}, {"sector": "New Town", "start": 7, "color": "#8E44AD"}, {"sector": "Almond", "start": 22, "color": "#5D6D7E"}, {"sector": "Old Town", "start": 23, "color": "#C0392B"}, {"sector": "Canongate", "start": 30, "color": "#E74C3C"}, {"sector": "Craigentinny/Duddingston", "start": 32, "color": "#D35400"}, {"sector": "Portobello/Craigmillar", "start": 33, "color": "#E67E22"}, {"sector": "South Central", "start": 34, "color": "#27AE60"}, {"sector": "South West", "start": 38, "color": "#1E8449"}, {"sector": "Liberton/Gilmerton", "start": 39, "color": "#2ECC71"}];
+const sectorOrder = ["Leith", "Inverleith", "New Town", "Almond", "Old Town", "Canongate", "Craigentinny/Duddingston", "Portobello/Craigmillar", "South Central", "South West", "Liberton/Gilmerton"];
+const freqOrder = ["Leith", "Canongate", "Princes Street", "Holyrood", "Castle Street", "New Town", "High Street", "Arthur's Seat", "Scotland Street", "Old Town", "St Giles", "Dalkeith", "Scottish Parliament", "Heriot Row", "Grassmarket", "University of Edinburgh", "Calton Hill", "Musselburgh", "Cramond", "Leith Walk", "Cowgate", "Lothian Road", "Moray Place", "Dundas Street", "Queen Street", "Tollcross", "Southside", "Drummond Place", "Water of Leith", "Cumberland Bar", "Stockbridge", "India Street", "Waverley Station", "Morningside", "The Meadows", "Bruntsfield", "Howe Street", "Clarence Street", "Great King Street", "Jenners"];
+const alphaOrder = ["Arthur's Seat", "Bruntsfield", "Calton Hill", "Canongate", "Castle Street", "Clarence Street", "Cowgate", "Cramond", "Cumberland Bar", "Dalkeith", "Drummond Place", "Dundas Street", "Grassmarket", "Great King Street", "Heriot Row", "High Street", "Holyrood", "Howe Street", "India Street", "Jenners", "Leith", "Leith Walk", "Lothian Road", "Moray Place", "Morningside", "Musselburgh", "New Town", "Old Town", "Princes Street", "Queen Street", "Scotland Street", "Scottish Parliament", "Southside", "St Giles", "Stockbridge", "The Meadows", "Tollcross", "University of Edinburgh", "Water of Leith", "Waverley Station"];
+const placeToSector = {"Leith": "Leith", "Leith Walk": "Leith", "Water of Leith": "Leith", "Calton Hill": "Leith", "Scotland Street": "Inverleith", "Stockbridge": "Inverleith", "Clarence Street": "Inverleith", "Moray Place": "New Town", "Dundas Street": "New Town", "Princes Street": "New Town", "New Town": "New Town", "Drummond Place": "New Town", "Cumberland Bar": "New Town", "Queen Street": "New Town", "India Street": "New Town", "Castle Street": "New Town", "Heriot Row": "New Town", "Howe Street": "New Town", "Waverley Station": "New Town", "Lothian Road": "New Town", "Jenners": "New Town", "Great King Street": "New Town", "Cramond": "Almond", "Holyrood": "Old Town", "High Street": "Old Town", "The Meadows": "Old Town", "Old Town": "Old Town", "Grassmarket": "Old Town", "Cowgate": "Old Town", "St Giles": "Old Town", "Canongate": "Canongate", "Scottish Parliament": "Canongate", "Arthur's Seat": "Craigentinny/Duddingston", "Musselburgh": "Portobello/Craigmillar", "Bruntsfield": "South Central", "Morningside": "South Central", "University of Edinburgh": "South Central", "Southside": "South Central", "Tollcross": "South West", "Dalkeith": "Liberton/Gilmerton"};
+
+let currentOrder = 'sector';
+let currentScale = 'pct';
+let activeSectors = new Set(sectorOrder);
+let searchTerm = '';
+
+const W = 1100, H = 90;
+const tooltip = document.getElementById('tooltip');
+const panel = document.getElementById('detail-panel');
+
+// Sector legend
+const legendDiv = document.getElementById('sector-legend');
+sectorGroupsBase.forEach(g => {
+  const tag = document.createElement('div');
+  tag.className = 'sector-tag';
+  tag.style.background = g.color;
+  tag.textContent = g.sector;
+  tag.dataset.sector = g.sector;
+  tag.title = g.sector;
+  tag.addEventListener('click', () => {
+    if (activeSectors.has(g.sector)) {
+      activeSectors.delete(g.sector);
+      tag.classList.add('muted');
+    } else {
+      activeSectors.add(g.sector);
+      tag.classList.remove('muted');
+    }
+    redraw();
+  });
+  legendDiv.appendChild(tag);
+});
+
+function getOrderedPlaces() {
+  let base = authorsData[0].values.map(v => v.place);
+  if (currentOrder === 'freq') base = [...freqOrder];
+  else if (currentOrder === 'alpha') base = [...alphaOrder];
+  return base.filter(p => activeSectors.has(placeToSector[p] || ''));
+}
+
+function getSectorGroups(orderedPlaces) {
+  const groups = [];
+  let current = null;
+  orderedPlaces.forEach((p, i) => {
+    const s = placeToSector[p] || '';
+    if (s !== current) {
+      groups.push({sector: s, start: i, color: sectorColors[s] || '#999'});
+      current = s;
+    }
+  });
+  return groups;
+}
+
+function redraw() {
+  document.getElementById('chart').innerHTML = '';
+  const orderedPlaces = getOrderedPlaces();
+  const sectorGroups = getSectorGroups(orderedPlaces);
+  const N = orderedPlaces.length;
+  if (N === 0) return;
+  const barW = Math.max(W / N, 6);
+
+  authorsData.forEach(author => {
+    const color = authorColors[author.author];
+    const vals = orderedPlaces.map(p => {
+      const v = author.values.find(x => x.place === p);
+      return v || {place: p, value: 0, abs: 0, sector: placeToSector[p]||'', books: []};
+    });
+
+    // PER-AUTHOR max value for independent Y axis
+    const maxVal = currentScale === 'pct'
+      ? d3.max(vals, d => d.value)
+      : d3.max(vals, d => d.abs);
+
+    const maxLabel = currentScale === 'pct'
+      ? (maxVal * 100).toFixed(1) + '%'
+      : maxVal.toString();
+
+    const block = document.createElement('div');
+    block.className = 'author-block';
+
+    const header = document.createElement('div');
+    header.className = 'author-header';
+    header.innerHTML = `
+      <div class="author-label" style="color:${color}">${author.author}</div>
+      <div class="author-maxval">max: ${maxLabel}</div>`;
+    block.appendChild(header);
+
+    const container = document.createElement('div');
+    const svgW = barW * N + 50;
+    const svg = d3.select(container).append('svg')
+      .attr('width', svgW).attr('height', H + 28)
+      .style('overflow', 'visible');
+
+    // sector backgrounds + dividers
+    sectorGroups.forEach((g, gi) => {
+      const nextStart = gi + 1 < sectorGroups.length ? sectorGroups[gi+1].start : N;
+      const gW = (nextStart - g.start) * barW;
+      svg.append('rect')
+        .attr('x', g.start * barW).attr('y', 0)
+        .attr('width', gW).attr('height', H)
+        .attr('fill', g.color).attr('opacity', 0.07);
+
+      // sector color strip at bottom instead of text
+      svg.append('rect')
+        .attr('x', g.start * barW).attr('y', H + 2)
+        .attr('width', gW - 1).attr('height', 4)
+        .attr('fill', g.color).attr('rx', 1);
+
+      // sector label only if wide enough
+      if (gW > 40 && currentOrder === 'sector') {
+        svg.append('text')
+          .attr('x', g.start * barW + gW/2)
+          .attr('y', H + 18)
+          .attr('text-anchor', 'middle')
+          .attr('font-size', '8px')
+          .attr('fill', g.color)
+          .attr('font-weight', '600')
+          .text(gW > 80 ? g.sector : g.sector.split('/')[0]);
+      }
+
+      if (g.start > 0) {
+        svg.append('line')
+          .attr('x1', g.start * barW).attr('y1', 0)
+          .attr('x2', g.start * barW).attr('y2', H)
+          .attr('stroke', '#CCC').attr('stroke-width', 0.8)
+          .attr('stroke-dasharray', '3,2');
+      }
+    });
+
+    const yScale = d3.scaleLinear().domain([0, maxVal]).range([0, H]);
+
+    vals.forEach((d, i) => {
+      const rawVal = currentScale === 'pct' ? d.value : d.abs;
+      const barH = Math.max(yScale(rawVal), rawVal > 0 ? 1 : 0);
+      const isMatch = searchTerm && d.place.toLowerCase().includes(searchTerm);
+      const isSearching = searchTerm.length > 0;
+
+      svg.append('rect')
+        .attr('x', i * barW).attr('y', H - barH)
+        .attr('width', Math.max(barW - 0.5, 1)).attr('height', barH)
+        .attr('fill', isMatch ? '#F0A500' : color)
+        .attr('opacity', isSearching && !isMatch ? 0.12 : 0.85)
+        .attr('cursor', 'pointer')
+        .on('mouseover', function(event) {
+          d3.select(this).attr('opacity', 1);
+          tooltip.style.display = 'block';
+          tooltip.innerHTML = `
+            <strong style="color:${color}">${d.place}</strong><br>
+            <span style="color:${sectorColors[d.sector]||'#999'};font-size:10px">● ${d.sector}</span><br>
+            ${(d.value*100).toFixed(2)}% &nbsp;·&nbsp; ${d.abs} mentions<br>
+            <span style="color:#AAA;font-size:10px">Click for book details</span>`;
+        })
+        .on('mousemove', function(event) {
+          tooltip.style.left = (event.clientX + 14) + 'px';
+          tooltip.style.top  = (event.clientY - 10) + 'px';
+        })
+        .on('mouseout', function() {
+          d3.select(this).attr('opacity', isSearching && !isMatch ? 0.12 : 0.85);
+          tooltip.style.display = 'none';
+        })
+        .on('click', function() {
+          tooltip.style.display = 'none';
+          showDetail(author.author, d, color);
+        });
+    });
+
+    // Y axis
+    svg.append('line')
+      .attr('x1', 0).attr('y1', H).attr('x2', barW*N).attr('y2', H)
+      .attr('stroke', '#DDD').attr('stroke-width', 1);
+    svg.append('text')
+      .attr('x', -4).attr('y', 4)
+      .attr('text-anchor', 'end').attr('font-size', '8px').attr('fill', '#AAA')
+      .text(maxLabel);
+    svg.append('text')
+      .attr('x', -4).attr('y', H)
+      .attr('text-anchor', 'end').attr('font-size', '8px').attr('fill', '#AAA')
+      .text('0');
+
+    block.appendChild(container);
+    document.getElementById('chart').appendChild(block);
+  });
+}
+
+function showDetail(authorName, d, color) {
+  document.getElementById('dp-place').textContent = d.place;
+  document.getElementById('dp-place').style.color = color;
+  document.getElementById('dp-meta').innerHTML =
+    `<strong style="color:${color}">${authorName}</strong><br>
+     <span style="color:${sectorColors[d.sector]||'#999'}">● ${d.sector}</span>`;
+  document.getElementById('dp-stat').textContent =
+    d.abs + ' mentions (' + (d.value*100).toFixed(2) + '%)';
+  document.getElementById('dp-stat').style.color = color;
+
+  const booksDiv = document.getElementById('dp-books');
+  booksDiv.innerHTML = '';
+  (d.books || []).forEach(b => {
+    const row = document.createElement('div');
+    row.className = 'book-row';
+    row.innerHTML = `<span class="book-title" title="${b.title}">${b.title}</span><span class="book-count">${b.count}</span>`;
+    booksDiv.appendChild(row);
+  });
+  panel.style.display = 'block';
+}
+
+document.getElementById('dp-close').addEventListener('click', () => panel.style.display = 'none');
+
+['btn-sector','btn-freq','btn-alpha'].forEach(id => {
+  document.getElementById(id).addEventListener('click', () => {
+    currentOrder = id.replace('btn-','');
+    document.querySelectorAll('#btn-sector,#btn-freq,#btn-alpha').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    redraw();
+  });
+});
+
+['btn-pct','btn-abs'].forEach(id => {
+  document.getElementById(id).addEventListener('click', () => {
+    currentScale = id.replace('btn-','');
+    document.querySelectorAll('#btn-pct,#btn-abs').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    redraw();
+  });
+});
+
+document.getElementById('search').addEventListener('input', function() {
+  searchTerm = this.value.toLowerCase().trim();
+  redraw();
+});
+
+redraw();
+</script>
+</body>
+</html>
