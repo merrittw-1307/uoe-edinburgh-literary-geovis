@@ -35,10 +35,6 @@
   .card:hover { border-color: #21295C; box-shadow: 0 4px 14px rgba(33,41,92,0.12); transform: translateY(-1px); }
   .card .name { font-size: 14px; font-weight: bold; color: #21295C; margin-bottom: 4px; }
   .card .desc { font-size: 12px; color: #888; line-height: 1.4; }
-  .badge {
-    display: inline-block; font-size: 9.5px; font-weight: 600; letter-spacing: 0.03em;
-    color: white; background: #C9A227; padding: 2px 7px; border-radius: 8px; margin-bottom: 6px;
-  }
   .note {
     font-size: 12px; color: #856404; background: #FFF8E7; border-left: 3px solid #C9A227;
     padding: 10px 14px; border-radius: 0 6px 6px 0; margin: 28px 0; max-width: 640px;
@@ -87,39 +83,11 @@
     </a>
   </div>
 
-  <div class="note">The six visualisations above use five test authors (Alexander McCall Smith, Irvine Welsh, John Gibson Lockhart, Walter Scott, Robert Louis Stevenson) and are the versions described in the dissertation. The section below is a separate, ongoing exploration of how each design behaves at 2, 20, and up to 408 authors — kept apart from the canonical prototypes above so the two are never confused.</div>
-
-  <h2>Scale Exploration <span class="badge">In progress</span></h2>
-  <div class="dir-desc">Each of the six designs fails at scale in a different, specific way — see the write-up in <code>data/processed/scale_exploration/NOTES.md</code> and the new Appendix table in the dissertation for the full comparison.</div>
-  <div class="grid">
-    <a class="card" href="data/processed/scale_exploration/d3/radar_scale_explore.html">
-      <div class="name">Radar — scale explorer</div>
-      <div class="desc">2 to 408 authors; hover any author to isolate their polygon.</div>
-    </a>
-    <a class="card" href="data/processed/scale_exploration/d3/barcode_scale_explore.html">
-      <div class="name">Bar-code — scale explorer</div>
-      <div class="desc">2 to 408 authors; each row shows that author's own top-15 places.</div>
-    </a>
-    <a class="card" href="data/processed/scale_exploration/d3/small_multiples_scale_explore.html">
-      <div class="name">Small Multiples — scale explorer</div>
-      <div class="desc">Live Leaflet panel grid; measures real rendering cost up to 408 authors.</div>
-    </a>
-    <a class="card" href="data/processed/scale_exploration/d3/network_scale_explore.html">
-      <div class="name">Network — scale explorer</div>
-      <div class="desc">Any author subset, or an arbitrary 2–3 book selection, computed live in the browser.</div>
-    </a>
-    <a class="card" href="data/processed/scale_exploration/d3/linear_scale_explore.html">
-      <div class="name">Linear — scale explorer</div>
-      <div class="desc">Same live computation as the network explorer, drawn as arcs on an axis.</div>
-    </a>
-    <a class="card" href="data/processed/scale_exploration/d3/metro_scale_explore_20authors.html">
-      <div class="name">Metro — 20-author snapshot</div>
-      <div class="desc">One rendered snapshot from the batch community-detection scale test (see NOTES.md for 2/5/20/50 comparison).</div>
-    </a>
-  </div>
+  <div class="note">All six visualisations above use the same five test authors (Alexander McCall Smith, Irvine Welsh, John Gibson Lockhart, Walter Scott, Robert Louis Stevenson) and are the exact versions described in the dissertation — each is a self-contained file with its data embedded, so nothing needs a server or an internet connection beyond loading D3.js/Leaflet.js from their CDNs. Click through, hover for tooltips, and click a node/vertex/bar/arc/station for a detail panel with an example sentence from the source text.</div>
 
   <footer>
-    Source: <a href="https://github.com/merrittw-1307/uoe-edinburgh-literary-geovis">github.com/merrittw-1307/uoe-edinburgh-literary-geovis</a>
+    Source: <a href="https://github.com/merrittw-1307/uoe-edinburgh-literary-geovis">github.com/merrittw-1307/uoe-edinburgh-literary-geovis</a> ·
+    A follow-up scale exploration (2 to 408 authors) is documented separately in <code>data/processed/scale_exploration/</code> and the dissertation's Limitations chapter.
   </footer>
 </div>
 </body>
