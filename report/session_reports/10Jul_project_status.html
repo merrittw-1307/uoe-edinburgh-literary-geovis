@@ -1,0 +1,328 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+<meta charset="utf-8">
+<title>阶段性总结 — A Visual Trace Map of Edinburgh Place Names in Literature</title>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<style>
+  :root {
+    --bg: #F8F9FC;
+    --surface: #FFFFFF;
+    --surface-soft: #F1F3FA;
+    --ink: #21295C;
+    --ink-soft: #5B5F7A;
+    --ink-faint: #8A8FAE;
+    --border: #E0E4F0;
+    --border-soft: #EBEDF6;
+    --done: #2C5F2D;
+    --done-bg: #EAF3EA;
+    --progress: #A6791E;
+    --progress-bg: #FFF6E2;
+    --problem: #A2413A;
+    --problem-bg: #FBEBEA;
+    --next: #1C7293;
+    --next-bg: #E9F3F6;
+    --shadow: 0 1px 3px rgba(33,41,92,0.06);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #14172B;
+      --surface: #1B1F3B;
+      --surface-soft: #20244A;
+      --ink: #E6E8FA;
+      --ink-soft: #ABB0D6;
+      --ink-faint: #7075A0;
+      --border: #313760;
+      --border-soft: #262B4E;
+      --done: #7FC77F;
+      --done-bg: #1D2E22;
+      --progress: #E0B04A;
+      --progress-bg: #332A14;
+      --problem: #E58A82;
+      --problem-bg: #3A1F1E;
+      --next: #6FC1D8;
+      --next-bg: #17303A;
+      --shadow: 0 1px 3px rgba(0,0,0,0.3);
+    }
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    line-height: 1.5;
+  }
+  .page {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 56px 28px 90px;
+  }
+
+  .eyebrow {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.09em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 10px;
+  }
+  h1 {
+    font-family: Georgia, "Times New Roman", serif;
+    font-size: 32px;
+    font-weight: 400;
+    color: var(--ink);
+    margin: 0 0 10px;
+    text-wrap: balance;
+    letter-spacing: -0.01em;
+  }
+  .lede {
+    font-size: 15px;
+    color: var(--ink-soft);
+    max-width: 62ch;
+    margin: 0 0 30px;
+  }
+
+  .countdown {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    padding: 16px 20px;
+    margin-bottom: 34px;
+    box-shadow: var(--shadow);
+  }
+  .countdown .num {
+    font-family: Georgia, serif;
+    font-size: 30px;
+    color: var(--problem);
+    font-variant-numeric: tabular-nums;
+    flex-shrink: 0;
+  }
+  .countdown .num small { font-size: 13px; font-weight: 400; color: var(--ink-faint); margin-left: 4px; }
+  .countdown .bar-wrap { flex: 1; min-width: 120px; }
+  .countdown .bar-track { height: 6px; border-radius: 3px; background: var(--border-soft); overflow: hidden; margin-bottom: 6px; }
+  .countdown .bar-fill { height: 100%; background: linear-gradient(90deg, var(--next), var(--problem)); border-radius: 3px; }
+  .countdown .bar-label { font-size: 11px; color: var(--ink-faint); display: flex; justify-content: space-between; }
+
+  .stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 44px;
+  }
+  .stat {
+    background: var(--surface);
+    padding: 16px 14px;
+    text-align: center;
+  }
+  .stat .n { font-family: Georgia, serif; font-size: 22px; color: var(--ink); font-variant-numeric: tabular-nums; }
+  .stat .l { font-size: 10.5px; color: var(--ink-faint); margin-top: 3px; letter-spacing: 0.01em; }
+
+  section.block { margin-bottom: 40px; }
+  .block-head {
+    display: flex;
+    align-items: baseline;
+    gap: 10px;
+    margin-bottom: 4px;
+  }
+  .block-head h2 {
+    font-family: Georgia, serif;
+    font-weight: 400;
+    font-size: 21px;
+    color: var(--ink);
+    margin: 0;
+  }
+  .block-head .count {
+    font-size: 12px;
+    color: var(--ink-faint);
+    font-variant-numeric: tabular-nums;
+  }
+  .block-desc { font-size: 12.5px; color: var(--ink-soft); margin: 0 0 16px; max-width: 68ch; }
+
+  .rail {
+    border-left: 3px solid var(--rail-color);
+    padding-left: 20px;
+  }
+  .grp { margin-bottom: 20px; }
+  .grp:last-child { margin-bottom: 0; }
+  .grp-title {
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    color: var(--ink-faint);
+    margin-bottom: 8px;
+  }
+  .item {
+    display: grid;
+    grid-template-columns: 20px 1fr auto;
+    gap: 10px;
+    align-items: start;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+  .item:last-child { border-bottom: none; }
+  .item .dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: var(--rail-color);
+    margin-top: 6px;
+  }
+  .item .body .t { font-size: 13.5px; font-weight: 600; color: var(--ink); }
+  .item .body .d { font-size: 12.5px; color: var(--ink-soft); margin-top: 2px; }
+  .chip {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.03em;
+    padding: 2px 8px;
+    border-radius: 999px;
+    white-space: nowrap;
+    align-self: start;
+    margin-top: 3px;
+  }
+  .chip.done { color: var(--done); background: var(--done-bg); }
+  .chip.progress { color: var(--progress); background: var(--progress-bg); }
+  .chip.problem { color: var(--problem); background: var(--problem-bg); }
+  .chip.next { color: var(--next); background: var(--next-bg); }
+
+  code {
+    font-family: "SF Mono", Menlo, Consolas, monospace;
+    font-size: 0.92em;
+    background: var(--surface-soft);
+    padding: 1px 5px;
+    border-radius: 4px;
+    color: var(--ink);
+  }
+
+  footer {
+    margin-top: 50px;
+    padding-top: 18px;
+    border-top: 1px solid var(--border);
+    font-size: 11.5px;
+    color: var(--ink-faint);
+  }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="eyebrow">阶段性总结 · 生成于 2026年7月10日</div>
+  <h1>A Visual Trace Map of Edinburgh Place Names in Literature</h1>
+  <p class="lede">六个可视化的核心设计与交互均已完成，metro地图完成方法论级重建，六图规模探索全部跑完并写入论文；论文主体章节大部分就位，剩余部分结构性等待用户调研数据。</p>
+
+  <div class="countdown">
+    <div class="num">42<small>天</small></div>
+    <div class="bar-wrap">
+      <div class="bar-track"><div class="bar-fill" style="width:65%"></div></div>
+      <div class="bar-label"><span>2026-07-10</span><span>截止 2026-08-21（约6周）</span></div>
+    </div>
+  </div>
+
+  <div class="stats">
+    <div class="stat"><div class="n">6 / 6</div><div class="l">可视化功能完善</div></div>
+    <div class="stat"><div class="n">6 / 6</div><div class="l">规模探索完成</div></div>
+    <div class="stat"><div class="n">5 / 7</div><div class="l">论文章节基本完成</div></div>
+    <div class="stat"><div class="n">0%</div><div class="l">用户调研进度</div></div>
+  </div>
+
+  <section class="block" style="--rail-color: var(--done)">
+    <div class="block-head"><h2>已完成</h2><span class="count">18 项</span></div>
+    <p class="block-desc">数据基础设施、六个可视化的设计与交互、metro方法论重建、六图规模探索、论文同步、协作基础设施。</p>
+    <div class="rail">
+
+      <div class="grp">
+        <div class="grp-title">数据基础设施</div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">PostgreSQL数据库 + mention_order自定义表</div><div class="d">用start_word字段的单调递增性还原叙事阅读顺序，无需解析原文</div></div></div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">14个官方sector分类</div><div class="d">City of Edinburgh Council NP Areas + Natural Neighbourhoods，取代早期手定lat/lon边界</div></div></div>
+      </div>
+
+      <div class="grp">
+        <div class="grp-title">六个可视化 — 设计与交互</div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">radar.html / barcode.html / small_multiples.html</div><div class="d">方向一三张图；本次会话补上原文句子hover、sector筛选、双作者对比模式</div></div></div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">network.html / linear.html</div><div class="d">方向二两张图；导师提的待办（slider下限、排序、点击看书目、scale切换）全部清空</div></div></div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">metro.html — 方法论级重建</div><div class="d">社群检测替代手绘分组，5条数据驱动线；88%相邻站点有真实共现支撑（对比旧版22%）</div></div></div>
+      </div>
+
+      <div class="grp">
+        <div class="grp-title">规模探索（导师第二优先级）</div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">六图全部测了2/5/20/408位作者</div><div class="d">发现六个图不共享一个规模上限，是六种不同的失效模式，已量化写入论文Appendix</div></div></div>
+      </div>
+
+      <div class="grp">
+        <div class="grp-title">论文与协作基础设施</div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">Ch1/2/3 完成，Ch4/6 大部分完成，Appendix B完整</div><div class="d">含sector方法论、六图设计决策、metro重建方法论、scale exploration汇总表</div></div></div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">handover v1→v2→v3、README重写、GitHub Pages落地页</div><div class="d">交接文档持续维护；README对齐当前状态；index.html整理六图链接</div></div></div>
+      </div>
+
+    </div>
+  </section>
+
+  <section class="block" style="--rail-color: var(--progress)">
+    <div class="block-head"><h2>正在推进 / 阻塞中</h2><span class="count">5 项</span></div>
+    <p class="block-desc">严格说，目前没有"写了一半"的代码任务——这一类主要是结构性等待用户调研数据的论文内容。</p>
+    <div class="rail">
+      <div class="item"><div class="dot"></div><div class="body"><div class="t">Evaluation章节：Results / Discussion of Results</div><div class="d">Study Design已完成，其余内容等用户调研跑完才能写</div></div><span class="chip progress">等数据</span></div>
+      <div class="item"><div class="dot"></div><div class="body"><div class="t">Conclusion：RQ1 / RQ2 具体答案</div><div class="d">框架已完成，具体结论同样等用户调研</div></div><span class="chip progress">等数据</span></div>
+      <div class="item"><div class="dot"></div><div class="body"><div class="t">Abstract</div><div class="d">按原计划留到用户调研结果出来后一次写完（~200-300词）</div></div><span class="chip progress">等数据</span></div>
+      <div class="item"><div class="dot"></div><div class="body"><div class="t">Appendix A：PIS/Consent Form插入、Task/Survey Questions定稿</div><div class="d">等study design最终确认后收尾</div></div><span class="chip progress">等确认</span></div>
+      <div class="item"><div class="dot"></div><div class="body"><div class="t">GitHub Pages是否已实际生效</div><div class="d">Settings里的手动开关我这边看不到状态，需要Merritt确认链接能打开</div></div><span class="chip progress">待确认</span></div>
+    </div>
+  </section>
+
+  <section class="block" style="--rail-color: var(--problem)">
+    <div class="block-head"><h2>存在问题</h2><span class="count">5 项</span></div>
+    <p class="block-desc">按处理难度和性质分组——前两项几分钟能改完，中间两项是已知但未修复/已诚实记录的局限，最后一项是目前最大的风险。</p>
+    <div class="rail">
+      <div class="grp">
+        <div class="grp-title">容易修，随手就能改</div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">Ethics approval日期仍是TODO占位</div><div class="d"><code>ethics/ResponseSummary_446635.pdf</code>里应该就有实际日期，抄进去即可</div></div><span class="chip problem">低</span></div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">Acknowledgements章节完全空白</div><div class="d">占位注释还没写内容</div></div><span class="chip problem">低</span></div>
+      </div>
+      <div class="grp">
+        <div class="grp-title">已知局限，未修复 / 已诚实记录</div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">JOIN api_location丢失约35%的mention行</div><div class="d">5位测试作者数据里的悬空外键问题，已记录未处理，影响"提及数"跨图口径一致性</div></div><span class="chip problem">未修复</span></div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">scale_exploration里重算的5作者metro配置跟正式版不完全一样</div><div class="d">McCall Smith材料拆成两条线而非一条——已在论文里诚实交代，不是bug</div></div><span class="chip problem">已记录</span></div>
+      </div>
+      <div class="grp">
+        <div class="grp-title">最大风险</div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">用户调研尚未启动，距截止只剩42天</div><div class="d">招募+跑session+分析都需要不可压缩的时间，但目前排在优先级列表最后一位</div></div><span class="chip problem">高</span></div>
+      </div>
+    </div>
+  </section>
+
+  <section class="block" style="--rail-color: var(--next)">
+    <div class="block-head"><h2>后续任务</h2><span class="count">按优先级</span></div>
+    <p class="block-desc">前两个优先级（原有清单+规模探索+live link）已清空，从第四优先级开始是尚未启动的工作。</p>
+    <div class="rail">
+      <div class="grp">
+        <div class="grp-title">第四优先级 — Combined Interface</div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">单页应用整合方向一/方向二</div><div class="d">顶部导航切换、全部424位作者选择器、跨视图联动（选中作者高亮对应地名）</div></div><span class="chip next">未开始</span></div>
+      </div>
+      <div class="grp">
+        <div class="grp-title">第五优先级 — 用户调研</div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">两组参与者：领域专家 + 普通公众</div><div class="d">伦理审批（#446635）已有，study design已完成，可以随时启动招募</div></div><span class="chip next">未开始</span></div>
+      </div>
+      <div class="grp">
+        <div class="grp-title">论文收尾（等用户调研完成后一次性处理）</div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">Abstract、Acknowledgements、Ethics日期</div><div class="d">Acknowledgements和Ethics日期其实现在就能填，不必等调研</div></div></div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">Evaluation结果 + Conclusion的RQ1/RQ2具体回答</div><div class="d">论文里最后一块结构性空白</div></div></div>
+      </div>
+      <div class="grp">
+        <div class="grp-title">未列入当前计划（数据已备好，暂缓）</div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">Reader-plot叙事时间轴</div><div class="d"><code>mention_order.position_pct</code>字段已就位，可视化本身未做，列为future work</div></div></div>
+        <div class="item"><div class="dot"></div><div class="body"><div class="t">Narrative weight分析（对话/叙述/描写）</div><div class="d">api_posmention的2百万条词性标注尚未使用</div></div></div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    基于 <code>docs/handover_v3.md</code>、<code>dissertation/10Jul/dissertation.tex</code> 里的TODO标记、<code>data/processed/scale_exploration/NOTES.md</code> 以及本次会话的git提交历史整理。"Literary silences"方向已在早期正式放弃，列入论文Discussion的局限性讨论，不在本清单中重复。
+  </footer>
+</div>
+</body>
+</html>
