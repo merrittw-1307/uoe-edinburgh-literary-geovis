@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>A Visual Trace Map of Edinburgh Place Names in Literature</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #F8F9FC;
+    color: #2C2C2A;
+    padding: 40px 24px 80px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+  .wrap { max-width: 880px; width: 100%; }
+  h1 { font-size: 26px; color: #21295C; margin-bottom: 6px; }
+  .subtitle { font-size: 14px; color: #888; margin-bottom: 4px; }
+  .byline { font-size: 12px; color: #AAA; margin-bottom: 28px; }
+  h2 { font-size: 16px; color: #21295C; margin: 32px 0 6px; padding-bottom: 6px; border-bottom: 2px solid #E0E4F0; }
+  .dir-desc { font-size: 13px; color: #666; margin-bottom: 16px; max-width: 640px; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 14px; margin-bottom: 8px; }
+  .card {
+    display: block;
+    background: white;
+    border: 1px solid #E0E4F0;
+    border-radius: 12px;
+    padding: 16px 18px;
+    text-decoration: none;
+    color: inherit;
+    transition: all 0.15s;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  }
+  .card:hover { border-color: #21295C; box-shadow: 0 4px 14px rgba(33,41,92,0.12); transform: translateY(-1px); }
+  .card .name { font-size: 14px; font-weight: bold; color: #21295C; margin-bottom: 4px; }
+  .card .desc { font-size: 12px; color: #888; line-height: 1.4; }
+  .badge {
+    display: inline-block; font-size: 9.5px; font-weight: 600; letter-spacing: 0.03em;
+    color: white; background: #C9A227; padding: 2px 7px; border-radius: 8px; margin-bottom: 6px;
+  }
+  .note {
+    font-size: 12px; color: #856404; background: #FFF8E7; border-left: 3px solid #C9A227;
+    padding: 10px 14px; border-radius: 0 6px 6px 0; margin: 28px 0; max-width: 640px;
+  }
+  footer { font-size: 11px; color: #AAA; margin-top: 48px; text-align: center; }
+  footer a { color: #21295C; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>A Visual Trace Map of Edinburgh Place Names in Literature</h1>
+  <div class="subtitle">MSc Dissertation prototypes — six interactive D3.js visualisations exploring narrative structure vs. geographic accuracy</div>
+  <div class="byline">Merritt Wang (S2887338) · University of Edinburgh, School of Informatics · supervised by Uta Hinrichs</div>
+
+  <h2>Direction 1 — Author Spatial Fingerprints</h2>
+  <div class="dir-desc">Can each author's distribution of place names across Edinburgh form a distinct visual "fingerprint," recognisable without prior knowledge of their work?</div>
+  <div class="grid">
+    <a class="card" href="data/processed/dir_1/radar/d3/radar.html">
+      <div class="name">Radar Chart</div>
+      <div class="desc">Primary design. Polygon shape across 14 official city sectors; click a vertex for places, books, and example sentences.</div>
+    </a>
+    <a class="card" href="data/processed/dir_1/barcode/d3/barcode.html">
+      <div class="name">Bar-code Fingerprint</div>
+      <div class="desc">Secondary design. Per-place bars, independent Y-axis per author; sortable, searchable.</div>
+    </a>
+    <a class="card" href="data/processed/dir_1/small_multiples/d3/small_multiples.html">
+      <div class="name">Small Multiples</div>
+      <div class="desc">Tertiary design. Five real Leaflet maps side by side; sector filter and 2-author compare mode.</div>
+    </a>
+  </div>
+
+  <h2>Direction 2 — Narrative Topology Networks</h2>
+  <div class="dir-desc">Does document-level co-occurrence of place names reveal a narrative structure distinct from geographic proximity?</div>
+  <div class="grid">
+    <a class="card" href="data/processed/dir_2/network/d3/network.html">
+      <div class="name">Force-Directed Network</div>
+      <div class="desc">Primary design. Node-link diagram of the full 403-pair co-occurrence graph; weight-threshold slider, click a node for details.</div>
+    </a>
+    <a class="card" href="data/processed/dir_2/linear/d3/linear.html">
+      <div class="name">Linear Connection Diagram</div>
+      <div class="desc">Secondary design. Places on a single axis, arcs for co-occurrence; sortable, click an arc for the book list.</div>
+    </a>
+    <a class="card" href="data/processed/dir_2/metro/d3/metro.html">
+      <div class="name">Metro-Style Map</div>
+      <div class="desc">Illustrative design. Lines derived from real community detection on the co-occurrence graph, not hand-drawn geography — 88% of adjacent stations share a real book co-occurrence.</div>
+    </a>
+  </div>
+
+  <div class="note">The six visualisations above use five test authors (Alexander McCall Smith, Irvine Welsh, John Gibson Lockhart, Walter Scott, Robert Louis Stevenson) and are the versions described in the dissertation. The section below is a separate, ongoing exploration of how each design behaves at 2, 20, and up to 408 authors — kept apart from the canonical prototypes above so the two are never confused.</div>
+
+  <h2>Scale Exploration <span class="badge">In progress</span></h2>
+  <div class="dir-desc">Each of the six designs fails at scale in a different, specific way — see the write-up in <code>data/processed/scale_exploration/NOTES.md</code> and the new Appendix table in the dissertation for the full comparison.</div>
+  <div class="grid">
+    <a class="card" href="data/processed/scale_exploration/d3/radar_scale_explore.html">
+      <div class="name">Radar — scale explorer</div>
+      <div class="desc">2 to 408 authors; hover any author to isolate their polygon.</div>
+    </a>
+    <a class="card" href="data/processed/scale_exploration/d3/barcode_scale_explore.html">
+      <div class="name">Bar-code — scale explorer</div>
+      <div class="desc">2 to 408 authors; each row shows that author's own top-15 places.</div>
+    </a>
+    <a class="card" href="data/processed/scale_exploration/d3/small_multiples_scale_explore.html">
+      <div class="name">Small Multiples — scale explorer</div>
+      <div class="desc">Live Leaflet panel grid; measures real rendering cost up to 408 authors.</div>
+    </a>
+    <a class="card" href="data/processed/scale_exploration/d3/network_scale_explore.html">
+      <div class="name">Network — scale explorer</div>
+      <div class="desc">Any author subset, or an arbitrary 2–3 book selection, computed live in the browser.</div>
+    </a>
+    <a class="card" href="data/processed/scale_exploration/d3/linear_scale_explore.html">
+      <div class="name">Linear — scale explorer</div>
+      <div class="desc">Same live computation as the network explorer, drawn as arcs on an axis.</div>
+    </a>
+    <a class="card" href="data/processed/scale_exploration/d3/metro_scale_explore_20authors.html">
+      <div class="name">Metro — 20-author snapshot</div>
+      <div class="desc">One rendered snapshot from the batch community-detection scale test (see NOTES.md for 2/5/20/50 comparison).</div>
+    </a>
+  </div>
+
+  <footer>
+    Source: <a href="https://github.com/merrittw-1307/uoe-edinburgh-literary-geovis">github.com/merrittw-1307/uoe-edinburgh-literary-geovis</a>
+  </footer>
+</div>
+</body>
+</html>

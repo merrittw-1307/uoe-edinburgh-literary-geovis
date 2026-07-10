@@ -2,7 +2,7 @@
 ## A Visual Trace Map of Edinburgh Place Names in Literature
 ### MSc Dissertation — Merritt Wang (S2887338)
 ### University of Edinburgh, School of Informatics, 2025–2026
-### 生成时间：2026年7月10日（本文档取代 handover_v2.md，v2继续保留作历史存档）
+### 生成时间：2026年7月10日（本文档取代 handover_v2.md，v2继续保留作历史存档；同日追加并扩充了第15节"规模探索"——现已覆盖全部六个图）
 
 ---
 
@@ -22,6 +22,7 @@
 - **metro.html 整个方法论重做**：从"手绘地理示意图套了个叙事拓扑的名头"，变成"从403条真实共现数据里用社群检测算出来的5条线"，是这次最大的一块工作，详见第14节
 - **论文路径修正**：v2文档里写的 `dissertation/main/` 不存在，实际路径是按日期命名的文件夹，目前最新是 `dissertation/10Jul/dissertation.tex`
 - **新增数据管道脚本**：见第2节仓库结构更新
+- **规模探索完成**（导师第二优先级任务，分两轮）：六个图全部测了2/5/20/全部作者规模。核心发现：六个图不是共享一个规模上限，是六个不同的失效模式（radar视觉重叠、barcode要滚动、network/linear同根因不同轴、small_multiples唯一有真实计算成本、metro是算法本身失效）。写进论文Limitations两段+新Appendix汇总表。详见第15、15b节
 
 ---
 
@@ -271,10 +272,11 @@
 - [ ] Discussion章节加一段：地铁图验证结果（88% vs 22%）+ "Leith更靠近历史老城线"这个新发现
 - [ ] Appendix加一个表：5条线的名称/站数/adjacency_backed百分比
 
-### 第二优先级：扩大规模探索（未开始）
-- 5作者→全部424作者
-- 只选2个作者/2-3本书的变化
-- 截图记录pros/cons
+### 第二优先级：扩大规模探索 ✅ 已完成（详见第15节）
+- [x] 5作者→全部408位（有地名数据的）作者——radar + network两个代表图
+- [x] 只选2个作者/2-3本书的变化
+- [x] 截图+决策log记录pros/cons（`data/processed/scale_exploration/NOTES.md`）
+- [x] 结果写进论文（Limitations + Discussion）
 
 ### 第三优先级：Live Links（未开始）
 - GitHub Pages部署
@@ -327,5 +329,71 @@
 
 ---
 
+## 15. 规模探索（导师第二优先级任务，本次会话补充）
+
+### 范围决策（第一轮）
+
+Merritt第一次明确要求：只挑两个代表图（radar代表方向一、network代表方向二），不是六个图都做；同时要求"留痕"（决策过程要能查）、"不要覆盖历史版本"、"效果好才更新论文"。三条都照办了：
+
+- 新建了独立目录 `data/processed/scale_exploration/`，完全不碰 `dir_1/radar/`、`dir_2/network/` 里现有的5作者版本
+- 新文件：`radar_scale_explore.html`、`network_scale_explore.html`（两个全新的探索工具，不是截图，是真的可交互）
+- 决策过程和最终发现全部写在 `data/processed/scale_exploration/NOTES.md`，比这里更详细，是主要的方法论记录
+- 效果判断为"好"（发现了非预期的、量化的、可以直接写进论文的规律），已经更新论文和这份手册
+
+### 两个工具怎么做的
+
+**radar_scale_explore.html**：数据来自新脚本 `generate_all_authors_radar_data.py`，把原来锁死5位作者的SQL去掉WHERE条件，跑全部424位作者（408位有地名数据）。**先做了正确性校验**：拿这个新脚本算出来的5位作者数值，跟论文Appendix里已发表的5个百分比逐一对比，全部精确匹配到小数点后3位，才敢往下继续。工具本身：4个预设按钮（2/5/20/全部）+ 搜索框自由加人 + hover隔离某个作者的多边形。
+
+**network_scale_explore.html**：数据来自 `generate_all_authors_network_data.py`，导出全部12,243条(author, place, document)原始记录（不预先聚合），**在浏览器里用JS实时计算**"每作者取top15地名→document级别共现"，这样选择任意作者子集时图会实时重算，不是预设几个固定画面。多加了一个"按书"模式：选2-3本具体的书，直接用这几本书的地名共现（不做top15过滤，因为书本身就已经是小范围了）。
+
+### 发现（已写进论文，也是最有价值的部分）
+
+**radar图**：合法性随作者数单调下降——20人时多边形已经叠得分不清形状，408人时完全是一团乱麻，验证了Limitations章节里本来只是"存疑"的判断。但发现一个缓解手段：hover隔离功能在408人规模下依然有效（测试过，能把目标作者的多边形从背景噪音里拎出来），代价是从"一次看全部"退化成"一次看一个"——不是完全失效，是优雅退化。这个更precise的说法已经写进Limitations。
+
+**network图（这个发现更有意思，非预期）**：密度不是随作者数单调变化的，是U型的，而且两头密的原因完全不同：
+- 2位作者/2-3本书时密：document级别共现在小样本下会退化成"只要在同一本书里出现过就算共现"——这几乎是所有地名对的默然状态。实测3本书（McCall Smith两本+Welsh一本）在weight≥1时密度51%，提高到weight≥2立刻掉到33个地名、423对，而且几乎全是McCall Smith自己两本书之间的（他的Scotland Street世界反复出现），跟Welsh的书完全没有交集——这正好是"发现1"（作者间几乎零共享地名）在book级别的具体体现
+- 408位作者时稀：加作者加的是节点，不是真实的跨作者边，因为大部分作者之间词汇不重叠（还是发现1）
+- **5位作者的原始选择正好卡在中间**：既不会像2人/2-3本书那样"什么都trivially连起来"，也不会像408人那样"基本不连"，这个中间态可能是原来选5位作者时凭直觉做对了、但没有明说的理由
+
+### 第一轮论文改动位置
+
+- Limitations "Five-author prototype" 段落——把"是否scale是个open question"改写成有具体数据支撑的答案（hover隔离能救场，但要接受"一次一个"的代价）
+- Discussion "Author Spatial Languages" 节——新增一段，把network密度的U型发现和"发现1"（作者词汇不重叠）显式连起来
+
+### 第一轮数据管道注意事项
+
+`generate_all_authors_radar_data.py` 和 `generate_all_authors_network_data.py` 都在 `data/processed/scale_exploration/py/`，跑完会自动做正确性校验打印在终端（radar脚本会对比5个已发表数值）。这两个探索工具用的是完全独立的数据管道，没有复用`dir_2/network/py/generate_enriched_data.py`（那个是锁定5作者的），所以5作者配置下两边算出来的边数会有小差异（403 vs 实测的~403附近），差异来源已经在NOTES.md里写清楚了，不是bug。
+
+---
+
+## 15b. 规模探索第二轮——剩下四个图（同日，Merritt追加要求）
+
+Merritt紧接着要求把剩下四个图（barcode、small_multiples、linear、metro）也做完，同样的四个规模档位（2/5/20/全部），同样要留痕、不覆盖历史版本。这一轮最大的收获：**六个图不是共享一个"规模上限"问题，是六个各不相同的失效模式**，这个发现本身比任何单个数字都重要。
+
+### 四个新工具怎么做的
+
+- **barcode_scale_explore.html**：数据脚本`generate_all_authors_barcode_data.py`，每位作者展示自己的top15地名（不是原版固定的39地名共享列——408个差异巨大的作者没法共享一套列名）。实测了才知道：408行渲染只要20ms，完全不卡，问题纯粹是页面变成45,274px高（约50屏），"一眼对比两个作者"这个卖点没了，但不是渲不出来。
+- **linear_scale_explore.html**：直接复用network那份12,243行原始数据，同样的JS实时共现计算，换成弧线+横轴的画法。发现一个容易看错的现象：408作者时SVG宽度是29,790px，但截图只看得到最左边一小段（跟20作者截图长得几乎一样），因为容器是横向滚动的，最左边总是提及数最高的那几个地名——不是没更新，是画对了但没人会滚动29,790px去看完。
+- **small_multiples_scale_explore.html**：这个是唯一真的测了"计算成本"而不是"好不好看"的——每个面板是真实的Leaflet地图实例，会真的请求网络贴图。实测：5→50位作者时每个面板初始化成本基本不变（1-3ms），但50→408时骤降3.6倍（408位作者时1.47秒，直接测的不是推算的）。这是六个图里唯一一个"规模太大真的会让浏览器卡顿"的，其他五个都只是"不好看"或"要滚动"。
+- **metro的方法不一样**：社群检测+弹簧布局+octilinear修正都是networkx的批处理运算，没法简单搬到浏览器里实时跑，所以这个是Python批处理脚本（`metro_scale_test.py`），不是live网页。复用了`build_metro_lines.py`里的函数（import，没有复制粘贴逻辑），在2/5/20/50位作者规模下重跑一遍，另外渲染了一个20作者的完整HTML（`metro_scale_explore_20authors.html`）截图用。
+
+### 发现（已写进论文）
+
+- **barcode**：失效方式是"要滚动"，不是"渲不出来"或"看不清"——跟radar（视觉重叠）和network/linear（同一个根因：一条轴上塞所有东西，只是横轴纵轴不同）都不一样。
+- **small_multiples**：唯一一个有真实计算成本的图，而且是非线性的（50→408时每面板成本涨3.6倍）——是六个图里唯一"规模太大可能真卡死"的。
+- **metro**：社群检测算法本身在规模变大后会失效，不只是画面变乱。50位作者时，有一条线膨胀到75个站——因为`greedy_modularity_communities`判断这一大块内部连接太紧密、不该再拆，即使已经超过18站的上限。同时adjacency-backed比例单调下降：96%(2人)→92.5%(5人)→84.4%(20人)→72.5%(50人)。**顺带发现**：拿这套通用管道重新算5作者配置，算出来也是5条线，但McCall Smith的内容拆成了两条（跟正式版metro.html的5条线不完全一样）——不是bug，是两边用独立算出来的共现图，边权重有细微差异，社群检测对这种差异很敏感，这本身也是一个值得写进论文的真实局限。
+
+### 第二轮论文改动位置
+
+- Limitations "Five-author prototype, tested at scale" 段落——从只讲radar扩展成六个图各自的失效模式概述，指向新的Appendix表格
+- Limitations "Metro-map layout is heuristic" 段落——把"重新跑管道可能会产生不同分组"从推测改成了有具体数据的确认（20人→8条线，50人→11条线+75站超大线）
+- 新增Appendix "Scale Exploration Summary"（`tab:scale-summary`）——一张表总结六个图各自的失效模式，方便审阅人一眼扫过去
+
+### 如果以后要重新生成这批数据
+
+四个新脚本都在`data/processed/scale_exploration/py/`：`generate_all_authors_barcode_data.py`、`generate_all_authors_small_multiples_data.py`（这个要重新JOIN `api_location`拿lat/lon，跟其他脚本不共用）、`metro_scale_test.py`（批处理分析，用`importlib`直接import了`build_metro_lines.py`，不是复制代码）、`render_metro_scale_snapshot.py`（渲染20作者截图用，同样import了`build_metro_lines.py`和`build_metro_html.py`）。metro相关的两个脚本记得也要`PYTHONHASHSEED=0`跑，原因跟正式版一样（社群检测的tie-breaking依赖哈希顺序）。
+
+---
+
 *文档生成时间：2026年7月10日*
-*项目状态：六个D3可视化的核心待办全部清空，metro.html完成方法论级重建；论文的metro相关章节尚未同步更新（下一步工作）；用户调研仍未启动*
+*项目状态：六个D3可视化的核心待办全部清空，metro.html完成方法论级重建，六个图的规模探索全部完成并已写入论文；用户调研仍未启动*
