@@ -12,12 +12,18 @@ Metro is the one exception -- its lines depend on offline community
 detection (see build_metro_lines.py), so it stays an <iframe> that swaps
 between the two precomputed snapshots (5-author canonical, 20-author) based
 on how many authors are currently selected, rather than recomputing live.
+
+The outer detail panel is driven by all_authors_sentences.json (see
+generate_all_authors_sentences.py), keyed by (author, place) for each
+author's own top-15 places -- exactly the set reachable through the live
+views, so no unreachable data is shipped.
 """
 import json
 from pathlib import Path
 
 REPO_ROOT = Path("/Users/wangmingyu/Downloads/UoE/Dissertation")
 SCALE_DATA = REPO_ROOT / "data/processed/scale_exploration/data"
+COMBINED_DATA = REPO_ROOT / "data/processed/combined/data"
 OUT_PATH = REPO_ROOT / "data/processed/combined/d3/combined_interface.html"
 
 TEMPLATE = r"""<!DOCTYPE html>
@@ -229,6 +235,15 @@ TEMPLATE = r"""<!DOCTYPE html>
   .detail-panel code { background: #EEF0FA; padding: 1px 4px; border-radius: 3px; font-size: 11px; }
   .todo-tag { display: inline-block; font-size: 10px; background: #FFF8E7; color: #856404; border-radius: 4px; padding: 2px 6px; }
   .done-tag { display: inline-block; font-size: 10px; background: #E9F7EF; color: #1E5C3A; border-radius: 4px; padding: 2px 6px; }
+  .dp-name { font-size: 14px; font-weight: bold; color: #21295C; margin-bottom: 2px; }
+  .dp-meta { font-size: 11px; color: #888; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #EEE; }
+  .detail-panel h4 { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; color: #999; margin: 10px 0 5px; }
+  .dp-row { font-size: 11.5px; color: #444; padding: 3px 0; border-bottom: 1px solid #F5F5F5; display: flex; justify-content: space-between; gap: 8px; }
+  .dp-row .dp-lbl { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .dp-row .dp-val { color: #999; flex-shrink: 0; font-size: 11px; }
+  .dp-quote { margin-top: 8px; padding-top: 6px; border-top: 1px dashed #E0E4F0; font-style: italic; color: #444; font-size: 11px; line-height: 1.4; }
+  .dp-quote .dp-src { font-style: normal; color: #999; display: block; margin-top: 3px; }
+  .dp-empty { font-size: 11px; color: #AAA; font-style: italic; }
 </style>
 </head>
 <body>
@@ -243,12 +258,13 @@ TEMPLATE = r"""<!DOCTYPE html>
 </header>
 
 <div class="status-banner">
-  <strong>Author selector and cross-view linking are live.</strong>
+  <strong>Author selector, cross-view linking, and the outer detail panel are all live.</strong>
   Radar, bar-code, small multiples, network and linear all re-render from the shared author selection below
   using the same client-side computation as the scale-exploration tools. Click an author's shape/row/panel in a
   Fingerprints view, then switch to Topology, to see their places highlighted there (and vice-versa is not yet built).
-  The metro map is the one exception &mdash; its lines depend on offline community detection, so it swaps between
-  precomputed 5- and 20-author snapshots rather than recomputing live.
+  Hover any place, bar, node, or panel to see a real example sentence from <code>api_sentence</code> in the right-hand
+  detail panel. The metro map is the one exception &mdash; its lines depend on offline community detection, so it swaps
+  between precomputed 5- and 20-author snapshots rather than recomputing live, and does not feed the detail panel.
 </div>
 
 <div class="body-wrap">
@@ -332,12 +348,9 @@ TEMPLATE = r"""<!DOCTYPE html>
   </div>
 
   <div class="detail-panel">
-    <h3>Detail Panel</h3>
-    <div class="todo-block">
-      <span class="todo-tag">planned &mdash; outer panel</span>
-      <p style="margin-top:6px;">A shared outer detail panel driven by <code>api_sentence</code> lookups is still planned.
-      Until then, each view already has its own working hover/click detail (example sentences, book titles in the
-      canonical six; place/mentions tooltips here) &mdash; try hovering a shape below.</p>
+    <h3>Detail Panel <span class="done-tag">live</span></h3>
+    <div class="info-block" id="detail-live">
+      <div class="dp-empty">Hover a place, bar, node, or panel to see an example sentence from <code>api_sentence</code>.</div>
     </div>
     <h3>Cross-view Linking</h3>
     <div class="info-block">
@@ -349,7 +362,9 @@ TEMPLATE = r"""<!DOCTYPE html>
     <h3>Data Reuse</h3>
     <p>Radar, bar-code, small multiples, network and linear all read live from the same four scale-exploration JSON bundles
     (<code>all_authors_radar.json</code>, <code>all_authors_barcode.json</code>, <code>all_authors_small_multiples.json</code>,
-    <code>all_authors_network.json</code>), covering any subset of the 408 authors with location data.</p>
+    <code>all_authors_network.json</code>), covering any subset of the 408 authors with location data. The detail panel adds a
+    fifth bundle, <code>all_authors_sentences.json</code>, sampled directly from <code>api_sentence</code> for each author's own
+    top-15 places.</p>
   </div>
 
 </div>
@@ -359,6 +374,7 @@ const ALL_AUTHORS_RADAR = /*__RADAR_JSON__*/;
 const ALL_AUTHORS_BARCODE = /*__BARCODE_JSON__*/;
 const ALL_AUTHORS_SM = /*__SM_JSON__*/;
 const NETWORK_RAW = /*__NETWORK_JSON__*/;
+const ALL_AUTHORS_SENTENCES = /*__SENTENCES_JSON__*/;
 
 const radarByName = {}; ALL_AUTHORS_RADAR.forEach(a => radarByName[a.author] = a);
 const barcodeByName = {}; ALL_AUTHORS_BARCODE.forEach(a => barcodeByName[a.author] = a);
@@ -405,6 +421,42 @@ function moveTooltip(ev) {
   t.style.left = (ev.clientX + 14) + 'px'; t.style.top = (ev.clientY - 10) + 'px';
 }
 function hideTooltip() { document.getElementById('tooltip').style.display = 'none'; }
+
+/* ---- outer detail panel (api_sentence-backed) ---- */
+function sectorForPlace(place) {
+  const row = MENTIONS.find(m => m.place === place);
+  return row ? row.sector : null;
+}
+function clearDetail() {
+  document.getElementById('detail-live').innerHTML = '<div class="dp-empty">Hover a place, bar, node, or panel to see an example sentence from <code>api_sentence</code>.</div>';
+}
+function showDetailForPlace(place, authors) {
+  const seen = new Set();
+  const sentences = [];
+  authors.forEach(author => {
+    const list = (ALL_AUTHORS_SENTENCES[author] || {})[place];
+    if (list) list.forEach(s => { if (!seen.has(s.text)) { seen.add(s.text); sentences.push({...s, author}); } });
+  });
+  const bookCounts = {};
+  MENTIONS.filter(m => m.place === place && authors.includes(m.author)).forEach(m => {
+    bookCounts[m.doc_title] = (bookCounts[m.doc_title] || 0) + m.mentions;
+  });
+  const bookList = Object.entries(bookCounts).sort((a,b) => b[1]-a[1]).slice(0, 5);
+  const sector = sectorForPlace(place);
+
+  const host = document.getElementById('detail-live');
+  host.innerHTML =
+    `<div class="dp-name">${place}</div>` +
+    `<div class="dp-meta">${sector ? sector + ' &middot; ' : ''}${authors.length===1 ? authors[0] : authors.length+' authors in view'}</div>` +
+    (bookList.length ? `<h4>Books mentioning this place</h4>` + bookList.map(([title,count]) => `<div class="dp-row"><span class="dp-lbl">${title}</span><span class="dp-val">${count}</span></div>`).join('') : '') +
+    (sentences.length ? `<h4>Example sentence</h4>` + sentences.slice(0,2).map(s => `<div class="dp-quote">&ldquo;${s.text}&rdquo;<span class="dp-src">${s.book} &middot; ${s.author}</span></div>`).join('') : '<div class="dp-empty" style="margin-top:8px;">No sample sentence found for this pair.</div>');
+}
+function showDetailForAuthor(name) {
+  const rec = barcodeByName[name];
+  if (!rec || !rec.places.length) { clearDetail(); return; }
+  showDetailForPlace(rec.places[0].place, [name]);
+}
+
 function dragBehavior(sim) {
   return d3.drag()
     .on('start', (ev,d) => { if (!ev.active) sim.alphaTarget(0.3).restart(); d.fx=d.x; d.fy=d.y; })
@@ -572,6 +624,7 @@ function updateExtraControls() {
 
 function renderActive() {
   updateExtraControls();
+  clearDetail();
   if (currentViz === 'radar') renderRadar();
   else if (currentViz === 'barcode') renderBarcode();
   else if (currentViz === 'small_multiples') renderSmallMultiples();
@@ -625,7 +678,7 @@ function renderRadar() {
       .attr('stroke', color).attr('stroke-width', isFocused?3.2:1.8).attr('stroke-opacity', strokeOpacity)
       .attr('cursor','pointer')
       .on('click', () => toggleFocus(name))
-      .on('mouseover', (ev) => showTooltip(`<strong style="color:${color}">${name}</strong><br>${rec.total_mentions} mentions &middot; ${rec.works} works<br>Dominant: ${rec.dominant_sector} (${(rec.dominant_pct*100).toFixed(1)}%)`, ev))
+      .on('mouseover', (ev) => { showTooltip(`<strong style="color:${color}">${name}</strong><br>${rec.total_mentions} mentions &middot; ${rec.works} works<br>Dominant: ${rec.dominant_sector} (${(rec.dominant_pct*100).toFixed(1)}%)`, ev); showDetailForAuthor(name); })
       .on('mousemove', moveTooltip)
       .on('mouseout', hideTooltip);
 
@@ -663,7 +716,7 @@ function buildBarcodeRow(name) {
     const bar = document.createElement('div'); bar.className = 'bar';
     bar.style.height = Math.max(p.pct_of_top15*100, 2) + '%';
     bar.style.background = sectorColors[p.sector] || '#999';
-    bar.addEventListener('mouseover', (ev) => showTooltip(`<strong>${p.place}</strong><br><span style="color:${sectorColors[p.sector]||'#999'}">&#9679; ${p.sector}</span><br>${p.abs} mentions (${(p.pct_of_top15*100).toFixed(1)}% of top 15)`, ev));
+    bar.addEventListener('mouseover', (ev) => { showTooltip(`<strong>${p.place}</strong><br><span style="color:${sectorColors[p.sector]||'#999'}">&#9679; ${p.sector}</span><br>${p.abs} mentions (${(p.pct_of_top15*100).toFixed(1)}% of top 15)`, ev); showDetailForPlace(p.place, [name]); });
     bar.addEventListener('mousemove', moveTooltip);
     bar.addEventListener('mouseout', hideTooltip);
     const label = document.createElement('div'); label.className = 'bar-label'; label.textContent = p.place;
@@ -706,7 +759,7 @@ function buildSmPanel(rec) {
     const r = Math.max(Math.log1p(p.mentions/maxCount*100)*3, 3);
     L.circleMarker([p.lat, p.lon], { radius: r, fillColor: '#B85042', color: 'white', weight: 1, fillOpacity: 0.75 })
       .bindPopup(`<strong>${p.place}</strong><br>${p.mentions} mentions`, { closeButton: false })
-      .on('mouseover', function () { this.openPopup(); })
+      .on('mouseover', function () { this.openPopup(); showDetailForPlace(p.place, [rec.author]); })
       .on('mouseout', function () { this.closePopup(); })
       .addTo(map);
   });
@@ -759,6 +812,7 @@ function renderNetwork() {
         .map(e => { const sp=e.source.place||e.source, tp=e.target.place||e.target; return {place: sp===d.place?tp:sp, weight:e.weight}; });
       showTooltip(`<div style="font-weight:bold;color:#21295C">${d.place}</div><div style="color:#888;font-size:11px;margin-bottom:6px">${d.mentions} mentions in current selection</div>` +
         connected.map(c => `<div style="display:flex;justify-content:space-between;gap:16px"><span>${c.place}</span><span style="color:#21295C;font-weight:bold">${c.weight}</span></div>`).join(''), ev);
+      showDetailForPlace(d.place, selectedAuthors);
     })
     .on('mousemove', moveTooltip)
     .on('mouseout', function (ev,d) { d3.select(this).attr('fill', focusedAuthor ? (focusSet.has(d.place)?'#C9A227':'#21295C') : '#21295C'); hideTooltip(); });
@@ -818,7 +872,7 @@ function renderLinear() {
     const fill = focusedAuthor ? (isFocusNode?'#C9A227':'#B85042') : '#B85042';
     const opacity = focusedAuthor ? (isFocusNode?1:0.3) : 1;
     svg.append('circle').attr('cx',x).attr('cy',axisY).attr('r',r).attr('fill',fill).attr('opacity',opacity).attr('stroke','white').attr('stroke-width',1.5).attr('cursor','pointer')
-      .on('mouseover', function (ev) { d3.select(this).attr('fill','#21295C'); showTooltip(`<div style="font-weight:bold;color:#21295C">${d.place}</div><div style="color:#888">${d.mentions} mentions</div>`, ev); })
+      .on('mouseover', function (ev) { d3.select(this).attr('fill','#21295C'); showTooltip(`<div style="font-weight:bold;color:#21295C">${d.place}</div><div style="color:#888">${d.mentions} mentions</div>`, ev); showDetailForPlace(d.place, selectedAuthors); })
       .on('mousemove', moveTooltip)
       .on('mouseout', function () { d3.select(this).attr('fill', fill); hideTooltip(); });
     svg.append('text').attr('x',x).attr('y',axisY+r+14).attr('text-anchor','end')
@@ -860,12 +914,14 @@ def main():
     barcode = json.loads((SCALE_DATA / "all_authors_barcode.json").read_text())
     small_multiples = json.loads((SCALE_DATA / "all_authors_small_multiples.json").read_text())
     network = json.loads((SCALE_DATA / "all_authors_network.json").read_text())
+    sentences = json.loads((COMBINED_DATA / "all_authors_sentences.json").read_text())
 
     html = TEMPLATE
     html = html.replace("/*__RADAR_JSON__*/", json.dumps(radar, ensure_ascii=False))
     html = html.replace("/*__BARCODE_JSON__*/", json.dumps(barcode, ensure_ascii=False))
     html = html.replace("/*__SM_JSON__*/", json.dumps(small_multiples, ensure_ascii=False))
     html = html.replace("/*__NETWORK_JSON__*/", json.dumps(network, ensure_ascii=False))
+    html = html.replace("/*__SENTENCES_JSON__*/", json.dumps(sentences, ensure_ascii=False))
 
     OUT_PATH.parent.mkdir(parents=True, exist_ok=True)
     OUT_PATH.write_text(html)
