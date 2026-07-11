@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Combined Interface — Fingerprints &amp; Topology</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; }
+  body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #F8F9FC;
+    color: #2C2C2A;
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* ---- Top bar ---- */
+  header {
+    background: #21295C;
+    color: white;
+    padding: 12px 24px;
+    display: flex;
+    align-items: center;
+    gap: 24px;
+    flex-wrap: wrap;
+  }
+  header h1 { font-size: 16px; font-weight: bold; margin-right: auto; }
+  header .byline { font-size: 11px; color: #C7CBE8; margin-right: 24px; }
+  .dir-tabs { display: flex; gap: 8px; }
+  .dir-tab {
+    background: rgba(255,255,255,0.08);
+    color: #E6E8F5;
+    border: 1px solid rgba(255,255,255,0.25);
+    border-radius: 6px;
+    padding: 7px 16px;
+    font-size: 13px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .dir-tab:hover { background: rgba(255,255,255,0.16); }
+  .dir-tab.active { background: #C9A227; color: #21295C; border-color: #C9A227; font-weight: bold; }
+
+  /* ---- Status banner ---- */
+  .status-banner {
+    background: #FFF8E7;
+    border-bottom: 1px solid #EEDFA8;
+    color: #856404;
+    font-size: 12px;
+    padding: 8px 24px;
+    line-height: 1.5;
+  }
+  .status-banner strong { color: #6b4e00; }
+
+  /* ---- Body layout ---- */
+  .body-wrap { flex: 1; display: flex; min-height: 0; }
+
+  /* ---- Left panel ---- */
+  .side-panel {
+    width: 260px;
+    flex-shrink: 0;
+    background: white;
+    border-right: 1px solid #E0E4F0;
+    padding: 18px 16px;
+    overflow-y: auto;
+  }
+  .side-section { margin-bottom: 22px; }
+  .side-section h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #E0E4F0;
+  }
+  .viz-option {
+    display: block;
+    width: 100%;
+    text-align: left;
+    background: #F8F9FC;
+    border: 1px solid #E0E4F0;
+    border-radius: 8px;
+    padding: 10px 12px;
+    margin-bottom: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #2C2C2A;
+    transition: all 0.15s;
+  }
+  .viz-option:hover { border-color: #21295C; }
+  .viz-option.active { background: #21295C; color: white; border-color: #21295C; font-weight: bold; }
+  .viz-option .role { display: block; font-size: 11px; color: inherit; opacity: 0.7; font-weight: normal; margin-top: 2px; }
+
+  .planned-controls {
+    background: #F8F9FC;
+    border: 1px dashed #C7CBE8;
+    border-radius: 8px;
+    padding: 12px;
+  }
+  .planned-controls .label { font-size: 12px; font-weight: bold; color: #555; margin-bottom: 8px; display: block; }
+  .planned-controls select,
+  .planned-controls input[type="range"] {
+    width: 100%;
+    margin-bottom: 10px;
+    opacity: 0.5;
+    pointer-events: none;
+  }
+  .planned-controls .field-label { font-size: 11px; color: #888; margin-bottom: 4px; display: block; }
+  .planned-controls .todo-tag {
+    display: inline-block;
+    font-size: 10px;
+    background: #FFF8E7;
+    color: #856404;
+    border-radius: 4px;
+    padding: 2px 6px;
+    margin-bottom: 8px;
+  }
+
+  .scale-link {
+    display: block;
+    font-size: 12px;
+    color: #21295C;
+    text-decoration: none;
+    padding: 8px 10px;
+    background: #EEF0FA;
+    border-radius: 6px;
+    margin-top: 4px;
+  }
+  .scale-link:hover { background: #E0E4F0; }
+
+  /* ---- Main view ---- */
+  .main-view { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+  .view-header {
+    padding: 10px 20px;
+    background: white;
+    border-bottom: 1px solid #E0E4F0;
+    font-size: 13px;
+    color: #666;
+  }
+  .view-header .active-name { color: #21295C; font-weight: bold; }
+  .iframe-host { flex: 1; position: relative; }
+  .iframe-host iframe {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    border: none;
+    display: none;
+  }
+  .iframe-host iframe.active { display: block; }
+
+  /* ---- Right detail panel ---- */
+  .detail-panel {
+    width: 260px;
+    flex-shrink: 0;
+    background: white;
+    border-left: 1px solid #E0E4F0;
+    padding: 18px 16px;
+    overflow-y: auto;
+    font-size: 12px;
+    color: #666;
+    line-height: 1.6;
+  }
+  .detail-panel h3 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #888;
+    margin-bottom: 10px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid #E0E4F0;
+  }
+  .detail-panel .todo-block {
+    background: #F8F9FC;
+    border: 1px dashed #C7CBE8;
+    border-radius: 8px;
+    padding: 10px;
+    margin-bottom: 14px;
+  }
+  .detail-panel code { background: #EEF0FA; padding: 1px 4px; border-radius: 3px; font-size: 11px; }
+</style>
+</head>
+<body>
+
+<header>
+  <h1>Combined Interface — Framework Preview</h1>
+  <div class="byline">Merritt Wang (S2887338) · scaffold for the Ch.4 &ldquo;Combined Interface&rdquo; deliverable</div>
+  <div class="dir-tabs">
+    <button class="dir-tab active" data-dir="fingerprints">Fingerprints</button>
+    <button class="dir-tab" data-dir="topology">Topology</button>
+  </div>
+</header>
+
+<div class="status-banner">
+  <strong>Framework scaffold, not the final integration.</strong>
+  The panel below embeds the six existing canonical visualisations (unmodified, via <code>&lt;iframe&gt;</code>) behind a single navigation shell.
+  Shared author selection, parameter sliders, and cross-view linking (greyed out on the left) are planned for the next iteration — once that
+  live-recompute code is written it slots directly into this same shell without changing the surrounding structure.
+</div>
+
+<div class="body-wrap">
+
+  <div class="side-panel">
+    <div class="side-section" id="viz-picker">
+      <h3>Visualisation</h3>
+      <!-- populated by JS depending on active direction -->
+    </div>
+
+    <div class="side-section">
+      <h3>Controls <span class="todo-tag">planned</span></h3>
+      <div class="planned-controls">
+        <span class="todo-tag">TODO — Week 6-7</span>
+        <span class="field-label">Author selector (all 424 authors)</span>
+        <select disabled><option>5 canonical test authors (current)</option></select>
+        <span class="field-label">Co-occurrence weight threshold</span>
+        <input type="range" disabled>
+        <span class="field-label">Sector/place sort order</span>
+        <select disabled><option>Default</option></select>
+      </div>
+    </div>
+
+    <div class="side-section">
+      <h3>Scale Exploration</h3>
+      <a class="scale-link" href="../../scale_exploration/d3/radar_scale_explore.html">Radar — 2 to 408 authors →</a>
+      <a class="scale-link" href="../../scale_exploration/d3/network_scale_explore.html" style="margin-top:6px;">Network — 2 to 408 authors →</a>
+      <a class="scale-link" href="../../../../index.html" style="margin-top:6px;">↩ back to all six (static)</a>
+    </div>
+  </div>
+
+  <div class="main-view">
+    <div class="view-header">Now viewing: <span class="active-name" id="active-name">Radar Chart</span></div>
+    <div class="iframe-host" id="iframe-host">
+      <iframe id="frame-radar" class="active" src="../../dir_1/radar/d3/radar.html"></iframe>
+      <iframe id="frame-barcode" src="../../dir_1/barcode/d3/barcode.html"></iframe>
+      <iframe id="frame-small_multiples" src="../../dir_1/small_multiples/d3/small_multiples.html"></iframe>
+      <iframe id="frame-network" src="../../dir_2/network/d3/network.html"></iframe>
+      <iframe id="frame-linear" src="../../dir_2/linear/d3/linear.html"></iframe>
+      <iframe id="frame-metro" src="../../dir_2/metro/d3/metro.html"></iframe>
+    </div>
+  </div>
+
+  <div class="detail-panel">
+    <h3>Detail Panel</h3>
+    <div class="todo-block">
+      <span style="font-size:10px;background:#FFF8E7;color:#856404;border-radius:4px;padding:2px 6px;">planned — outer panel</span>
+      <p style="margin-top:6px;">An outer detail panel driven by <code>api_sentence</code> lookups, shared across whichever visualisation is active, is planned here.
+      Until then, each embedded visualisation already has its own working hover/click detail panel (example sentences, book titles) — try clicking a vertex, bar, node, arc or station in the main view.</p>
+    </div>
+    <h3>Cross-view Linking</h3>
+    <div class="todo-block">
+      <span style="font-size:10px;background:#FFF8E7;color:#856404;border-radius:4px;padding:2px 6px;">planned</span>
+      <p style="margin-top:6px;">Selecting an author in a Fingerprints view will highlight their places in the active Topology view (and vice-versa) via <code>postMessage</code>
+      between this shell and each iframe. Not yet wired — the iframes currently run fully independently, each with the same fixed 5-author dataset.</p>
+    </div>
+    <h3>Data Reuse</h3>
+    <p>The scale-exploration JSON bundles (<code>all_authors_radar.json</code>, <code>all_authors_network.json</code>, <code>all_authors_barcode.json</code>,
+    <code>all_authors_small_multiples.json</code>) already contain live-recomputable data for any author subset up to all 424 authors, and are the
+    intended data source for the live author selector once it is implemented.</p>
+  </div>
+
+</div>
+
+<script>
+(function () {
+  var directions = {
+    fingerprints: [
+      { id: 'radar', name: 'Radar Chart', role: 'Primary design' },
+      { id: 'barcode', name: 'Bar-code Fingerprint', role: 'Secondary design' },
+      { id: 'small_multiples', name: 'Small Multiples', role: 'Tertiary design' }
+    ],
+    topology: [
+      { id: 'network', name: 'Force-Directed Network', role: 'Primary design' },
+      { id: 'linear', name: 'Linear Connection Diagram', role: 'Secondary design' },
+      { id: 'metro', name: 'Metro-Style Map', role: 'Illustrative design' }
+    ]
+  };
+
+  var pickerEl = document.getElementById('viz-picker');
+  var activeNameEl = document.getElementById('active-name');
+  var dirTabs = document.querySelectorAll('.dir-tab');
+  var currentDir = 'fingerprints';
+  var currentViz = 'radar';
+
+  function renderPicker() {
+    var html = '<h3>Visualisation</h3>';
+    directions[currentDir].forEach(function (v) {
+      var activeClass = v.id === currentViz ? ' active' : '';
+      html += '<button class="viz-option' + activeClass + '" data-viz="' + v.id + '">' +
+        v.name + '<span class="role">' + v.role + '</span></button>';
+    });
+    pickerEl.innerHTML = html;
+    pickerEl.querySelectorAll('.viz-option').forEach(function (btn) {
+      btn.addEventListener('click', function () { selectViz(btn.getAttribute('data-viz')); });
+    });
+  }
+
+  function selectViz(vizId) {
+    currentViz = vizId;
+    document.querySelectorAll('.iframe-host iframe').forEach(function (f) { f.classList.remove('active'); });
+    var frame = document.getElementById('frame-' + vizId);
+    if (frame) frame.classList.add('active');
+    var meta = directions[currentDir].find(function (v) { return v.id === vizId; });
+    if (meta) activeNameEl.textContent = meta.name;
+    renderPicker();
+  }
+
+  function selectDir(dirId) {
+    currentDir = dirId;
+    dirTabs.forEach(function (t) { t.classList.toggle('active', t.getAttribute('data-dir') === dirId); });
+    selectViz(directions[dirId][0].id);
+  }
+
+  dirTabs.forEach(function (t) {
+    t.addEventListener('click', function () { selectDir(t.getAttribute('data-dir')); });
+  });
+
+  renderPicker();
+})();
+</script>
+
+</body>
+</html>

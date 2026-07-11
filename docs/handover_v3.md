@@ -281,7 +281,7 @@
 ### 第三优先级：Live Links（未开始）
 - GitHub Pages部署
 
-### 第四优先级：Combined Interface（未开始）
+### 第四优先级：Combined Interface ✅ 框架搭建完成（详见第16节），实时功能未开始
 
 ### 第五优先级：用户调研（未开始，⚠️见下方时间线提醒）
 
@@ -395,5 +395,44 @@ Merritt紧接着要求把剩下四个图（barcode、small_multiples、linear、
 
 ---
 
-*文档生成时间：2026年7月10日*
-*项目状态：六个D3可视化的核心待办全部清空，metro.html完成方法论级重建，六个图的规模探索全部完成并已写入论文；用户调研仍未启动*
+## 16. 2026年7月11日会话：论文内容补充 + PIS/Consent阻塞 + Combined Interface框架
+
+Merritt提供了伦理审批日期（5月13日），并明确指示：跟用户调研相关的内容先放一放，下周针对性开始；这期间把其他能做的内容最大限度完成。随后又追加要求把剩下两项（PIS/Consent Form插入 + Combined Interface）同时推进。
+
+### 论文内容补充（不依赖用户调研的部分，全部完成）
+
+- 伦理批准日期填入前置页（13 May 2026）
+- Acknowledgements草稿（标注为DRAFT，提醒Merritt审阅补充个人化感谢内容）
+- Abstract v1草稿：写全问题/数据/两个研究问题/方法/六个设计/用户调研，RQ2部分用已有数据支撑的发现（Leith/Princes St权重28，metro 22%→88%），结尾留一句TODO等RQ1结果
+- Conclusion的RQ2回答：直接给"Yes"结论，引用metro重做（§sec:metro-redesign）和规模探索附录（§app:scale）的数据，RQ1继续留空等用户调研
+- Appendix A的Task Questions和Survey Questions全部写完整（原来是TODO）：Task 1（5选1指纹识别+置信度+理由）、Task 2（叙事/地理关系判断+远近判断+可选理由）、任务后排序；Survey背景4项+反思4项开放题。顺手修正了3处`Section~\ref{chap:eval}`应为`Chapter~\ref{chap:eval}`的引用错误（chap:eval是章节级label）
+- 每次编辑后手动核对了大括号/环境配对（`\begin`/`\end`计数），因为本地没有LaTeX编译环境
+
+### PIS / Consent Form —— 仍阻塞，非我能自主处理
+
+检查了`ethics/PIS_Informatics_LitLong.docx`和`ethics/Participant_Consent_Informatics_LitLong.docx`（用macOS自带`textutil -convert txt`读取，没装新软件）。**两份都是三个学生共用的"雨伞"申请模板，没有个人化**：
+- PIS开头就是"this is part of an 'umbrella' ethics application that includes all MSc students..."，里面写着`Researcher collecting data: [Yvonne Preiss, Jiaki Zhang, Merritt Wang; to be edited accordingly]`和`reference number XXXXX [edit accordingly]`
+- Consent Form里有多处`[delete as appropriate]`的Yes/No选项（比如是否同意录音）没有勾定
+
+这些是Merritt自己的协议决定（保留哪几位学生的名字、勾哪个录音选项、填哪个reference number），我没有代她填写。已经明确告知她："把这两份docx改成你自己单独的版本（研究者只写你自己，勾好该删的选项，reference number填446635），发给我文件我再帮你转PDF插进Appendix A；或者你自己导出PDF发我，我直接接进`\includepdf`。" Appendix A里两处`\includepdf`调用位置已经搭好，等文件一到可以直接插入。
+
+**过程中的插曲**：本机磁盘一度严重不足（377Mi可用/926Gi，99%已用），导致`brew install pandoc`失败，也让`osascript`驱动Word导出PDF超时失败（"AppleEvent timed out"）。没有继续重试或强制退出Word（怕影响她其他未保存的文档），只是把这个风险明确报告给她。会话过程中磁盘空间回升到4.6Gi可用，可能是她自己清理了，也可能是波动——不能假设已经彻底解决。
+
+### Combined Interface —— 框架搭建完成
+
+新文件：`data/processed/combined/d3/combined_interface.html`。做法：不是重新实现六套渲染逻辑，而是把六个现成的canonical HTML（未做任何修改）用`<iframe>`嵌入一个统一的导航外壳里，一次只显示一个iframe。外壳提供：
+- 顶部两个方向的tab（Fingerprints / Topology）
+- 左侧面板：切换方向内的三个子可视化（radio-button风格）
+- 主视图：对应的iframe
+- 右侧detail面板：说明每个子可视化自己已经有效的hover/click详情面板，外层共享的detail面板是后续工作
+
+原计划里的两项——作者选择器/参数滑块、跨视图联动（选中一个作者时另一个方向同步高亮其地名）——用虚线边框+"planned"标签明确标注为未实现，不做假装能用的占位符（半成品交互比明显标注"未实现"更容易误导人）。已确认规模探索阶段生成的四份JSON（`all_authors_radar.json`/`all_authors_network.json`/`all_authors_barcode.json`/`all_authors_small_multiples.json`）已经包含任意作者子集（最多全部424位）的实时可算数据，是未来接入作者选择器时的现成数据源；metro图因为社群检测是离线批处理，计划改成在几个预生成的快照（5/20/50作者）之间切换，不做实时重算。
+
+浏览器测试：方向tab切换、子可视化切换、六个iframe各自渲染正常（radar/barcode/network/metro截图均确认交互正常），控制台无报错。根目录`index.html`底部加了一条链接指向这个框架页。
+
+论文`\section{Combined Interface}`（`\label{sec:combined-interface}`）已从纯TODO注释改写成实际描述，说明了iframe方案的取舍、两项"planned"功能延后的理由、以及后续实现路径。
+
+---
+
+*文档生成时间：2026年7月11日（第16节新增，其余章节沿用7月10日版本）*
+*项目状态：六个D3可视化的核心待办全部清空，六个图的规模探索全部完成并已写入论文；Combined Interface框架已搭建（实时功能待续）；伦理日期/Acknowledgements/Abstract v1/Conclusion RQ2/Task&Survey Questions均已完成；PIS/Consent Form插入仍阻塞（等待Merritt提供个人化版本）；用户调研相关内容按Merritt指示暂缓，下周针对性开始*

@@ -26,15 +26,11 @@
 \date{\today}
  
 \abstract{
-% TODO (~200-300 words) — write after user study is complete
-% Suggested structure:
-%   Sentence 1-2: the problem — existing tools treat literary place names
-%     as geographic data, but literary meaning is narrative, not spatial.
-%   Sentence 3-4: the data — LitLong Edinburgh database,
-%     620 works (1687-2015), 2,135 place names, 50,248 mention records.
-%   Sentence 5-6: the two research directions.
-%   Sentence 7-8: method — interactive D3.js visualisations, user study.
-%   Sentence 9-10: key findings and contribution.
+% DRAFT v1 -- sentences 1-8 are not study-dependent and should be close to
+% final. The last 2-3 sentences summarise the corpus-analysis findings that
+% do not need the study (RQ2); a sentence reporting the RQ1 identification
+% accuracy (Chapter 5) still needs to be added once the study has run.
+Existing digital tools for literary geography plot place names as points on a map, treating them as geographic data; but the meaning a place name carries in a literary text comes from its narrative context, not its coordinates. This dissertation asks whether that narrative structure can be made visible directly, using the LitLong Edinburgh database of 620 literary works (1687--2015), 2,135 place names, and 50,248 place-name mention records. Two research questions are addressed. RQ1 asks whether an author's distribution of place-name mentions across the city forms a visually distinctive spatial ``fingerprint.'' RQ2 asks whether the co-occurrence of place names within literary works reveals a narrative topology distinct from their geographic topology. Six interactive D3.js visualisation prototypes were designed and implemented across these two directions --- a radar chart, a bar-code fingerprint, and small-multiple maps for RQ1; a force-directed network, a linear connection diagram, and a metro-style map for RQ2 --- and evaluated through a user study with domain-expert and general-public participants. The corpus analysis underlying RQ2 shows that Leith and Princes Street, roughly 2.5km apart, are the most strongly co-occurring place pair in the corpus (28 shared works); rebuilding the metro-style map's line structure from measured co-occurrence rather than hand-drawn geography raises the proportion of adjacent stations sharing a real book from 22\% to 88\%, and surfaces further instances of narrative structure that geographic proximity alone could not reveal. % TODO: add RQ1 finding once the user study has run (identification accuracy for the fingerprint designs).
 }
  
 \maketitle
@@ -46,7 +42,7 @@
 \begin{ethics}
 This project obtained approval from the Informatics Research Ethics committee.\\
 Ethics application number: 446635\\
-Date when approval was obtained: % TODO: fill in date\\
+Date when approval was obtained: 13 May 2026\\
 The participants' information sheet and a consent form are included in the appendix.\\
 \standarddeclaration
 \end{ethics}
@@ -366,7 +362,8 @@ Community detection is order-sensitive in an unwanted way: Python's hash-randomi
 At render time, each line is drawn as a single SVG path through its stations' shared grid coordinates, converted to pixel coordinates and corrected for octilinearity (Section~\ref{sec:metro-redesign}) by inserting an intermediate ``dog-leg'' point wherever two consecutive stations are not already aligned at a multiple of $45^\circ$. Because coordinates are shared across lines, two lines that both stop at the same interchange are drawn passing through the same physical point, producing genuine visual crossings rather than the separate parallel lanes used in the initial prototype. Interchange stations (those appearing on two or more lines) are marked with an outer white circle of radius 9 and an inner dark circle of radius 4, following the London Underground convention; all other stations use a smaller white circle with a coloured stroke matching their line's colour. Station labels are positioned by the greedy eight-direction search described in Section~\ref{sec:metro-redesign}; an initial fixed below-circle placement produced ten overlapping label pairs among the 57 stations in the densest cluster, reduced to two after adopting the greedy search. D3 zoom behaviour is attached to the SVG to support scroll-to-zoom and drag-to-pan; clicking a line or a legend entry isolates it by dimming all other lines and stations, and a text field highlights matching station names.
  
 \section{Technical Decisions and Constraints}
- 
+\label{sec:technical-decisions}
+
 \textbf{Data embedding.} All six D3 HTML files embed their data as JavaScript object literals. The trade-off is larger file sizes and the need to regenerate the HTML file when the underlying data changes. For a research prototype evaluated with a fixed dataset, this is an acceptable constraint.
  
 \textbf{Versioning.} Each HTML file is versioned by maintaining previous versions under filenames such as \texttt{radar\_v1.html}, \texttt{network\_v1.html}, etc. This preserves the design evolution as a record for the dissertation and for the supervisor.
@@ -376,17 +373,13 @@ At render time, each line is drawn as a single SVG path through its stations' sh
 \textbf{PostGIS.} The PostGIS extension was not installed, and the geometry fields of \texttt{api\_location} (\texttt{geom}, \texttt{poly}) are excluded from all analyses. Latitude/longitude centroid coordinates are used throughout. For the current visualisation directions, centroid coordinates are sufficient; more precise polygon representations of place areas would be needed only for overlay analyses that are not part of the current scope.
  
 \section{Combined Interface}
-% TODO: implement in Week 6-7 then write this section
-%
-% Planned architecture:
-% - Single-page HTML application with top navigation (Fingerprints / Topology)
-% - Left control panel: author selector (all 424 authors), visualisation type,
-%   parameter sliders
-% - Main view: selected visualisation
-% - Detail panel: source text from api_sentence on hover/click
-% - Cross-view linking: selecting an author in fingerprint view highlights
-%   their places in topology view
-% - Scale: expand to 20-30 representative authors for final submission
+\label{sec:combined-interface}
+
+A framework scaffold for the combined interface has been built (\texttt{data/processed/combined/d3/combined\_interface.html}), implementing the navigation shell described in the original plan while deferring the live-recompute logic to a later iteration. The shell provides top-level navigation between the two directions (Fingerprints / Topology), a left-hand panel that switches between the three visualisations within the active direction, a main view, and a right-hand detail panel, matching the intended layout. Rather than reimplementing each visualisation's rendering logic a second time inside a shared page, the six canonical HTML files (Section~\ref{sec:technical-decisions}) are embedded unmodified via \texttt{<iframe>}, one per visualisation, with only the active one made visible; this reuses every existing interaction (hover tooltips, click-through detail panels, zoom/pan, search) exactly as tested individually, at the cost of the six visualisations currently running as independent documents rather than sharing state.
+
+Two features from the original plan are scaffolded but not yet functional, and are marked as such in the interface itself (a dashed border and a ``planned'' tag): the author selector and per-visualisation parameter sliders (weight threshold, sort order), and cross-view linking (selecting an author in one direction highlighting their places in the other). Both are deferred rather than implemented with placeholder behaviour, since a non-functional-looking control is less misleading than one that appears to do something but does not. The scale-exploration datasets built for Appendix~\ref{app:scale} (\texttt{all\_authors\_radar.json}, \texttt{all\_authors\_network.json}, \texttt{all\_authors\_barcode.json}, \texttt{all\_authors\_small\_multiples.json}) already contain live-recomputable top-place and co-occurrence data for any author subset up to all 424 authors, and are the intended data source for the author selector once implemented: at that point the six \texttt{<iframe>}s would be replaced by six render functions reading from a single shared \texttt{selectedAuthors} array, with the surrounding shell (navigation, panel layout) unchanged. The metro map is the one exception, since its lines depend on re-running community detection offline (Section~\ref{sec:metro-redesign}) rather than a client-side recomputation; the plan is for it to switch between a small number of precomputed snapshots (as already produced for 5, 20, and up to 50 authors in the scale exploration) rather than recompute per selection.
+
+% TODO: revisit priority against the user-study-dependent chapters once the study itself has run in Week 7; full cross-view linking and the live author selector are the main remaining implementation work if time allows.
  
  
 % ============================================================
@@ -483,12 +476,11 @@ Metro is the only design where the failure is in the underlying algorithm rather
  
 This dissertation has argued that place names in literary text are data about narrative structure, not merely about geographic location, and has demonstrated that this argument can be operationalised as a set of interactive visualisations grounded in real corpus data. The LitLong Edinburgh database---620 literary works spanning three centuries, 2,135 place names, 50,248 mention records---provided the empirical foundation. Six visualisation prototypes were developed across two research directions, implemented in D3.js, and evaluated through a user study.
  
-% TODO: fill in after user study — answer RQ1 and RQ2 explicitly
+\textbf{RQ2 --- does narrative co-occurrence reveal a topology distinct from geography?} Yes. The strongest evidence is the Leith/Princes Street pair itself: 28 shared works despite roughly 2.5km of geographic separation, and one of only 12 station-pairs across the entire redesigned metro map that behave as a genuine narrative interchange. The redesign of the metro-style map (Section~\ref{sec:metro-redesign}) turned this from a single anecdote into a systematic result: deriving line structure from measured co-occurrence rather than hand-drawn geography raised the proportion of adjacent stations sharing a real book from 22\% to 88\%, and surfaced two further instances of the same divergence that geography could not have produced --- the word ``Leith'' clustering with Scott and Lockhart's historical corridor rather than Welsh's, and a biographical corridor (Castle Street, Lasswade, the University of Edinburgh) distinct from the historical-fiction corridor immediately next to it. The scale-exploration work (Appendix~\ref{app:scale}) adds a boundary condition rather than a contradiction: narrative and geographic topology diverge clearly at the five-author scale used throughout this dissertation, but the mechanism generating that divergence --- near-total non-overlap of authorial vocabularies (Finding~1) --- means the co-occurrence signal itself thins out at very large author counts and degenerates at very small ones (2--3 books), so the divergence is most legible at a middle scale, not a universal property independent of $N$.
+
+% TODO: fill in after user study
 % RQ1: [YES/PARTIAL] — the radar chart / bar-code / small multiples
 %      allowed users to identify authors at [X]% accuracy.
-% RQ2: [YES] — the force-directed network and linear connection diagram
-%      revealed that Leith and Princes Street are the most narratively
-%      proximate pair (weight 28) despite geographic separation.
  
 The project's contributions include: a validated spatial classification of Edinburgh place names using official City of Edinburgh Council administrative boundary data; an empirical finding that each of five representative Edinburgh authors constructs an almost entirely private imaginary geography of the city; a method for extracting narrative reading order from the LitLong database using the \texttt{start\_word} field as a monotonic index; and a suite of interactive visualisation prototypes that make authorial spatial patterns and narrative co-occurrence structure visible in forms not previously available.
  
@@ -518,10 +510,46 @@ Several directions for future work are identified. Scaling the system to the ful
 % \includepdf[pages=-]{consent.pdf}
  
 \section{Task Questions}
-% TODO: finalise after study design is confirmed
- 
+
+The following instrument implements the two task types described in the Study Design section of Chapter~\ref{chap:eval}. Each participant sees all six visualisations; the order of the three fingerprint designs (and, separately, the three topology designs) is randomised per participant to control for ordering effects. Wording is final; formatting into the online survey tool is the only remaining step before the study can run.
+
+\textbf{Task 1 --- fingerprint identification (shown once per fingerprint design: radar, bar-code, small multiples).}
+\begin{enumerate}
+  \item You are looking at a visualisation of one author's use of Edinburgh place names in their writing. Which of the following five authors do you think it represents? \emph{(Alexander McCall Smith / Irvine Welsh / John Gibson Lockhart / Walter Scott / Robert Louis Stevenson / I don't know)}
+  \item How confident are you in this answer? \emph{(Not at all confident -- Very confident, 5-point scale)}
+  \item In one or two sentences, what about the visualisation led you to that answer?
+\end{enumerate}
+
+\textbf{Task 2 --- narrative/geographic relationship (shown once per topology design: force-directed network, linear connection diagram, metro map).}
+\begin{enumerate}
+  \item Looking at this visualisation, which two places appear to be the \emph{most strongly connected}? \emph{(free text, two place names)}
+  \item Based on your own knowledge of Edinburgh (or your best guess if you are not familiar with the city), are these two places geographically close together or far apart? \emph{(Very close -- Very far, 5-point scale / Not sure)}
+  \item Did the visualisation give you any sense of \emph{why} these two places might be connected in the way it shows? \emph{(free text, optional)}
+\end{enumerate}
+
+\textbf{Post-task ranking (once per direction, after all three designs in that direction have been seen).}
+\begin{enumerate}
+  \item Of the three fingerprint designs you just saw (radar chart, bar-code, small multiples), which did you find the most intuitive to read without any explanation? \emph{(single choice + free-text reason, optional)}
+  \item Of the three topology designs you just saw (force-directed network, linear connection diagram, metro map), which did you find the most intuitive to read without any explanation? \emph{(single choice + free-text reason, optional)}
+\end{enumerate}
+
 \section{Survey Questions}
-% TODO: finalise after study design is confirmed
+
+\textbf{Background (before the tasks).} Collected to test whether familiarity moderates the results reported in Chapter~\ref{chap:eval}, not for identification purposes, consistent with the ethics application's data-minimisation commitment.
+\begin{enumerate}
+  \item How familiar are you with Edinburgh's literary history (e.g.\ Scott, Stevenson, contemporary Edinburgh fiction)? \emph{(Not at all -- Very familiar, 5-point scale)}
+  \item Have you read any works by Alexander McCall Smith, Irvine Welsh, John Gibson Lockhart, Walter Scott, or Robert Louis Stevenson? \emph{(Yes, several / Yes, one or two / No)}
+  \item How would you describe your background? \emph{(Literary studies / digital humanities / information visualisation or HCI / other academic / general public with no specialist background / other, please specify)} --- this question, not a fixed group assignment, is what actually separates the ``domain expert'' and ``general public'' groups described in Chapter~\ref{chap:eval} at analysis time.
+  \item How familiar are you with reading data visualisations or charts in general? \emph{(Not at all -- Very familiar, 5-point scale)}
+\end{enumerate}
+
+\textbf{Reflection (after all tasks).}
+\begin{enumerate}
+  \item Before this study, had you thought about literary place names as anything other than locations on a map?
+  \item Did any of the six visualisations change how you think about the relationship between a literary work and the real city it is set in? If so, which one, and how?
+  \item Is there anything about any of the six visualisations that confused you or that you would change?
+  \item Any other comments?
+\end{enumerate}
  
 \chapter{Data and Implementation}
  
