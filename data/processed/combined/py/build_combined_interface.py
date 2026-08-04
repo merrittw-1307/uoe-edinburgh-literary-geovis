@@ -265,6 +265,8 @@ TEMPLATE = r"""<!DOCTYPE html>
   Hover any place, bar, node, or panel to see a real example sentence from <code>api_sentence</code> in the right-hand
   detail panel. The metro map is the one exception &mdash; its lines depend on offline community detection, so it swaps
   between precomputed 5- and 20-author snapshots rather than recomputing live, and does not feed the detail panel.
+  Network/linear cap rendering at the 1,500 strongest connections and small multiples at 50 live map instances, with
+  the weight slider and status text explaining any cap &mdash; this keeps every view fast even at very large author counts.
 </div>
 
 <div class="body-wrap">
@@ -407,6 +409,24 @@ let networkThreshold = 1;
 let linearThreshold = 2;
 let networkSim = null;
 let smMaps = [];
+
+/* Rendering safety caps. Without these, a large author selection can push
+   network's edge count into the tens of thousands (e.g. 12,833 edges at the
+   Top-50 preset, 30k+ beyond that) -- measured to take 8+ seconds of force
+   simulation without even converging, during which the tab is unresponsive
+   and any subsequent view switch (e.g. to bar-code) appears to hang or not
+   render. Capping to the strongest-weighted edges keeps every view fast
+   regardless of selection size; the weight slider still fully controls
+   which edges qualify, this only bounds the worst case if the user's chosen
+   threshold still leaves too many. */
+const MAX_RENDERED_EDGES = 1500;
+const MAX_SMALL_MULTIPLES_PANELS = 50;
+
+function capEdgesByWeight(edges, max) {
+  if (edges.length <= max) return { edges, truncated: false, totalBeforeCap: edges.length };
+  const sorted = [...edges].sort((a, b) => b.weight - a.weight);
+  return { edges: sorted.slice(0, max), truncated: true, totalBeforeCap: edges.length };
+}
 
 function colorForAuthor(name, idx) { const hue = (idx * 47) % 360; return `hsl(${hue}, 65%, 45%)`; }
 function nodeRadius(mentions) { return Math.max(Math.log1p(mentions) * 2.6, 3); }
@@ -608,8 +628,12 @@ function updateExtraControls() {
   const el = document.getElementById('extra-controls');
   if (currentViz === 'network' || currentViz === 'linear') {
     const val = currentViz === 'network' ? networkThreshold : linearThreshold;
+    const { edges } = buildGraph(selectedAuthors);
+    const maxWeight = Math.max(1, ...edges.map(e => e.weight));
+    const clampedVal = Math.min(val, maxWeight);
+    if (currentViz === 'network') networkThreshold = clampedVal; else linearThreshold = clampedVal;
     el.style.display = 'flex';
-    el.innerHTML = `<label>Min co-occurrence weight: <input type="range" id="threshold-slider" min="1" max="10" value="${val}" step="1"> <span id="threshold-val">${val}</span></label>`;
+    el.innerHTML = `<label>Min co-occurrence weight: <input type="range" id="threshold-slider" min="1" max="${maxWeight}" value="${clampedVal}" step="1"> <span id="threshold-val">${clampedVal}</span></label><span style="color:#AAA;">(max ${maxWeight} in current selection)</span>`;
     document.getElementById('threshold-slider').addEventListener('input', function () {
       const v = +this.value;
       if (currentViz === 'network') { networkThreshold = v; } else { linearThreshold = v; }
@@ -623,6 +647,8 @@ function updateExtraControls() {
 }
 
 function renderActive() {
+  if (currentViz !== 'network' && networkSim) { networkSim.stop(); networkSim = null; }
+  if (currentViz !== 'small_multiples' && smMaps.length) { smMaps.forEach(m => m.remove()); smMaps = []; }
   updateExtraControls();
   clearDetail();
   if (currentViz === 'radar') renderRadar();
@@ -732,8 +758,11 @@ function renderSmallMultiples() {
   grid.innerHTML = '';
   smMaps.forEach(m => m.remove());
   smMaps = [];
-  const names = selectedAuthors.filter(n => smByName[n]);
-  setStatus(`${names.length} live Leaflet map instance(s)` + (focusedAuthor ? ` · focused: ${focusedAuthor}` : ''));
+  const allNames = selectedAuthors.filter(n => smByName[n]);
+  const truncated = allNames.length > MAX_SMALL_MULTIPLES_PANELS;
+  const names = truncated ? allNames.slice(0, MAX_SMALL_MULTIPLES_PANELS) : allNames;
+  const capNote = truncated ? ` · showing the first ${MAX_SMALL_MULTIPLES_PANELS} of ${allNames.length} (each panel is a real Leaflet map instance -- see Appendix scale-exploration findings on map-panel cost)` : '';
+  setStatus(`${names.length} live Leaflet map instance(s)${capNote}` + (focusedAuthor ? ` · focused: ${focusedAuthor}` : ''));
   names.forEach(name => smMaps.push(buildSmPanel(smByName[name])));
 }
 function buildSmPanel(rec) {
@@ -771,12 +800,14 @@ function renderNetwork() {
   const chart = document.getElementById('network-chart');
   chart.innerHTML = '';
   const {nodes, edges} = buildGraph(selectedAuthors);
-  const activeEdges = edges.filter(e => e.weight >= networkThreshold);
+  const thresholded = edges.filter(e => e.weight >= networkThreshold);
+  const { edges: activeEdges, truncated, totalBeforeCap } = capEdgesByWeight(thresholded, MAX_RENDERED_EDGES);
   const activePlaceNames = new Set(activeEdges.flatMap(e => [e.source, e.target]));
   const activeNodes = nodes.filter(n => activePlaceNames.has(n.place)).map(n => ({...n}));
   const focusSet = focusPlacesFor(focusedAuthor);
 
-  setStatus(`${selectedAuthors.length} author(s) selected · ${activeNodes.length} places · ${activeEdges.length} co-occurrence pairs (of ${edges.length} at weight >= 1)` + (focusedAuthor ? ` · highlighting ${focusedAuthor}'s places` : ''));
+  const capNote = truncated ? ` · showing the ${MAX_RENDERED_EDGES} strongest of ${totalBeforeCap} pairs (raise the weight slider to narrow further)` : '';
+  setStatus(`${selectedAuthors.length} author(s) selected · ${activeNodes.length} places · ${activeEdges.length} co-occurrence pairs (of ${edges.length} at weight >= 1)${capNote}` + (focusedAuthor ? ` · highlighting ${focusedAuthor}'s places` : ''));
 
   const W=760, H=560;
   const svg = d3.select(chart).append('svg').attr('width', W).attr('height', H).style('background','#F4F6FB').style('border-radius','12px');
@@ -834,13 +865,15 @@ function renderLinear() {
   const scrollHost = document.getElementById('linear-chart');
   scrollHost.innerHTML = '';
   const {nodes, edges} = buildGraph(selectedAuthors);
-  const activeEdges = edges.filter(e => e.weight >= linearThreshold);
+  const thresholded = edges.filter(e => e.weight >= linearThreshold);
+  const { edges: activeEdges, truncated, totalBeforeCap } = capEdgesByWeight(thresholded, MAX_RENDERED_EDGES);
   const activePlaceNames = new Set(activeEdges.flatMap(e => [e.source, e.target]));
   let activeNodes = nodes.filter(n => activePlaceNames.has(n.place)).sort((a,b) => b.mentions-a.mentions);
   const n = activeNodes.length;
   const focusSet = focusPlacesFor(focusedAuthor);
 
-  setStatus(`${selectedAuthors.length} author(s) selected · ${n} places · ${activeEdges.length} connections (of ${edges.length} at weight >= 1)` + (focusedAuthor ? ` · highlighting ${focusedAuthor}'s places` : ''));
+  const capNote = truncated ? ` · showing the ${MAX_RENDERED_EDGES} strongest of ${totalBeforeCap} connections (raise the weight slider to narrow further)` : '';
+  setStatus(`${selectedAuthors.length} author(s) selected · ${n} places · ${activeEdges.length} connections (of ${edges.length} at weight >= 1)${capNote}` + (focusedAuthor ? ` · highlighting ${focusedAuthor}'s places` : ''));
   if (n === 0) return;
 
   const marginLeft=60, marginRight=60, nodeSpacing=46, axisY=380, H=500;
