@@ -27,6 +27,8 @@ Does the co-occurrence of place names across literary works reveal a narrative t
 
 Every file is also self-contained and can be opened locally by double-clicking — no server or build step required. Data is embedded directly as JavaScript objects in each HTML file (browsers block local file reads under `file://`, so nothing is fetched at runtime).
 
+**[Combined Interface](data/processed/combined/d3/combined_interface.html)** (`data/processed/combined/`) unifies five of the six visualisations (all but metro) behind a single shared author selector (any subset of the 408 authors with location data) and cross-view linking — click an author in a Fingerprints view to highlight their places in a Topology view. An `api_sentence`-backed detail panel shows a real example sentence and book list on hover. Rendering is capped (1,500 strongest edges for network/linear, 50 live map instances for small multiples) so it stays responsive at any selection size; metro stays a static snapshot switch since its lines depend on offline community detection. Built with `data/processed/combined/py/build_combined_interface.py`.
+
 ---
 
 ## Key Findings
