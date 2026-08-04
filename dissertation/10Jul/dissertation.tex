@@ -252,6 +252,20 @@ An audit of this prototype against the document-level co-occurrence data (Findin
 \end{enumerate}
 
 This pipeline reduces the map to five data-derived lines (rather than eight hand-drawn ones) and raises the proportion of adjacency backed by real co-occurrence from 22\% to 88\% (46 of 52 adjacent station pairs; per-line figures are reported in Appendix~\ref{app:metro}). The community structure also surfaced two findings not visible in the hand-drawn version, discussed further in Section~\ref{chap:discussion}: the word ``Leith'' clusters with the historical Old Town corridor associated with Scott and Lockhart rather than with the Welsh-dominated periphery line, and a small five-station line---Castle Street, Lasswade, the University of Edinburgh, the Royal Society of Edinburgh, and St Giles---emerged as a coherent biographical corridor corresponding to the places Lockhart's \textit{Life of Walter Scott} associates with Scott's own residences and professional life, rather than with Scott's fiction.
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig_metro_v1_geographic.png}
+\caption{The initial hand-drawn metro-map prototype, before the redesign. Lines follow geographic and cultural axes (a North Line, an Old Town Line, an East-West Line) chosen by inspection, with only 22\% of adjacent station pairs backed by measured co-occurrence.}
+\label{fig:metro-before}
+\end{figure}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig_metro.png}
+\caption{The same map after the redesign: five lines derived from modularity clustering on the co-occurrence graph and named after their dominant author, with 88\% of adjacent station pairs now backed by measured co-occurrence. Compare against Figure~\ref{fig:metro-before} --- the line structure itself, not just the layout, has changed.}
+\label{fig:metro-after}
+\end{figure}
  
 \section{Design Summary}
  
@@ -321,7 +335,14 @@ A second pass over the same five-author mention data joins \texttt{api\_sentence
 \section{Direction 1: Author Spatial Fingerprints --- Implementation}
  
 \subsection*{Radar chart}
- 
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig_radar.png}
+\caption{The radar chart (primary Direction 1 design), showing all five test authors simultaneously. Each polygon is one author's distribution of place-name mentions across the 14 city sectors; the near-total lack of overlap between polygons is the visual evidence for the ``private imaginary geography'' finding reported in Section~\ref{chap:design}.}
+\label{fig:radar}
+\end{figure}
+
 The radar chart is implemented using D3's \texttt{lineRadial} function with \texttt{curveLinearClosed}, which produces a closed polygon across the 14 angular positions. The angular spacing is $2\pi / 14$ radians per sector. The radial scale maps sector proportion to a radius between 0 and $R = 250$ pixels, where the scale maximum is set to the observed data maximum (0.436) rather than to 1.0.
  
 Hover interaction is implemented using invisible \texttt{circle} elements of radius 14 pixels centred on each vertex. This radius was chosen after testing smaller values: a radius of 6 pixels requires pixel-precise cursor placement and is difficult to target reliably. At radius 14, hovering is comfortable without the targets overlapping each other. On hover, a tooltip shows the sector name and percentage; on click, a detail panel opens showing the top eight place names in that sector for the selected author, ordered by mention count, together with a bar chart and the top five books.
@@ -329,7 +350,14 @@ Hover interaction is implemented using invisible \texttt{circle} elements of rad
 Data is embedded directly as JavaScript arrays in the HTML file. This is necessary because browsers block \texttt{XMLHttpRequest} calls to local files under the \texttt{file://} protocol; a \texttt{d3.csv()} call would silently fail. The same embedding approach is used for all six D3 visualisations.
  
 \subsection*{Bar-code fingerprint}
- 
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig_barcode.png}
+\caption{The bar-code fingerprint (secondary Direction 1 design). Each row is one author, each bar one place; bar height is normalised to that author's own maximum, so a short bar for a high-mention author is not visually confused with a tall bar for a low-mention author.}
+\label{fig:barcode}
+\end{figure}
+
 Each author's row is rendered as an SVG element appended to a container div. The Y-axis domain is \texttt{[0, maxVal]}, where \texttt{maxVal} is the maximum proportion value for that author across all place names---not the global maximum across all authors. This per-author scaling is a deliberate design decision, as justified in Section~\ref{chap:design}.
  
 Sector boundaries are visualised using two complementary encodings: a low-opacity background rectangle in the sector's colour spans the bars belonging to each sector, and a narrow colour strip below the bar area identifies the sector. Text labels are rendered below the colour strip only when the sector is wide enough to accommodate them without overlap (threshold: 40 pixels); narrower sectors are identified by colour alone. This approach avoids the text-stacking problem that arose in earlier versions when 14 sector labels were displayed regardless of available width.
@@ -337,7 +365,14 @@ Sector boundaries are visualised using two complementary encodings: a low-opacit
 Switching between ordering modes (sector, frequency, alphabetical) and scale modes (percentage, absolute) is implemented by re-rendering the SVG elements in JavaScript with the new ordering applied to the place-name array, rather than by animating existing elements. This approach is simpler to implement correctly and avoids the complexity of D3 transition management across multiple SVG groups.
  
 \subsection*{Small multiples}
- 
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig_small_multiples.png}
+\caption{The small multiples design (tertiary Direction 1 design), five independent Leaflet maps side by side. Unlike the other two Direction 1 designs, this one retains real geographic coordinates as a spatial anchor, at the cost of the visual comparison being harder to make at a glance across panels.}
+\label{fig:small-multiples}
+\end{figure}
+
 Each of the five panels is implemented as an independent Leaflet.js map instance, initialised with the CartoDB Positron tile layer. Place-name bubbles are rendered as Leaflet \texttt{CircleMarker} objects, whose \texttt{radius} property is recomputed whenever the scale mode changes. The two-stage Leaflet/D3 overlay approach used in earlier prototypes (in which D3 SVG elements were positioned over the map using screen-coordinate projection) was replaced with native Leaflet \texttt{CircleMarker} objects, which correctly handle map pan and zoom without requiring manual coordinate projection.
  
 Synchronised zoom is implemented by attaching a \texttt{moveend} event listener to each map; when the listener fires and the sync toggle is enabled, it calls \texttt{setView} on all other maps with the current centre and zoom level. A boolean \texttt{isSyncing} flag prevents the listener from triggering cascading updates.
@@ -345,16 +380,37 @@ Synchronised zoom is implemented by attaching a \texttt{moveend} event listener 
 \section{Direction 2: Narrative Topology --- Implementation}
  
 \subsection*{Force-directed network}
- 
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig_network.png}
+\caption{The force-directed network (primary Direction 2 design). Nodes are places, edges are document-level co-occurrence; node size reflects mention count. Leith and Princes Street, the strongest co-occurring pair in the corpus, are visibly pulled together despite the roughly 2.5km geographic distance between them.}
+\label{fig:network}
+\end{figure}
+
 The simulation uses four forces: \texttt{forceLink} (spring attraction between connected nodes, with link distance inversely proportional to co-occurrence weight), \texttt{forceManyBody} (uniform repulsion, strength $-400$), \texttt{forceCollide} (collision avoidance with radius equal to node radius plus 18 pixels), and \texttt{forceCenter} (gentle attraction to the canvas centre). The simulation is re-run from scratch whenever the weight threshold is changed, because the set of active nodes and edges changes and a smooth transition between graph topologies is not meaningful.
  
 Node labels are positioned at $y = \text{node.y} + r + 12$ pixels, placing them below each node. An earlier version positioned labels at the node centroid with white fill, expecting the text to appear inside the node; in practice, the labels were invisible because the white text was rendered against the dark node background. Repositioning labels below the node boundary resolved this issue.
  
 \subsection*{Linear connection diagram}
- 
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig_linear.png}
+\caption{The linear connection diagram (secondary Direction 2 design). Places sit on a single horizontal axis; arc height and thickness both encode co-occurrence weight, so the strongest connections are immediately visible as the tallest arcs regardless of how far apart their endpoints are on the axis.}
+\label{fig:linear}
+\end{figure}
+
 Each arc is drawn as a quadratic Bézier path: \texttt{M x1 y0 Q midX (y0 - h) x2 y0}, where \texttt{midX} $= (x1 + x2) / 2$ and \texttt{h} $= |x2 - x1| \times 0.42$. The coefficient 0.42 was chosen to produce arcs that are visually distinct without extending beyond the SVG canvas for the longest connections. Stroke width is computed as $(w / w_{\max})^{1.5} \times 6$.
  
 \subsection*{Metro-style map}
+
+\begin{figure}[htbp]
+\centering
+\includegraphics[width=0.85\textwidth]{figures/fig_metro.png}
+\caption{The metro-style map (illustrative Direction 2 design) after the data-driven redesign described in Section~\ref{sec:metro-redesign}. Lines are named after their dominant author and derived from modularity clustering on the co-occurrence graph, not drawn by hand; interchange stations (double-ringed) mark places that multiple authors' narrative corridors both pass through.}
+\label{fig:metro}
+\end{figure}
 
 The redesigned pipeline described in Section~\ref{sec:metro-redesign} is implemented as two Python scripts. \texttt{build\_metro\_lines.py} performs the community detection, station sequencing, interchange detection, and layout, and writes a single JSON file containing, per line, its name, colour, member stations, each station's shared $(x,y)$ grid coordinate, and the adjacency-backed diagnostic count; \texttt{build\_metro\_html.py} consumes this JSON and renders the final HTML file, embedding the data as a JavaScript object literal in the same manner as the other five visualisations. Separating data derivation from rendering allows the underlying clustering parameters (community-detection threshold, interchange threshold, maximum line size) to be adjusted and the map regenerated without touching the rendering code.
 
