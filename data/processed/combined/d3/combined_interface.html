@@ -112,7 +112,7 @@
   }
   #author-suggestions div { padding: 5px 10px; cursor: pointer; }
   #author-suggestions div:hover { background: #F0F2FA; }
-  .chip-list { display: flex; flex-wrap: wrap; gap: 5px; }
+  .chip-list { display: flex; flex-wrap: wrap; gap: 5px; max-height: 140px; overflow-y: auto; padding-right: 2px; }
   .chip {
     display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px;
     background: #EEF0FA; color: #21295C; border-radius: 10px; padding: 3px 8px;
@@ -400,7 +400,14 @@ function capEdgesByWeight(edges, max) {
   return { edges: sorted.slice(0, max), truncated: true, totalBeforeCap: edges.length };
 }
 
-function colorForAuthor(name, idx) { const hue = (idx * 47) % 360; return `hsl(${hue}, 65%, 45%)`; }
+function colorForAuthor(idx, total) {
+  /* Evenly spaced hues guarantee a minimum gap of 360/total degrees between
+     every pair of authors currently shown. A fixed prime-step formula
+     (previously idx*47 % 360) does not: at 50 authors two colors landed
+     1 degree apart, making distinct authors visually indistinguishable. */
+  const hue = Math.round((idx * 360) / Math.max(total, 1));
+  return `hsl(${hue}, 65%, 45%)`;
+}
 function nodeRadius(mentions) { return Math.max(Math.log1p(mentions) * 2.6, 3); }
 function setStatus(text) { document.getElementById('status-text').textContent = text; }
 function showTooltip(html, ev) {
@@ -666,7 +673,7 @@ function renderRadar() {
   names.forEach((name, idx) => {
     const rec = radarByName[name];
     const vals = SECTORS.map(s => rec.sector_pct[s]);
-    const color = colorForAuthor(name, idx);
+    const color = colorForAuthor(idx, names.length);
     const isFocused = focusedAuthor === name;
     const strokeOpacity = hasFocus ? (isFocused?1:0.15) : baseOpacity;
     const fillOpacity = hasFocus ? (isFocused?baseFillOpacity*3:baseFillOpacity*0.3) : baseFillOpacity;
