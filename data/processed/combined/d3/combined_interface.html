@@ -186,6 +186,7 @@
     font-size: 11px; color: #856404; background: #FFF8E7; border-left: 3px solid #C9A227;
     padding: 7px 10px; border-radius: 0 6px 6px 0; margin-bottom: 10px; max-width: 760px;
   }
+  .metro-note.severe { color: #7A2E2E; background: #FBEAEA; border-left-color: #B85042; }
   #metro-iframe { width: 100%; height: 640px; border: none; border-radius: 10px; }
 
   .tooltip {
@@ -236,7 +237,7 @@
   Fingerprints view, then switch to Topology, to see their places highlighted there (and vice-versa is not yet built).
   Hover any place, bar, node, or panel to see a real example sentence from <code>api_sentence</code> in the right-hand
   detail panel. The metro map is the one exception &mdash; its lines depend on offline community detection, so it swaps
-  between precomputed 5- and 20-author snapshots rather than recomputing live, and does not feed the detail panel.
+  between four precomputed snapshots (2/5/20/50 authors, nearest match) rather than recomputing live, and does not feed the detail panel. Past ~20 authors the snapshot itself demonstrates community detection breaking down &mdash; that is a real finding, not a rendering bug.
   Network/linear cap rendering at the 1,500 strongest connections and small multiples at 50 live map instances, with
   the weight slider and status text explaining any cap &mdash; this keeps every view fast even at very large author counts.
 </div>
@@ -275,6 +276,7 @@
       <h3>Scale Exploration</h3>
       <a class="scale-link" href="../../scale_exploration/d3/radar_scale_explore.html">Radar &mdash; 2 to 408 authors &rarr;</a>
       <a class="scale-link" href="../../scale_exploration/d3/network_scale_explore.html" style="margin-top:6px;">Network &mdash; 2 to 408 authors &rarr;</a>
+      <a class="scale-link" href="../../scale_exploration/d3/metro_scale_explore.html" style="margin-top:6px;">Metro &mdash; 2/5/20/50 authors &rarr;</a>
       <a class="scale-link" href="../../../../index.html" style="margin-top:6px;">&#x21A9; back to all six (static)</a>
     </div>
   </div>
@@ -894,20 +896,37 @@ function renderLinear() {
 }
 
 /* ---- metro (precomputed snapshot swap, not live) ---- */
+const METRO_SNAPSHOTS = [
+  { n: 2, src: '../../scale_exploration/d3/metro_scale_explore_2authors.html' },
+  { n: 5, src: '../../dir_2/metro/d3/metro.html' },
+  { n: 20, src: '../../scale_exploration/d3/metro_scale_explore_20authors.html' },
+  { n: 50, src: '../../scale_exploration/d3/metro_scale_explore_50authors.html' }
+];
 function renderMetro() {
   const iframe = document.getElementById('metro-iframe');
   const note = document.getElementById('metro-note');
-  const n = selectedAuthors.length;
-  const useSnapshot20 = n > 10;
-  const src = useSnapshot20 ? '../../scale_exploration/d3/metro_scale_explore_20authors.html' : '../../dir_2/metro/d3/metro.html';
-  if (iframe.getAttribute('data-src') !== src) {
-    iframe.src = src;
-    iframe.setAttribute('data-src', src);
+  const n = Math.max(selectedAuthors.length, 1);
+  /* Log-distance nearest-neighbour: these four snapshots span 2 to 50
+     authors, so linear distance would make e.g. 12 authors look "closer"
+     to 5 than to 20 by absolute count while it is a 2.4x jump from 5 and
+     only a 1.7x jump to 20 -- log-distance matches that better. */
+  let closest = METRO_SNAPSHOTS[0];
+  let bestDist = Infinity;
+  METRO_SNAPSHOTS.forEach(s => {
+    const d = Math.abs(Math.log(n) - Math.log(s.n));
+    if (d < bestDist) { bestDist = d; closest = s; }
+  });
+  if (iframe.getAttribute('data-src') !== closest.src) {
+    iframe.src = closest.src;
+    iframe.setAttribute('data-src', closest.src);
   }
-  note.textContent = useSnapshot20
-    ? `${n} authors selected — metro lines cannot be recomputed live (community detection runs offline), showing the closest precomputed snapshot: the 20-author configuration.`
-    : `${n} author(s) selected — showing the canonical 5-author metro map (closest precomputed snapshot; not live-linked to the author selector or the focus highlight).`;
-  setStatus('Metro map: precomputed snapshot, independent of the shared author selector above.');
+  const exact = closest.n === n;
+  const degradeWarning = closest.n >= 20
+    ? ` At this scale the map demonstrates community detection breaking down (see Appendix), not a legible exploration surface -- use the 2 or 5 preset to see the design at its intended scale.`
+    : '';
+  note.textContent = `${selectedAuthors.length} author(s) selected — metro lines cannot be recomputed live (community detection runs offline), so this shows the closest precomputed snapshot: ${closest.n} authors${exact ? ' (exact match)' : ''}.${degradeWarning}`;
+  note.classList.toggle('severe', closest.n >= 20);
+  setStatus(`Metro map: precomputed ${closest.n}-author snapshot, independent of the shared author selector above.`);
 }
 
 /* ---- bootstrap ---- */

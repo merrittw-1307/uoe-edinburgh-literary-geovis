@@ -1,9 +1,18 @@
 """
-Renders one illustrative full metro.html snapshot (20 authors) for a
-screenshot, reusing the exact interchange-detection, spring-layout,
-octilinear-correction, and label-placement code from build_metro_lines.py
-and build_metro_html.py - no logic is duplicated, only the author-list
-input and a couple of module-level path constants are swapped.
+Renders full metro.html-style snapshots at several author-count scales,
+reusing the exact interchange-detection, spring-layout, octilinear-
+correction, and label-placement code from build_metro_lines.py and
+build_metro_html.py -- no logic is duplicated, only the author-list input
+and a couple of module-level path constants are swapped per scenario.
+
+Originally rendered only N=20 as a single illustrative screenshot. Extended
+to also render N=2 and N=50 (matching the four preset buttons already used
+everywhere else in the project -- 2 / 5 / 20 / 50) after Merritt observed
+that the Combined Interface's metro view looked identical when switching
+between 2 and 5 authors, or between 20 and 50: both pairs mapped to the
+same one precomputed file. N=5 still uses the canonical dir_2/metro
+pipeline (a separate, already-published data pipeline) rather than being
+re-rendered here, so it is not duplicated.
 """
 import importlib.util
 import json
@@ -16,7 +25,14 @@ ALL_AUTHORS_NETWORK = REPO_ROOT / "data/processed/scale_exploration/data/all_aut
 SCALE_DATA_DIR = REPO_ROOT / "data/processed/scale_exploration/data"
 SCALE_D3_DIR = REPO_ROOT / "data/processed/scale_exploration/d3"
 
-N_AUTHORS = 20
+# label -> explicit author list, or None to mean "top N by mentions"
+SCENARIOS = {
+    "2": ["Alexander McCall Smith", "Irvine Welsh"],
+    "5": ["Alexander McCall Smith", "Irvine Welsh", "John Gibson Lockhart", "Walter Scott", "Robert Louis Stevenson"],
+    "20": None,
+    "50": None,
+}
+TOP_N_BY_MENTIONS = {"20": 20, "50": 50}
 
 
 def load_module(name, path):
@@ -27,18 +43,8 @@ def load_module(name, path):
     return module
 
 
-def main():
-    metro_lines = load_module("build_metro_lines", METRO_PY_DIR / "build_metro_lines.py")
-    scale_test = load_module("metro_scale_test", Path(__file__).parent / "metro_scale_test.py")
-
-    payload = json.loads(ALL_AUTHORS_NETWORK.read_text())
-    mentions = payload["mentions"]
-    author_totals = {}
-    for m in mentions:
-        author_totals[m["author"]] = author_totals.get(m["author"], 0) + m["mentions"]
-    top_authors = sorted(author_totals, key=lambda a: -author_totals[a])[:N_AUTHORS]
-
-    nodes, edges, place_books = scale_test.build_nodes_edges(mentions, top_authors)
+def render_one(label, authors, metro_lines, scale_test):
+    nodes, edges, place_books = scale_test.build_nodes_edges(scale_test_mentions, authors)
     node_map = {n["place"]: n for n in nodes}
     lines = scale_test.run_pipeline(nodes, edges, place_books)
 
@@ -88,6 +94,7 @@ def main():
         edge_books[key] = []
 
     result = {
+        "n_authors": len(authors),
         "lines": [
             {
                 "id": i,
@@ -112,15 +119,32 @@ def main():
         "placeBooks": {},
     }
 
-    out_json = SCALE_DATA_DIR / f"metro_scale_{N_AUTHORS}authors.json"
+    out_json = SCALE_DATA_DIR / f"metro_scale_{label}authors.json"
     out_json.write_text(json.dumps(result, ensure_ascii=False))
-    print(f"Wrote {out_json}")
+    print(f"Wrote {out_json} ({len(authors)} authors, {len(result['lines'])} lines, {sum(len(l['stations']) for l in result['lines'])} stations)")
 
-    build_html = load_module("build_metro_html", METRO_PY_DIR / "build_metro_html.py")
+    build_html = load_module(f"build_metro_html_{label}", METRO_PY_DIR / "build_metro_html.py")
     build_html.DATA_PATH = out_json
-    build_html.OUT_PATH = SCALE_D3_DIR / f"metro_scale_explore_{N_AUTHORS}authors.html"
+    build_html.OUT_PATH = SCALE_D3_DIR / f"metro_scale_explore_{label}authors.html"
     build_html.BACKUP_PATH = SCALE_D3_DIR / "_unused_backup.html"
     build_html.main()
+
+
+def main():
+    global scale_test_mentions
+    metro_lines = load_module("build_metro_lines", METRO_PY_DIR / "build_metro_lines.py")
+    scale_test = load_module("metro_scale_test", Path(__file__).parent / "metro_scale_test.py")
+
+    payload = json.loads(ALL_AUTHORS_NETWORK.read_text())
+    scale_test_mentions = payload["mentions"]
+    author_totals = {}
+    for m in scale_test_mentions:
+        author_totals[m["author"]] = author_totals.get(m["author"], 0) + m["mentions"]
+    by_mentions = sorted(author_totals, key=lambda a: -author_totals[a])
+
+    for label, fixed_authors in SCENARIOS.items():
+        authors = fixed_authors if fixed_authors is not None else by_mentions[:TOP_N_BY_MENTIONS[label]]
+        render_one(label, authors, metro_lines, scale_test)
 
 
 if __name__ == "__main__":
