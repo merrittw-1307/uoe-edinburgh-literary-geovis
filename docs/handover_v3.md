@@ -535,5 +535,15 @@ Merritt问完地铁图"解释性怎么样"之后，实测发现2和5作者、20�
 
 ---
 
-*文档生成时间：2026年8月4日（第17-19节新增，其余章节沿用7月11日版本）*
-*项目状态：六个可视化+Combined Interface全部完成（含实时作者选择器/跨视图联动/api_sentence detail面板/性能优化/配色与布局修复/条形码渲染修复/metro四档真实快照）；PIS/Consent Form已定稿插入论文附录（Task #23完成）；论文其余不依赖用户调研的内容均已完成；用户调研仍未启动，是当前最大的未完成项，需要本周内启动招募+跑session才能在提交前拿到RQ1结果*
+## 20. 同日追加：论文插图（发现论文一张截图都没有）
+
+Merritt问"截图都有了吗"，一查发现论文里`\listoffigures`命令是有的，但整篇论文**零个figure环境、零张`\includegraphics`**——编译出来插图目录页会是空的。用本机已装的Chrome headless模式（`--headless=new --screenshot=...`）截了8张图：六个canonical可视化各一张（5作者状态），加metro改造前（`metro_v1_geographic.html`，纯地理网格布局）和改造后各一张对比图。图插在Design/Implementation章节对应小节里，改造前后对比图放在`sec:metro-redesign`那段"22%→88%"数据结论旁边。
+
+过程中电脑意外关机，任务在截完6张图（差small_multiples没截、插图代码还没写）时中断——检查后确认**git已提交的内容全部完好，未提交的index.html小改动也还在磁盘上没丢**，只是把差的一张图补上、把插图代码写完就恢复了。
+
+顺带把index.html里一处过时描述也更新了：还写着Combined Interface"作者选择器和跨视图联动是下一步计划"，但这些早就做完了。
+
+---
+
+*文档生成时间：2026年8月4日（第17-20节新增，其余章节沿用7月11日版本）*
+*项目状态：六个可视化+Combined Interface全部完成（含实时作者选择器/跨视图联动/api_sentence detail面板/性能优化/配色与布局修复/条形码渲染修复/metro四档真实快照）；论文已插入全部8张图（六个可视化+metro前后对比）；PIS/Consent Form已定稿插入论文附录（Task #23完成）；论文其余不依赖用户调研的内容均已完成；本地未做过LaTeX编译验证（无pdflatex），只做过手动括号/引用核查；GitHub push仍卡在授权过期，等Merritt重新登录；用户调研仍未启动，是当前最大的未完成项*
