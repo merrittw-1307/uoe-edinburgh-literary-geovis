@@ -499,5 +499,19 @@ radar（点击/hover多边形）、barcode（hover柱子）、small_multiples（
 
 ---
 
-*文档生成时间：2026年7月11日（第16、16b、16c节新增，其余章节沿用7月10日版本）*
-*项目状态：六个D3可视化的核心待办全部清空，六个图的规模探索全部完成并已写入论文；Combined Interface的作者选择器、跨视图联动、outer detail面板（api_sentence驱动）均已实际接入并测试通过（metro维持快照切换，不参与联动/detail）；伦理日期/Acknowledgements/Abstract v1/Conclusion RQ2/Task&Survey Questions均已完成；PIS/Consent Form插入仍阻塞（等待Merritt提供个人化版本）；用户调研相关内容按Merritt指示暂缓，下周针对性开始*
+## 17. 2026年8月4日：PIS/Consent定稿并插入论文（Task #23完成）
+
+半个月未动项目后，Merritt回来处理，安装了LibreOffice+poppler（本地此前一直没有docx→PDF的转换工具）。当场做了4个决定：Researcher只写Merritt Wang（不保留另两位同学）、不录音、不录像、PIS里的研究活动描述用"背景问卷+任务式可视化探索"组合（对应原模板的Option A+C，删掉了跟"不录音"矛盾的转录描述）。Reference number用446635（来自`ResponseSummary_446635.pdf`）。
+
+**踩的坑**：编辑PIS的docx XML时，第一次用错误的锚点文本查找"Are there any risks..."段落的边界（写成了"What are the possible risks"，文档里实际没有这句），导致误删了从Option D一直到文档末尾的所有内容（风险/收益/数据保护/联系方式全没了），生成的PDF从5页变2页却没报错——**批量XML删除操作后必须逐页检查转出的PDF，不能只看"转换成功"就默认没问题**。用正确的锚点重做后4页内容完整。
+
+**最终产物**：`ethics/PIS_Merritt_final.docx`、`ethics/Consent_Merritt_final.docx`（新文件，原始"雨伞"模板`PIS_Informatics_LitLong.docx`等保持不动）；`dissertation/10Jul/pis.pdf`、`consent.pdf`；论文Appendix A的两处`\includepdf`已解除注释接入。本地没有pdflatex，未做完整编译验证，只做了大括号配对检查（450/450平衡）。
+
+**同时补提交了上次会话写完但没push的Combined Interface性能修复**（Network/Linear大规模作者选择时力导向仿真不收敛、卡死其他视图渲染的bug）。
+
+Git推送本次待办：GitHub token过期，本地已commit，等Merritt重新授权后推送。
+
+---
+
+*文档生成时间：2026年8月4日（第17节新增，其余章节沿用7月11日版本）*
+*项目状态：六个可视化+Combined Interface（含实时作者选择器/跨视图联动/api_sentence detail面板/性能优化）全部完成；PIS/Consent Form已定稿插入论文附录（Task #23完成）；论文其余不依赖用户调研的内容均已完成；用户调研仍未启动，是当前最大的未完成项，需要本周内启动招募+跑session才能在提交前拿到RQ1结果*
