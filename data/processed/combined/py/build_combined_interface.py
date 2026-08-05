@@ -119,6 +119,7 @@ TEMPLATE = r"""<!DOCTYPE html>
   .viz-option .role { display: block; font-size: 11px; color: inherit; opacity: 0.7; font-weight: normal; margin-top: 2px; }
 
   .preset-row { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 8px; }
+  .preset-btn-wide { flex-basis: 100%; }
   .preset-btn {
     border: 1.5px solid #C0C8D8; background: white; border-radius: 14px;
     padding: 4px 10px; font-size: 11px; cursor: pointer; color: #333;
@@ -296,8 +297,9 @@ TEMPLATE = r"""<!DOCTYPE html>
         <button class="preset-btn active" data-preset="5">5 (baseline)</button>
         <button class="preset-btn" data-preset="20">Top 20</button>
         <button class="preset-btn" data-preset="50">Top 50</button>
+        <button class="preset-btn preset-btn-wide" data-preset="all">All 408 (large-scale exploration)</button>
       </div>
-      <div class="preset-explainer">"2" and "5" are the two core authors used throughout this project's writing; "Top 20/50" means the 20 or 50 authors with the most place-name mentions in the corpus.</div>
+      <div class="preset-explainer">"2" and "5" are the two core authors used throughout this project's writing; "Top 20/50" means the 20 or 50 authors with the most place-name mentions in the corpus. "All 408" loads every author with a mapped location &mdash; it's meant for spotting broad, corpus-wide patterns rather than reading individual details, since points inevitably overlap and some views cap what they draw at this scale (each view explains its own limit when you hit it).</div>
       <div id="author-search-wrap">
         <input type="text" id="author-search" placeholder="Add an author&hellip;" autocomplete="off">
         <div id="author-suggestions"></div>
@@ -568,6 +570,7 @@ function presetAuthors(kind) {
   if (kind === '5') return ['Alexander McCall Smith','Irvine Welsh','John Gibson Lockhart','Walter Scott','Robert Louis Stevenson'];
   if (kind === '20') return ALL_AUTHOR_NAMES.slice(0, 20);
   if (kind === '50') return ALL_AUTHOR_NAMES.slice(0, 50);
+  if (kind === 'all') return ALL_AUTHOR_NAMES.slice();
   return [];
 }
 function renderAuthorChips() {
@@ -854,8 +857,8 @@ function renderSmallMultiples() {
   const allNames = selectedAuthors.filter(n => smByName[n]);
   const truncated = allNames.length > MAX_SMALL_MULTIPLES_PANELS;
   const names = truncated ? allNames.slice(0, MAX_SMALL_MULTIPLES_PANELS) : allNames;
-  const capNote = truncated ? ` · showing the first ${MAX_SMALL_MULTIPLES_PANELS} of ${allNames.length} (each panel is a real Leaflet map instance -- see Appendix scale-exploration findings on map-panel cost)` : '';
-  setStatus(`${names.length} live Leaflet map instance(s)${capNote}` + (focusedAuthor ? ` · focused: ${focusedAuthor}` : ''));
+  const capNote = truncated ? ` · showing the first ${MAX_SMALL_MULTIPLES_PANELS} of ${allNames.length} authors (each panel is a real live map, so this many at once is kept as the practical limit)` : '';
+  setStatus(`Showing ${names.length} map${names.length===1?'':'s'}${capNote}` + (focusedAuthor ? ` · focused: ${focusedAuthor}` : ''));
   names.forEach(name => smMaps.push(buildSmPanel(smByName[name])));
 }
 function buildSmPanel(rec) {
