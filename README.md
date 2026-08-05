@@ -1,5 +1,7 @@
 # A Visual Trace Map of Edinburgh Place Names in Literature
 
+[![Live Demo](https://img.shields.io/badge/live%20demo-GitHub%20Pages-2E7D32)](https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/) [![License: MIT](https://img.shields.io/badge/code%20license-MIT-blue)](LICENSE) [![Ethics Approved](https://img.shields.io/badge/ethics-REC%20446635-informational)](ethics/)
+
 **MSc Dissertation** · University of Edinburgh, School of Informatics · 2025–2026
 **Student**: Merritt Wang (S2887338) · **Supervisor**: Uta Hinrichs (VisHub) · **Second supervisor**: Nina Pardal
 
@@ -23,11 +25,19 @@ Does the co-occurrence of place names across literary works reveal a narrative t
 
 ## Live Demo
 
-**[Open the live link](https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/)** — a landing page linking all six visualisations, served via GitHub Pages from `index.html` at the repo root. (If the link 404s, GitHub Pages needs enabling once under Settings → Pages → Source: `main` / `/root`.)
+**[Open the live link](https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/)** — a landing page linking all six visualisations, served via GitHub Pages from `index.html` at the repo root.
 
 Every file is also self-contained and can be opened locally by double-clicking — no server or build step required. Data is embedded directly as JavaScript objects in each HTML file (browsers block local file reads under `file://`, so nothing is fetched at runtime).
 
-**[Combined Interface](data/processed/combined/d3/combined_interface.html)** (`data/processed/combined/`) unifies five of the six visualisations (all but metro) behind a single shared author selector (any subset of the 408 authors with location data) and cross-view linking — click an author in a Fingerprints view to highlight their places in a Topology view. An `api_sentence`-backed detail panel shows a real example sentence and book list on hover. Rendering is capped (1,500 strongest edges for network/linear, 50 live map instances for small multiples) so it stays responsive at any selection size; metro stays a static snapshot switch since its lines depend on offline community detection. Built with `data/processed/combined/py/build_combined_interface.py`.
+| | |
+|---|---|
+| ![Radar chart](docs/screenshots/radar.png) | ![Metro-style map](docs/screenshots/metro.png) |
+| ![Force-directed network](docs/screenshots/network.png) | ![Small multiples](docs/screenshots/small_multiples.png) |
+| ![Bar-code fingerprint](docs/screenshots/barcode.png) | ![Linear connection diagram](docs/screenshots/linear.png) |
+
+**[Combined Interface](data/processed/combined/d3/combined_interface.html)** (`data/processed/combined/`) puts all six visualisations behind a single shared author selector — presets for 2/5/20/50 authors, an "All 408" preset for large-scale exploration, a type-to-search box, and a browsable checklist of all 408 authors for a fully custom selection — plus cross-view linking (click an author in a Fingerprints view to highlight their places in a Topology view) and a detail panel that shows names, counts, percentages, and a real example sentence on hover. Rendering is capped (1,500 strongest edges for network/linear, 50 live map instances for small multiples) so it stays responsive at any selection size; metro switches between four precomputed snapshots (2/5/20/50 authors) instead of joining the live selection, since redrawing its lines from scratch isn't practical client-side. Built with `data/processed/combined/py/build_combined_interface.py`; this is a supplementary exploration tool, not part of the formal user study (see [User Study](#user-study) below).
+
+![Combined Interface](docs/screenshots/combined_interface.png)
 
 ---
 
@@ -163,14 +173,19 @@ Place-name assignment: point-in-polygon (Shapely) for 69% of places; nearest-sec
 - ✅ Metro map rebuilt from real co-occurrence data (community detection) instead of hand-drawn geography
 - ✅ Official 14-sector classification (City of Edinburgh Council data) replacing ad hoc lat/lon boundaries
 - ✅ Scale exploration across all six designs, 2 to 408 authors
+- ✅ Combined Interface: all six designs behind one author selector, with presets, full custom selection across all 408 authors, and cross-view linking
+- ✅ Combined Interface UX pass (supervised review, August 2026): plain-language copy throughout, richer per-point/per-vertex hover detail, "All 408" large-scale-exploration preset
+
+## User Study
+
+Ethics approval granted (Informatics REC, reference 446635). Participant Information Sheet, Consent Form, and the full 46-question Qualtrics-ready questionnaire are finalised — see [`ethics/user_study_questionnaire.md`](ethics/user_study_questionnaire.md) for the participant-facing instrument and [`ethics/user_study_handbook.md`](ethics/user_study_handbook.md) for the recruitment plan, build/distribution SOP, and analysis plan. The study is online, unmoderated, and self-paced (~35–50 min), using the six standalone visualisation links above (not the Combined Interface, which is a supplementary exploration tool). Currently being built out in Qualtrics; not yet distributed.
 
 ## Planned / Open
 
-- Combined single-page interface integrating both directions with an author selector across all 424 authors
 - Reader-plot timeline visualisation (data already prepared via `position_pct` in `mention_order`)
 - Narrative weight analysis using `api_posmention` (part-of-speech: dialogue vs. narration vs. description)
 - "Literary silences" mapping (deferred — LitLong's corpus coverage is not comprehensive enough to treat absence as meaningful without risking a methodologically unsound claim)
-- User study (ethics approval #446635 already granted; two participant groups — domain experts and general public)
+- User study data collection, analysis, and write-up into Results/Discussion/Conclusion (see User Study above)
 
 ---
 
@@ -194,4 +209,4 @@ Full bibliography: `dissertation/*/mybibfile.bib`.
 
 ## License
 
-Academic use only. LitLong database copyright University of Edinburgh / LitLong project. Visualisation and pipeline code: MIT License.
+Visualisation and pipeline code: [MIT License](LICENSE). The underlying LitLong database remains the copyright of the LitLong project / University of Edinburgh; literary source-text excerpts remain under their original copyright — see the License file for the exact scope.
