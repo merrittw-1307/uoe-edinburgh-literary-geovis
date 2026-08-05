@@ -121,6 +121,8 @@ English: The project also has a `combined_interface.html` ("Combined Interface",
 
 ## 4. 搭建与发布流程 / Setup & Publishing SOP
 
+**逐block、逐题的完整操作手册（可直接照抄）见 [`ethics/qualtrics_build_guide.md`](qualtrics_build_guide.md)**——里面精确到每个block选什么Question Type、粘贴什么文字、开不开Force Response、链接放在哪。下面这节是精简版流程概览。
+
 ### 中文步骤
 
 1. **登录Qualtrics**：https://ed.qualtrics.com ，用爱丁堡大学账号登录（机构账号，免费）。
