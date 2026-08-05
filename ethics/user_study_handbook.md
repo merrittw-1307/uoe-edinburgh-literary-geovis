@@ -56,7 +56,7 @@ The study is **online, unmoderated, self-paced** (Qualtrics), taking approximate
 **总数建议：13–20人。** 不是为了统计显著性，是为了拿到有代表性的准确率趋势+足够丰富的质性材料（自由文本回答）。
 
 **招募文案怎么发**：直接发下面英文模板（参与者是英语环境，招募信息必须用英文），附上：
-1. PIS文件（`ethics/PIS_Merritt_final.docx`转的PDF，即`dissertation/10Jul/pis.pdf`或`4Aug/pis.pdf`）
+1. PIS文件（`ethics/PIS_Merritt_final.docx`转的PDF，即`dissertation/5Aug/pis.pdf`——注意用这个日期文件夹，`4Aug/`那份还是旧版30-40分钟时长，没同步最新问卷）
 2. Qualtrics问卷链接（下面第4节教你怎么生成）
 
 ### English — Recruitment message template (send this, in English, via email/social media/etc.)
@@ -85,10 +85,10 @@ The study is **online, unmoderated, self-paced** (Qualtrics), taking approximate
 
 | 材料 | 状态 | 路径 |
 |---|---|---|
-| Participant Information Sheet（35-50分钟版） | ✅ 已定稿 | `ethics/PIS_Merritt_final.docx`（PDF版：`dissertation/10Jul/pis.pdf`） |
-| Consent Form | ✅ 已定稿 | `ethics/Consent_Merritt_final.docx`（PDF版：`dissertation/10Jul/consent.pdf`） |
+| Participant Information Sheet（35-50分钟版） | ✅ 已定稿 | `ethics/PIS_Merritt_final.docx`（PDF版：`dissertation/5Aug/pis.pdf`） |
+| Consent Form | ✅ 已定稿 | `ethics/Consent_Merritt_final.docx`（PDF版：`dissertation/5Aug/consent.pdf`） |
 | **完整问卷（逐屏，可直接照抄进Qualtrics）** | ✅ 已定稿 | **`ethics/user_study_questionnaire.md`** |
-| Task/Survey Questions 措辞同步版 | ✅ 已定稿（论文Appendix A） | `dissertation/10Jul/dissertation.tex` 搜索 `\section{Task Questions}` / `\section{Survey Questions}` |
+| Task/Survey Questions 措辞同步版 | ✅ 已定稿（论文Appendix A） | `dissertation/5Aug/dissertation.tex` 搜索 `\section{Task Questions}` / `\section{Survey Questions}` |
 | 六个可视化的公开链接 | ✅ 已上线并实测 | https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ |
 | 本手册（招募方案+流程SOP+分析方案） | ✅ 本文档 | `ethics/user_study_handbook.md` |
 
@@ -98,7 +98,7 @@ The study is **online, unmoderated, self-paced** (Qualtrics), taking approximate
 
 ## 3. 完整问卷内容 / Full Questionnaire
 
-**问卷已经拆分成独立文档，见 `ethics/user_study_questionnaire.md`** —— 那份文档是唯一的问卷正本，逐屏排列、可以直接照抄进Qualtrics，并且已经跟论文 `dissertation/10Jul/dissertation.tex` 的 Appendix A（Task Questions / Survey Questions）保持完全同步。本手册不再重复问卷全文，避免两处内容不一致。
+**问卷已经拆分成独立文档，见 `ethics/user_study_questionnaire.md`** —— 那份文档是唯一的问卷正本，逐屏排列、可以直接照抄进Qualtrics，并且已经跟论文 `dissertation/5Aug/dissertation.tex` 的 Appendix A（Task Questions / Survey Questions）保持完全同步。本手册不再重复问卷全文，避免两处内容不一致。
 
 **这一版问卷相比最初的Appendix A草稿，做了一次针对性加深（回应"希望被试自发发现地名共现关系"的要求）：**
 - Task 2（拓扑任务）每个设计新增两题：**T3**（"除了最强的那对，还有没有哪个连接让你意外？"）和**T4**（"有没有看到3个以上地方好像是一伙的？"）——这两题不设标准答案，专门用来捕捉自发的深度观察。

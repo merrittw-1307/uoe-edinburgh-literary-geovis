@@ -1,7 +1,7 @@
 # 用户调研问卷（完整版，可直接照抄进Qualtrics）
 # User Study Questionnaire (Complete, Qualtrics-ready)
 
-**说明 / Note:** 本文档只包含问卷本身，逐屏排列，可以直接从上到下照抄进Qualtrics。设计说明、招募方案、分析方法见 `ethics/user_study_handbook.md`。本问卷内容与论文 `dissertation/10Jul/dissertation.tex` 的 Appendix A（Task Questions / Survey Questions）完全同步——如果以后要改问卷措辞，两边都要改，保持一致。
+**说明 / Note:** 本文档只包含问卷本身，逐屏排列，可以直接从上到下照抄进Qualtrics。设计说明、招募方案、分析方法见 `ethics/user_study_handbook.md`。本问卷内容与论文 `dissertation/5Aug/dissertation.tex` 的 Appendix A（Task Questions / Survey Questions）完全同步——如果以后要改问卷措辞，两边都要改，保持一致。
 
 预计用时：**35-50分钟**（已同步进最新版PIS）。
 
