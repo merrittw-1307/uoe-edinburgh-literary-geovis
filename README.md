@@ -1,6 +1,6 @@
 # A Visual Trace Map of Edinburgh Place Names in Literature
 
-[![Live Demo](https://img.shields.io/badge/live%20demo-GitHub%20Pages-2E7D32)](https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/) [![License: MIT](https://img.shields.io/badge/code%20license-MIT-blue)](LICENSE) [![Ethics Approved](https://img.shields.io/badge/ethics-REC%20446635-informational)](ethics/)
+[![Tests](https://github.com/merrittw-1307/uoe-edinburgh-literary-geovis/actions/workflows/tests.yml/badge.svg)](https://github.com/merrittw-1307/uoe-edinburgh-literary-geovis/actions/workflows/tests.yml) [![Live Demo](https://img.shields.io/badge/live%20demo-GitHub%20Pages-2E7D32)](https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/) [![License: MIT](https://img.shields.io/badge/code%20license-MIT-blue)](LICENSE) [![Ethics Approved](https://img.shields.io/badge/ethics-REC%20446635-informational)](ethics/)
 
 **MSc Dissertation** · University of Edinburgh, School of Informatics · 2025–2026
 **Student**: Merritt Wang (S2887338) · **Supervisor**: Uta Hinrichs (VisHub) · **Second supervisor**: Nina Pardal
@@ -137,6 +137,15 @@ On macOS, the system Python (`/usr/bin/python3`) is sandboxed in a way that brea
 Scripts that touch the metro-map community-detection pipeline (`data/processed/dir_2/metro/py/build_metro_lines.py` and everything in `scale_exploration/py/` that imports it) should be run with a fixed hash seed for byte-identical output, since Python's hash randomisation affects tie-breaking inside `networkx.community.greedy_modularity_communities`:
 
     PYTHONHASHSEED=0 python3.11 build_metro_lines.py
+
+---
+
+## Testing
+
+    pip install -r requirements-dev.txt
+    pytest -v
+
+The suite (`tests/`) doesn't touch the database — it validates the derived data files actually shipped in the repo against the specific numbers the dissertation reports, so a regeneration that silently changes a figure (edge count, sector breakdown, an author's dominant sector) fails loudly instead of quietly going stale. `test_cooccurrence_algorithm.py` is the one exception: a self-contained, data-free test of the document-level co-occurrence method itself (Finding 3), including the sentence-level granularity argument. Runs automatically on every push via GitHub Actions.
 
 ---
 
