@@ -113,6 +113,23 @@
   #author-suggestions div { padding: 5px 10px; cursor: pointer; }
   #author-suggestions div:hover { background: #F0F2FA; }
   .chip-list { display: flex; flex-wrap: wrap; gap: 5px; max-height: 140px; overflow-y: auto; padding-right: 2px; }
+  .preset-explainer { font-size: 10.5px; color: #999; line-height: 1.4; margin-bottom: 10px; }
+  .browse-btn {
+    display: block; width: 100%; border: 1.5px solid #C0C8D8; background: white; border-radius: 8px;
+    padding: 6px 10px; font-size: 11px; cursor: pointer; color: #444; margin-bottom: 8px; text-align: left;
+  }
+  .browse-btn:hover { border-color: #21295C; background: #E8EAF6; }
+  .browse-btn.open { background: #21295C; color: white; border-color: #21295C; }
+  .author-browse-panel {
+    display: none; max-height: 260px; overflow-y: auto; border: 1px solid #E0E4F0; border-radius: 8px;
+    padding: 6px; margin-bottom: 10px; background: #FAFBFD;
+  }
+  .author-browse-panel.open { display: block; }
+  .author-browse-row { display: flex; align-items: center; gap: 6px; font-size: 11px; padding: 3px 4px; border-radius: 4px; cursor: pointer; }
+  .author-browse-row:hover { background: #EEF0FA; }
+  .author-browse-row input { flex-shrink: 0; }
+  .author-browse-row .abr-name { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .author-browse-row .abr-count { color: #AAA; font-size: 10px; flex-shrink: 0; }
   .chip {
     display: inline-flex; align-items: center; gap: 5px; font-size: 10.5px;
     background: #EEF0FA; color: #21295C; border-radius: 10px; padding: 3px 8px;
@@ -192,7 +209,7 @@
   .tooltip {
     position: fixed; background: white; border: 1px solid #E0E4F0; border-radius: 8px;
     padding: 8px 12px; font-size: 12px; color: #333; pointer-events: none;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; z-index: 100; max-width: 240px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; z-index: 100; max-width: 280px;
   }
 
   .detail-panel {
@@ -207,7 +224,6 @@
   .detail-panel .todo-block { background: #F8F9FC; border: 1px dashed #C7CBE8; border-radius: 8px; padding: 10px; margin-bottom: 14px; }
   .detail-panel code { background: #EEF0FA; padding: 1px 4px; border-radius: 3px; font-size: 11px; }
   .todo-tag { display: inline-block; font-size: 10px; background: #FFF8E7; color: #856404; border-radius: 4px; padding: 2px 6px; }
-  .done-tag { display: inline-block; font-size: 10px; background: #E9F7EF; color: #1E5C3A; border-radius: 4px; padding: 2px 6px; }
   .dp-name { font-size: 14px; font-weight: bold; color: #21295C; margin-bottom: 2px; }
   .dp-meta { font-size: 11px; color: #888; margin-bottom: 8px; padding-bottom: 8px; border-bottom: 1px solid #EEE; }
   .detail-panel h4 { font-size: 10.5px; text-transform: uppercase; letter-spacing: 0.04em; color: #999; margin: 10px 0 5px; }
@@ -231,15 +247,10 @@
 </header>
 
 <div class="status-banner">
-  <strong>Author selector, cross-view linking, and the outer detail panel are all live.</strong>
-  Radar, bar-code, small multiples, network and linear all re-render from the shared author selection below
-  using the same client-side computation as the scale-exploration tools. Click an author's shape/row/panel in a
-  Fingerprints view, then switch to Topology, to see their places highlighted there (and vice-versa is not yet built).
-  Hover any place, bar, node, or panel to see a real example sentence from <code>api_sentence</code> in the right-hand
-  detail panel. The metro map is the one exception &mdash; its lines depend on offline community detection, so it swaps
-  between four precomputed snapshots (2/5/20/50 authors, nearest match) rather than recomputing live, and does not feed the detail panel. Past ~20 authors the snapshot itself demonstrates community detection breaking down &mdash; that is a real finding, not a rendering bug.
-  Network/linear cap rendering at the 1,500 strongest connections and small multiples at 50 live map instances, with
-  the weight slider and status text explaining any cap &mdash; this keeps every view fast even at very large author counts.
+  Pick any authors on the left, then explore how their use of Edinburgh place names compares (<strong>Fingerprints</strong>)
+  or how the places they mention connect to each other (<strong>Topology</strong>). Hover any point, bar, node, or map
+  marker for details &mdash; the panel on the right fills in with an example sentence and source books. Click an author's
+  shape to focus them, then switch tabs to see their places highlighted in the other view.
 </div>
 
 <div class="body-wrap">
@@ -251,23 +262,26 @@
     </div>
 
     <div class="side-section">
-      <h3>Authors <span class="done-tag">live</span></h3>
+      <h3>Authors</h3>
       <div class="preset-row" id="author-presets">
         <button class="preset-btn" data-preset="2">2</button>
         <button class="preset-btn active" data-preset="5">5 (baseline)</button>
         <button class="preset-btn" data-preset="20">Top 20</button>
         <button class="preset-btn" data-preset="50">Top 50</button>
       </div>
+      <div class="preset-explainer">"2" and "5" are the two core authors used throughout this project's writing; "Top 20/50" means the 20 or 50 authors with the most place-name mentions in the corpus.</div>
       <div id="author-search-wrap">
         <input type="text" id="author-search" placeholder="Add an author&hellip;" autocomplete="off">
         <div id="author-suggestions"></div>
       </div>
       <button class="clear-btn" id="btn-clear-authors">Clear all</button>
+      <button class="browse-btn" id="btn-browse-authors">Browse all 408 authors &#x25BE;</button>
       <div class="chip-list" id="author-chips"></div>
+      <div id="author-browse-panel" class="author-browse-panel"></div>
     </div>
 
     <div class="side-section">
-      <h3>Cross-view Focus <span class="done-tag">live</span></h3>
+      <h3>Cross-view Focus</h3>
       <div id="focus-chip"></div>
       <div class="focus-hint">Click an author's shape (radar), row (bar-code) or map panel (small multiples) to focus them &mdash; then switch to Topology to see their places highlighted.</div>
     </div>
@@ -324,23 +338,16 @@
   </div>
 
   <div class="detail-panel">
-    <h3>Detail Panel <span class="done-tag">live</span></h3>
+    <h3>Detail Panel</h3>
     <div class="info-block" id="detail-live">
-      <div class="dp-empty">Hover a place, bar, node, or panel to see an example sentence from <code>api_sentence</code>.</div>
+      <div class="dp-empty">Hover a place, bar, node, or panel to see an example sentence from the source text.</div>
     </div>
-    <h3>Cross-view Linking</h3>
+    <h3>Cross-view Focus</h3>
     <div class="info-block">
-      <span class="done-tag">implemented</span>
-      <p style="margin-top:6px;">Click an author in a Fingerprints view to focus them (gold highlight). Switch to a Topology view: that
-      author's top-15 places are highlighted gold among the current selection's combined graph, others dimmed. Clear the focus chip
-      on the left to reset. The metro map does not participate (see note below).</p>
+      <p>Click an author's shape in a Fingerprints view to focus them (gold highlight). Switch to a Topology view and that
+      author's places light up gold, so you can follow one author's world from their fingerprint into how their places connect.
+      Click the focus chip on the left to clear it. (The metro map doesn't join in this &mdash; see its note when you view it.)</p>
     </div>
-    <h3>Data Reuse</h3>
-    <p>Radar, bar-code, small multiples, network and linear all read live from the same four scale-exploration JSON bundles
-    (<code>all_authors_radar.json</code>, <code>all_authors_barcode.json</code>, <code>all_authors_small_multiples.json</code>,
-    <code>all_authors_network.json</code>), covering any subset of the 408 authors with location data. The detail panel adds a
-    fifth bundle, <code>all_authors_sentences.json</code>, sampled directly from <code>api_sentence</code> for each author's own
-    top-15 places.</p>
   </div>
 
 </div>
@@ -429,7 +436,7 @@ function sectorForPlace(place) {
   return row ? row.sector : null;
 }
 function clearDetail() {
-  document.getElementById('detail-live').innerHTML = '<div class="dp-empty">Hover a place, bar, node, or panel to see an example sentence from <code>api_sentence</code>.</div>';
+  document.getElementById('detail-live').innerHTML = '<div class="dp-empty">Hover a place, bar, node, or panel to see an example sentence from the source text.</div>';
 }
 function showDetailForPlace(place, authors) {
   const seen = new Set();
@@ -456,6 +463,29 @@ function showDetailForAuthor(name) {
   const rec = barcodeByName[name];
   if (!rec || !rec.places.length) { clearDetail(); return; }
   showDetailForPlace(rec.places[0].place, [name]);
+}
+function placesInSectorFor(name, sector) {
+  const rec = barcodeByName[name];
+  if (!rec) return [];
+  return rec.places.filter(p => p.sector === sector).sort((a,b) => b.abs - a.abs);
+}
+function showSectorDetail(name, sector, ev) {
+  const rec = radarByName[name];
+  const pct = rec.sector_pct[sector] || 0;
+  const absCount = Math.round(pct * rec.total_mentions);
+  const places = placesInSectorFor(name, sector);
+  const placesHtml = places.length
+    ? places.map(p => `<div style="display:flex;justify-content:space-between;gap:10px"><span>${p.place}</span><span style="color:#888">${p.abs}</span></div>`).join('')
+    : `<div style="color:#AAA;font-style:italic;">No individual places from this author's top 15 fall in this sector.</div>`;
+  showTooltip(`<strong style="color:#21295C">${name}</strong><br><span style="color:#666">${sector}</span><br>${absCount} mentions &middot; ${(pct*100).toFixed(1)}% of this author's total<div style="margin-top:6px;font-size:11px;">${placesHtml}</div>`, ev);
+  if (places.length) {
+    showDetailForPlace(places[0].place, [name]);
+  } else {
+    document.getElementById('detail-live').innerHTML =
+      `<div class="dp-name">${sector}</div>` +
+      `<div class="dp-meta">${name} &middot; ${absCount} mentions (${(pct*100).toFixed(1)}%)</div>` +
+      `<div class="dp-empty" style="margin-top:8px;">No individual place from this author's top 15 falls in this sector -- their mentions here are spread across smaller places.</div>`;
+  }
 }
 
 function dragBehavior(sim) {
@@ -541,6 +571,7 @@ function setSelectedAuthors(names) {
   renderAuthorChips();
   renderFocusChip();
   renderActive();
+  syncBrowsePanelChecks();
 }
 function toggleFocus(name) {
   focusedAuthor = (focusedAuthor === name) ? null : name;
@@ -575,6 +606,41 @@ authorSuggestions.addEventListener('click', (e) => {
     setSelectedAuthors([...selectedAuthors, name]);
     authorSearch.value = ''; authorSuggestions.style.display = 'none';
   }
+});
+
+/* ---- browse-all-authors panel: lets someone build a fully custom set by
+   scanning and ticking, rather than only via presets or typed search ---- */
+const browsePanel = document.getElementById('author-browse-panel');
+const browseBtn = document.getElementById('btn-browse-authors');
+let browseBuilt = false;
+function buildBrowsePanel() {
+  browsePanel.innerHTML = ALL_AUTHOR_NAMES.map(name => {
+    const mentions = radarByName[name] ? radarByName[name].total_mentions : 0;
+    const checked = selectedAuthors.includes(name) ? 'checked' : '';
+    const id = 'abr-' + name.replace(/[^a-zA-Z0-9]/g, '');
+    return `<label class="author-browse-row" for="${id}"><input type="checkbox" id="${id}" data-name="${name}" ${checked}><span class="abr-name">${name}</span><span class="abr-count">${mentions}</span></label>`;
+  }).join('');
+  browsePanel.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    cb.addEventListener('change', () => {
+      const name = cb.dataset.name;
+      document.querySelectorAll('#author-presets .preset-btn').forEach(b => b.classList.remove('active'));
+      if (cb.checked) setSelectedAuthors([...selectedAuthors, name]);
+      else setSelectedAuthors(selectedAuthors.filter(n => n !== name));
+    });
+  });
+  browseBuilt = true;
+}
+function syncBrowsePanelChecks() {
+  if (!browseBuilt) return;
+  browsePanel.querySelectorAll('input[type=checkbox]').forEach(cb => {
+    cb.checked = selectedAuthors.includes(cb.dataset.name);
+  });
+}
+browseBtn.addEventListener('click', () => {
+  const isOpen = browsePanel.classList.toggle('open');
+  browseBtn.classList.toggle('open', isOpen);
+  browseBtn.innerHTML = isOpen ? 'Browse all 408 authors &#x25B4;' : 'Browse all 408 authors &#x25BE;';
+  if (isOpen && !browseBuilt) buildBrowsePanel();
 });
 
 /* ---- nav ---- */
@@ -685,9 +751,27 @@ function renderRadar() {
       .attr('stroke', color).attr('stroke-width', isFocused?3.2:1.8).attr('stroke-opacity', strokeOpacity)
       .attr('cursor','pointer')
       .on('click', () => toggleFocus(name))
-      .on('mouseover', (ev) => { showTooltip(`<strong style="color:${color}">${name}</strong><br>${rec.total_mentions} mentions &middot; ${rec.works} works<br>Dominant: ${rec.dominant_sector} (${(rec.dominant_pct*100).toFixed(1)}%)`, ev); showDetailForAuthor(name); })
+      .on('mouseover', (ev) => { showTooltip(`<strong style="color:${color}">${name}</strong><br>${rec.total_mentions} mentions &middot; ${rec.works} works<br>Dominant: ${rec.dominant_sector} (${(rec.dominant_pct*100).toFixed(1)}%)<div style="margin-top:4px;font-size:10.5px;color:#999;">Hover a point for that sector's places</div>`, ev); showDetailForAuthor(name); })
       .on('mousemove', moveTooltip)
       .on('mouseout', hideTooltip);
+
+    /* One small marker per sector vertex so hovering a specific point shows
+       that author's places within that one sector, not just the author-wide
+       summary the polygon outline gives. */
+    SECTORS.forEach((sector, i) => {
+      const a = angle(i);
+      const rPx = Math.max(vals[i], 0) / maxVal * R;
+      const vx = rPx * Math.cos(a), vy = rPx * Math.sin(a);
+      g.append('circle')
+        .attr('cx', vx).attr('cy', vy).attr('r', isFocused ? 4.5 : 3)
+        .attr('fill', color).attr('stroke', 'white').attr('stroke-width', 1)
+        .attr('opacity', strokeOpacity)
+        .attr('cursor', 'pointer')
+        .on('click', () => toggleFocus(name))
+        .on('mouseover', (ev) => showSectorDetail(name, sector, ev))
+        .on('mousemove', moveTooltip)
+        .on('mouseout', hideTooltip);
+    });
 
     const item = document.createElement('div');
     item.className = 'legend-item';
@@ -767,8 +851,10 @@ function buildSmPanel(rec) {
   const maxCount = Math.max(...rec.places.map(p => p.mentions));
   rec.places.forEach(p => {
     const r = Math.max(Math.log1p(p.mentions/maxCount*100)*3, 3);
+    const pSector = sectorForPlace(p.place);
+    const pPct = rec.total_mentions ? (p.mentions / rec.total_mentions * 100).toFixed(1) : null;
     L.circleMarker([p.lat, p.lon], { radius: r, fillColor: '#B85042', color: 'white', weight: 1, fillOpacity: 0.75 })
-      .bindPopup(`<strong>${p.place}</strong><br>${p.mentions} mentions`, { closeButton: false })
+      .bindPopup(`<strong>${p.place}</strong>${pSector ? `<br><span style="color:#888">${pSector}</span>` : ''}<br>${p.mentions} mentions${pPct ? ` (${pPct}% of this author's total)` : ''}`, { closeButton: false })
       .on('mouseover', function () { this.openPopup(); showDetailForPlace(p.place, [rec.author]); })
       .on('mouseout', function () { this.closePopup(); })
       .addTo(map);
@@ -922,11 +1008,11 @@ function renderMetro() {
   }
   const exact = closest.n === n;
   const degradeWarning = closest.n >= 20
-    ? ` At this scale the map demonstrates community detection breaking down (see Appendix), not a legible exploration surface -- use the 2 or 5 preset to see the design at its intended scale.`
+    ? ` At this many authors the map gets genuinely hard to read, on purpose -- it's showing you what happens as more voices are added. Try the 2 or 5 author preset to see it at its clearest.`
     : '';
-  note.textContent = `${selectedAuthors.length} author(s) selected — metro lines cannot be recomputed live (community detection runs offline), so this shows the closest precomputed snapshot: ${closest.n} authors${exact ? ' (exact match)' : ''}.${degradeWarning}`;
+  note.textContent = `Showing the ${closest.n}-author version of the map${exact ? '' : ` (closest match to your ${selectedAuthors.length}-author selection)`} -- unlike the other views, this map is pre-drawn rather than redrawn live, so it snaps to the nearest of four saved versions.${degradeWarning}`;
   note.classList.toggle('severe', closest.n >= 20);
-  setStatus(`Metro map: precomputed ${closest.n}-author snapshot, independent of the shared author selector above.`);
+  setStatus(`Showing the ${closest.n}-author metro map.`);
 }
 
 /* ---- bootstrap ---- */
