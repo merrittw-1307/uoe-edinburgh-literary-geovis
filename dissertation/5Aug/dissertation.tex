@@ -426,6 +426,8 @@ At render time, each line is drawn as a single SVG path through its stations' sh
 \textbf{Browser compatibility.} All files have been tested in Safari and Chrome on macOS. D3.js v7 and Leaflet.js 1.9.4 are both loaded from CDN at runtime, requiring an internet connection.
  
 \textbf{PostGIS.} The PostGIS extension was not installed, and the geometry fields of \texttt{api\_location} (\texttt{geom}, \texttt{poly}) are excluded from all analyses. Latitude/longitude centroid coordinates are used throughout. For the current visualisation directions, centroid coordinates are sufficient; more precise polygon representations of place areas would be needed only for overlay analyses that are not part of the current scope.
+
+\textbf{Colour accessibility.} The five fixed per-author colours were checked against simulated protanopia, deuteranopia, and tritanopia (the Brettel/Vi{\'e}not transform applied to each hex value) rather than assumed to be distinguishable. All ten pairs remain visually separable under all three simulations; the closest pair in every case is McCall Smith and Scott, noticeably closer together than the other pairs though still above the threshold treated here as a likely confusion risk. This is a reasonable but not maximally optimised palette, since the colours were originally chosen for contrast against the interface background rather than for colour-vision-deficient legibility specifically.
  
 \section{Combined Interface}
 \label{sec:combined-interface}
