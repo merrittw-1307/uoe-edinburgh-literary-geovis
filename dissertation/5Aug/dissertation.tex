@@ -26,11 +26,10 @@
 \date{\today}
  
 \abstract{
-% DRAFT v1 -- sentences 1-8 are not study-dependent and should be close to
-% final. The last 2-3 sentences summarise the corpus-analysis findings that
-% do not need the study (RQ2); a sentence reporting the RQ1 identification
-% accuracy (Chapter 5) still needs to be added once the study has run.
-Existing digital tools for literary geography plot place names as points on a map, treating them as geographic data; but the meaning a place name carries in a literary text comes from its narrative context, not its coordinates. This dissertation asks whether that narrative structure can be made visible directly, using the LitLong Edinburgh database of 620 literary works (1687--2015), 2,135 place names, and 50,248 place-name mention records. Two research questions are addressed. RQ1 asks whether an author's distribution of place-name mentions across the city forms a visually distinctive spatial ``fingerprint.'' RQ2 asks whether the co-occurrence of place names within literary works reveals a narrative topology distinct from their geographic topology. Six interactive D3.js visualisation prototypes were designed and implemented across these two directions --- a radar chart, a bar-code fingerprint, and small-multiple maps for RQ1; a force-directed network, a linear connection diagram, and a metro-style map for RQ2 --- and evaluated through a user study with domain-expert and general-public participants. The corpus analysis underlying RQ2 shows that Leith and Princes Street, roughly 2.5km apart, are the most strongly co-occurring place pair in the corpus (28 shared works); rebuilding the metro-style map's line structure from measured co-occurrence rather than hand-drawn geography raises the proportion of adjacent stations sharing a real book from 22\% to 88\%, and surfaces further instances of narrative structure that geographic proximity alone could not reveal. % TODO: add RQ1 finding once the user study has run (identification accuracy for the fingerprint designs).
+% 摘要第一版——前面几句跟问卷结果没关系，应该不用大改了。
+% 最后两三句是RQ2那部分数据分析的结论，这个也不需要等问卷。
+% 等问卷做完了，要在这里补一句RQ1的识别准确率（对应第五章）。
+Existing digital tools for literary geography plot place names as points on a map, treating them as geographic data; but the meaning a place name carries in a literary text comes from its narrative context, not its coordinates. This dissertation asks whether that narrative structure can be made visible directly, using the LitLong Edinburgh database of 620 literary works (1687--2015), 2,135 place names, and 50,248 place-name mention records. Two research questions are addressed. RQ1 asks whether an author's distribution of place-name mentions across the city forms a visually distinctive spatial ``fingerprint.'' RQ2 asks whether the co-occurrence of place names within literary works reveals a narrative topology distinct from their geographic topology. Six interactive D3.js visualisation prototypes were designed and implemented across these two directions --- a radar chart, a bar-code fingerprint, and small-multiple maps for RQ1; a force-directed network, a linear connection diagram, and a metro-style map for RQ2 --- and evaluated through a user study with domain-expert and general-public participants. The corpus analysis underlying RQ2 shows that Leith and Princes Street, roughly 2.5km apart, are the most strongly co-occurring place pair in the corpus (28 shared works); rebuilding the metro-style map's line structure from measured co-occurrence rather than hand-drawn geography raises the proportion of adjacent stations sharing a real book from 22\% to 88\%, and surfaces further instances of narrative structure that geographic proximity alone could not reveal. % 等问卷做完了在这里补一句RQ1的结论（三个指纹设计的识别准确率）。
 }
  
 \maketitle
@@ -48,7 +47,7 @@ The participants' information sheet and a consent form are included in the appen
 \end{ethics}
  
 \begin{acknowledgements}
-% TODO: Merritt to write.
+% 这段我自己写，先空着。
 \end{acknowledgements}
  
 \tableofcontents
@@ -447,7 +446,7 @@ The metro map's own further redesign was also discussed in this meeting; the sup
 
 A fifth author preset, loading all 408 located authors at once, was added alongside the existing 2/5/20/50 presets and explicitly labelled ``large-scale exploration'' in both its button text and an accompanying note, distinguishing it from the four practical presets: it is intended for spotting broad, corpus-wide patterns rather than reading individual detail, and the rendering caps already described above for network, linear, small multiples, and metro are what keep it usable rather than something to disable at this scale.
 
-% TODO: revisit priority against the user-study-dependent chapters once the study itself has run in Week 7. The combined interface has now been through one supervised UX review in addition to the performance/legibility pass above; no further work is scoped unless the study or a further supervision meeting surfaces a need.
+% 等第7周问卷做完之后，再重新排一下这部分和问卷相关章节的优先级。整合界面除了前面那次性能/可读性调整之外，现在还经过了一次导师指导下的界面体验修改；除非问卷结果或者下次开会又提出新需求，这部分先不用再动了。
  
  
 % ============================================================
@@ -471,19 +470,19 @@ The user study is designed to evaluate whether the six visualisation prototypes 
 \textbf{Ethics.} The study has received ethics approval from the Informatics Research Ethics Committee (application number 446635). Participants complete an online consent form before beginning the study. The participant information sheet and consent form are included in Appendix~A.
  
 \section{Participants}
-% TODO: complete after study is run
-% Target: minimum 20 per group (40 total)
-% Demographics: age range, background, familiarity with Edinburgh,
-%               prior experience with data visualisation
- 
+% 等问卷做完再填这一节。
+% 目标：每组至少20人（共40人）。
+% 人口统计信息：年龄段、背景、对爱丁堡的熟悉程度、
+%               之前有没有接触过数据可视化
+
 \section{Study Procedure}
-% TODO: complete after study is run
- 
+% 等问卷做完再填这一节。
+
 \section{Results}
-% TODO: complete after study is run
- 
+% 等问卷做完再填这一节。
+
 \section{Discussion of Results}
-% TODO: complete after study is run
+% 等问卷做完再填这一节。
  
  
 % ============================================================
@@ -493,7 +492,7 @@ The user study is designed to evaluate whether the six visualisation prototypes 
 \label{chap:discussion}
  
 \section{Design Improvements after User Study}
-% TODO: complete after user study results are available
+% 等问卷结果出来之后再填这一节。
  
 \section{Narrative Topology vs Geographic Topology}
  
@@ -546,9 +545,9 @@ This dissertation has argued that place names in literary text are data about na
  
 \textbf{RQ2 --- does narrative co-occurrence reveal a topology distinct from geography?} Yes. The strongest evidence is the Leith/Princes Street pair itself: 28 shared works despite roughly 2.5km of geographic separation, and one of only 12 station-pairs across the entire redesigned metro map that behave as a genuine narrative interchange. The redesign of the metro-style map (Section~\ref{sec:metro-redesign}) turned this from a single anecdote into a systematic result: deriving line structure from measured co-occurrence rather than hand-drawn geography raised the proportion of adjacent stations sharing a real book from 22\% to 88\%, and surfaced two further instances of the same divergence that geography could not have produced --- the word ``Leith'' clustering with Scott and Lockhart's historical corridor rather than Welsh's, and a biographical corridor (Castle Street, Lasswade, the University of Edinburgh) distinct from the historical-fiction corridor immediately next to it. The scale-exploration work (Appendix~\ref{app:scale}) adds a boundary condition rather than a contradiction: narrative and geographic topology diverge clearly at the five-author scale used throughout this dissertation, but the mechanism generating that divergence --- near-total non-overlap of authorial vocabularies (Finding~1) --- means the co-occurrence signal itself thins out at very large author counts and degenerates at very small ones (2--3 books), so the divergence is most legible at a middle scale, not a universal property independent of $N$.
 
-% TODO: fill in after user study
-% RQ1: [YES/PARTIAL] — the radar chart / bar-code / small multiples
-%      allowed users to identify authors at [X]% accuracy.
+% 等问卷做完再填。
+% RQ1结论：[是/部分是]——雷达图/条码图/小地图矩阵
+%          让参与者识别作者的准确率是[X]%。
  
 The project's contributions include: a validated spatial classification of Edinburgh place names using official City of Edinburgh Council administrative boundary data; an empirical finding that each of five representative Edinburgh authors constructs an almost entirely private imaginary geography of the city; a method for extracting narrative reading order from the LitLong database using the \texttt{start\_word} field as a monotonic index; and a suite of interactive visualisation prototypes that make authorial spatial patterns and narrative co-occurrence structure visible in forms not previously available.
  
