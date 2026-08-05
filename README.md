@@ -5,6 +5,8 @@
 **MSc Dissertation** · University of Edinburgh, School of Informatics · 2025–2026
 **Student**: Merritt Wang (S2887338) · **Supervisor**: Uta Hinrichs (VisHub) · **Second supervisor**: Nina Pardal
 
+![Demo: switching author selection and views in the Combined Interface](docs/screenshots/demo.gif)
+
 ---
 
 ## Overview
