@@ -1,8 +1,20 @@
+import os
+from pathlib import Path
 import pandas as pd
 from sqlalchemy import create_engine
 from itertools import combinations
 
-engine = create_engine('postgresql://wangmingyu@localhost:5432/litlong_edinburgh')
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
+
+
+engine = create_engine(os.environ.get('LITLONG_DB_URL', 'postgresql://localhost:5432/litlong_edinburgh'))
 
 # 查询5个作者的所有地名提及，按句子分组
 query = """
@@ -51,5 +63,5 @@ print(f"共现地名对数量: {len(edges)}")
 print("\n共现最强的前10对:")
 print(edges.head(10).to_string())
 
-edges.to_csv('/Users/wangmingyu/Downloads/UoE/Dissertation/data/processed/network/network_edges.csv', index=False)
+edges.to_csv(f'{REPO_ROOT}/data/processed/network/network_edges.csv', index=False)
 print("\n数据已保存")

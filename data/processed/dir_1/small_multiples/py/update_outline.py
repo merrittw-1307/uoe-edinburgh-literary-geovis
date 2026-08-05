@@ -1,4 +1,16 @@
-with open('/Users/wangmingyu/Downloads/UoE/Dissertation/data/processed/small_multiples/d3/small_multiples.html', 'r') as f:
+import os
+from pathlib import Path
+
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
+
+with open(f'{REPO_ROOT}/data/processed/small_multiples/d3/small_multiples.html', 'r') as f:
     content = f.read()
 
 old = """// 简化的爱丁堡轮廓路径（基于真实海岸线近似，Firth of Forth在北侧）
@@ -185,6 +197,6 @@ new = """function drawCityOutline(svg) {
 }"""
 
 content = content.replace(old, new)
-with open('/Users/wangmingyu/Downloads/UoE/Dissertation/data/processed/small_multiples/d3/small_multiples.html', 'w') as f:
+with open(f'{REPO_ROOT}/data/processed/small_multiples/d3/small_multiples.html', 'w') as f:
     f.write(content)
 print("done")

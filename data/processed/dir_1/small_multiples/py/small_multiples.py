@@ -1,9 +1,21 @@
+import os
+from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 from sqlalchemy import create_engine
 
-engine = create_engine('postgresql://wangmingyu@localhost:5432/litlong_edinburgh')
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
+
+
+engine = create_engine(os.environ.get('LITLONG_DB_URL', 'postgresql://localhost:5432/litlong_edinburgh'))
 
 query = """
 SELECT 
@@ -64,6 +76,6 @@ for i, (author, color) in enumerate(zip(authors, colors)):
         spine.set_color('#DDDDDD')
 
 plt.tight_layout()
-plt.savefig('/Users/wangmingyu/Downloads/UoE/Dissertation/data/processed/small_multiples.png',
+plt.savefig(f'{REPO_ROOT}/data/processed/small_multiples.png',
             dpi=150, bbox_inches='tight')
 print("已保存 small_multiples.png")

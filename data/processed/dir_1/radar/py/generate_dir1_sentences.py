@@ -12,6 +12,7 @@ at all yet, so for that one we parse its existing embedded `data` object
 import json
 import re
 import random
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -22,7 +23,14 @@ MAX_SENTENCES_PER_PLACE = 3
 MAX_SENTENCE_CHARS = 220
 MAX_BOOKS_FOR_SMALL_MULTIPLES = 5
 
-REPO_ROOT = Path("/Users/wangmingyu/Downloads/UoE/Dissertation")
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
 SECTORS_CSV = REPO_ROOT / "data/processed/sectors/location_sectors_v2.csv"
 SMALL_MULTIPLES_HTML = REPO_ROOT / "data/processed/dir_1/small_multiples/d3/small_multiples.html"
 
@@ -32,7 +40,7 @@ OUT_SENTENCES_PATHS = [
 ]
 OUT_SMALL_MULTIPLES = REPO_ROOT / "data/processed/dir_1/small_multiples/data/small_multiples_enriched.json"
 
-engine = create_engine("postgresql://wangmingyu@localhost:5432/litlong_edinburgh")
+engine = create_engine(os.environ.get("LITLONG_DB_URL", "postgresql://localhost:5432/litlong_edinburgh"))
 
 QUERY = """
 SELECT

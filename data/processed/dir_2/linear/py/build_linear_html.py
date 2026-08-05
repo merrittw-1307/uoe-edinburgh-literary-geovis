@@ -7,9 +7,17 @@ linear_v1.html before overwriting.
 """
 import json
 import shutil
+import os
 from pathlib import Path
 
-REPO_ROOT = Path("/Users/wangmingyu/Downloads/UoE/Dissertation")
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
 DATA_PATH = REPO_ROOT / "data/processed/dir_2/linear/data/linear_enriched.json"
 OUT_PATH = REPO_ROOT / "data/processed/dir_2/linear/d3/linear.html"
 BACKUP_PATH = REPO_ROOT / "data/processed/dir_2/linear/d3/linear_v1.html"

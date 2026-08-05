@@ -1,10 +1,22 @@
+import os
+from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
 
-edges = pd.read_csv('/Users/wangmingyu/Downloads/UoE/Dissertation/data/processed/network/network_edges.csv')
-nodes = pd.read_csv('/Users/wangmingyu/Downloads/UoE/Dissertation/data/processed/network/network_nodes.csv')
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
+
+
+edges = pd.read_csv(f'{REPO_ROOT}/data/processed/network/network_edges.csv')
+nodes = pd.read_csv(f'{REPO_ROOT}/data/processed/network/network_nodes.csv')
 
 # 只取强连接
 edges_strong = edges[edges['weight'] >= 6].copy()
@@ -58,6 +70,6 @@ ax.set_title('Narrative Topology — Linear Connection Diagram\nPlace co-occurre
              fontsize=13, fontweight='bold')
 
 plt.tight_layout()
-plt.savefig('/Users/wangmingyu/Downloads/UoE/Dissertation/data/processed/linear/linear_chart_v1.png',
+plt.savefig(f'{REPO_ROOT}/data/processed/linear/linear_chart_v1.png',
             dpi=150, bbox_inches='tight')
 print("已保存 linear_chart_v1.png")

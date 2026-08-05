@@ -18,11 +18,19 @@ import json
 import sys
 import time
 from itertools import combinations
+import os
 from pathlib import Path
 
 import networkx as nx
 
-REPO_ROOT = Path("/Users/wangmingyu/Downloads/UoE/Dissertation")
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
 METRO_PY_DIR = REPO_ROOT / "data/processed/dir_2/metro/py"
 ALL_AUTHORS_NETWORK = REPO_ROOT / "data/processed/scale_exploration/data/all_authors_network.json"
 OUT_JSON_DIR = REPO_ROOT / "data/processed/scale_exploration/data"

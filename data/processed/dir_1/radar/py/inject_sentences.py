@@ -1,8 +1,16 @@
 """Inserts `const placeSentences = {...};` into radar.html right after detailData."""
 import json
+import os
 from pathlib import Path
 
-REPO_ROOT = Path("/Users/wangmingyu/Downloads/UoE/Dissertation")
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
 HTML_PATH = REPO_ROOT / "data/processed/dir_1/radar/d3/radar.html"
 DATA_PATH = REPO_ROOT / "data/processed/dir_1/radar/data/dir1_sentences.json"
 

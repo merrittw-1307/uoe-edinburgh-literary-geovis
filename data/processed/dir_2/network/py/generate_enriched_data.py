@@ -14,6 +14,7 @@ convention of per-chart data/ directories.
 import json
 import random
 from itertools import combinations
+import os
 from pathlib import Path
 
 import pandas as pd
@@ -25,14 +26,21 @@ MIN_EDGE_WEIGHT = 2
 MAX_SENTENCES_PER_PLACE = 4
 MAX_SENTENCE_CHARS = 220
 
-REPO_ROOT = Path("/Users/wangmingyu/Downloads/UoE/Dissertation")
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
 SECTORS_CSV = REPO_ROOT / "data/processed/sectors/location_sectors_v2.csv"
 OUTPUT_PATHS = [
     REPO_ROOT / "data/processed/dir_2/network/data/network_enriched.json",
     REPO_ROOT / "data/processed/dir_2/linear/data/linear_enriched.json",
 ]
 
-engine = create_engine("postgresql://wangmingyu@localhost:5432/litlong_edinburgh")
+engine = create_engine(os.environ.get("LITLONG_DB_URL", "postgresql://localhost:5432/litlong_edinburgh"))
 
 QUERY = """
 SELECT

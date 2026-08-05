@@ -1,7 +1,19 @@
+import os
+from pathlib import Path
 import pandas as pd
 from sqlalchemy import create_engine
 
-engine = create_engine('postgresql://wangmingyu@localhost:5432/litlong_edinburgh')
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
+
+
+engine = create_engine(os.environ.get('LITLONG_DB_URL', 'postgresql://localhost:5432/litlong_edinburgh'))
 
 query = """
 SELECT 
@@ -31,7 +43,7 @@ df_filtered = df[df['place'].isin(top_places)]
 pivot = df_filtered.pivot_table(index='author', columns='place', values='mention_count', fill_value=0)
 pivot_norm = pivot.div(pivot.sum(axis=1), axis=0)
 
-pivot_norm.to_csv('/Users/wangmingyu/Downloads/UoE/Dissertation/data/processed/barcode_data.csv')
+pivot_norm.to_csv(f'{REPO_ROOT}/data/processed/barcode_data.csv')
 print(f"地名数量: {len(pivot_norm.columns)}")
 print(f"作者数量: {len(pivot_norm.index)}")
 print("数据已保存")

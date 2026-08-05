@@ -1,10 +1,22 @@
+import os
+from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 import networkx as nx
 import numpy as np
 
-edges = pd.read_csv('/Users/wangmingyu/Downloads/UoE/Dissertation/data/processed/network/network_edges.csv')
-nodes = pd.read_csv('/Users/wangmingyu/Downloads/UoE/Dissertation/data/processed/network/network_nodes.csv')
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
+
+
+edges = pd.read_csv(f'{REPO_ROOT}/data/processed/network/network_edges.csv')
+nodes = pd.read_csv(f'{REPO_ROOT}/data/processed/network/network_nodes.csv')
 
 # 只取权重前50的边，避免hairball
 edges_top = edges.head(50)
@@ -53,6 +65,6 @@ ax.set_title('Narrative Topology Network\nPlace co-occurrence across literary wo
 ax.axis('off')
 
 plt.tight_layout()
-plt.savefig('/Users/wangmingyu/Downloads/UoE/Dissertation/data/processed/network/network_chart.png',
+plt.savefig(f'{REPO_ROOT}/data/processed/network/network_chart.png',
             dpi=150, bbox_inches='tight')
 print("已保存 network_chart.png")

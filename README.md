@@ -118,9 +118,11 @@ The full data dump (`litlong_original.sql`, 145MB) is excluded from the repo —
 
     psql litlong_edinburgh < data/raw/sql/litlong_original.sql
 
-No password is required locally (peer auth); connection string used throughout the Python scripts:
+No password is required locally (peer auth) — the scripts default to `postgresql://localhost:5432/litlong_edinburgh` (peer auth uses your own OS username automatically). Override with an environment variable if your setup differs:
 
-    postgresql://wangmingyu@localhost:5432/litlong_edinburgh
+    export LITLONG_DB_URL="postgresql://youruser@localhost:5432/litlong_edinburgh"
+
+Similarly, every script locates the repo root automatically by walking up to the nearest `.git` directory; set `DISSERTATION_REPO_ROOT` if you need to override that (e.g. running from a copy without git history).
 
 ---
 

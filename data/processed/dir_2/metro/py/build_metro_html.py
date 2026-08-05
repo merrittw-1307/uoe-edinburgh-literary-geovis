@@ -5,9 +5,17 @@ is derived from real 5-author book co-occurrence data via community
 detection - see the docstring in build_metro_lines.py for the pipeline.
 """
 import json
+import os
 from pathlib import Path
 
-REPO_ROOT = Path("/Users/wangmingyu/Downloads/UoE/Dissertation")
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
 DATA_PATH = REPO_ROOT / "data/processed/dir_2/metro/data/metro_lines.json"
 OUT_PATH = REPO_ROOT / "data/processed/dir_2/metro/d3/metro.html"
 BACKUP_PATH = REPO_ROOT / "data/processed/dir_2/metro/d3/metro_v1_geographic.html"

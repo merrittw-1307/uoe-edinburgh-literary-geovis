@@ -1,7 +1,8 @@
+import os
 import pandas as pd
 from sqlalchemy import create_engine
 
-engine = create_engine('postgresql://wangmingyu@localhost:5432/litlong_edinburgh')
+engine = create_engine(os.environ.get('LITLONG_DB_URL', 'postgresql://localhost:5432/litlong_edinburgh'))
 
 query = """
 SELECT 

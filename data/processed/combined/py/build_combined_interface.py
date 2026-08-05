@@ -19,9 +19,17 @@ author's own top-15 places -- exactly the set reachable through the live
 views, so no unreachable data is shipped.
 """
 import json
+import os
 from pathlib import Path
 
-REPO_ROOT = Path("/Users/wangmingyu/Downloads/UoE/Dissertation")
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
 SCALE_DATA = REPO_ROOT / "data/processed/scale_exploration/data"
 COMBINED_DATA = REPO_ROOT / "data/processed/combined/data"
 OUT_PATH = REPO_ROOT / "data/processed/combined/d3/combined_interface.html"

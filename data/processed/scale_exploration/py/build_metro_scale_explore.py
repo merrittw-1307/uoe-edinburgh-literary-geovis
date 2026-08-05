@@ -12,9 +12,17 @@ snapshots and switches between them -- the point is to make the *existing*
 precomputed data actually explorable in one place, not to make metro live.
 """
 import json
+import os
 from pathlib import Path
 
-REPO_ROOT = Path("/Users/wangmingyu/Downloads/UoE/Dissertation")
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
 SCALE_DATA = REPO_ROOT / "data/processed/scale_exploration/data"
 OUT_PATH = REPO_ROOT / "data/processed/scale_exploration/d3/metro_scale_explore.html"
 

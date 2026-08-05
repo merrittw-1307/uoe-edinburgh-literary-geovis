@@ -1,6 +1,18 @@
+import os
+from pathlib import Path
 import matplotlib.pyplot as plt
 import matplotlib.patches as mpatches
 import numpy as np
+
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
+
 
 fig, ax = plt.subplots(figsize=(20, 14))
 ax.set_facecolor('#F0F0F0')
@@ -190,6 +202,6 @@ ax.set_title('Edinburgh Literary Map — Metro Style\nPlace names in literature 
              fontsize=15, fontweight='bold', pad=20)
 
 plt.tight_layout()
-plt.savefig('/Users/wangmingyu/Downloads/UoE/Dissertation/data/processed/metro/metro_chart_v2.png',
+plt.savefig(f'{REPO_ROOT}/data/processed/metro/metro_chart_v2.png',
             dpi=150, bbox_inches='tight')
 print("已保存 metro_chart_v2.png")

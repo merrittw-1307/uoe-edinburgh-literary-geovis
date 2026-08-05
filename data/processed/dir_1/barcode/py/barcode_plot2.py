@@ -1,8 +1,20 @@
+import os
+from pathlib import Path
 import pandas as pd
 import matplotlib.pyplot as plt
 import numpy as np
 
-df = pd.read_csv('/Users/wangmingyu/Downloads/UoE/Dissertation/data/processed/barcode_data.csv', index_col=0)
+def _find_repo_root(start: Path) -> Path:
+    for candidate in [start, *start.parents]:
+        if (candidate / ".git").exists():
+            return candidate
+    raise RuntimeError("Could not locate repository root (no .git directory found)")
+
+
+REPO_ROOT = Path(os.environ["DISSERTATION_REPO_ROOT"]) if os.environ.get("DISSERTATION_REPO_ROOT") else _find_repo_root(Path(__file__).resolve())
+
+
+df = pd.read_csv(f'{REPO_ROOT}/data/processed/barcode_data.csv', index_col=0)
 
 authors = list(df.index)
 places = list(df.columns)
@@ -33,7 +45,7 @@ axes[-1].set_xticks(np.arange(n_places))
 axes[-1].set_xticklabels(places, rotation=45, ha='right', fontsize=7)
 
 plt.tight_layout()
-plt.savefig('/Users/wangmingyu/Downloads/UoE/Dissertation/data/processed/barcode_chart_log.png',
+plt.savefig(f'{REPO_ROOT}/data/processed/barcode_chart_log.png',
             dpi=150, bbox_inches='tight')
 print("已保存 barcode_chart_log.png")
 plt.show()
