@@ -247,6 +247,20 @@ English: The project also has a `combined_interface.html` ("Combined Interface",
 
 如果时间紧张，收集期和撤回等待期是唯一不能被压缩太多的部分（涉及真实人类响应时间和伦理承诺），其余步骤都可以并行准备。
 
+### 完整流程（从现在到论文彻底交完）
+
+1. **搭建问卷**（你）——照`qualtrics_build_guide.md`建好、自查、发布，拿到匿名链接。
+2. **招募**（你）——两组共13-20人，建议先找1-2人预跑一遍问卷再正式大批量发送。
+3. **数据收集**（等待）——7天收集期 + 7天撤回期，期间不定稿数字，但可以并行准备分析框架。
+4. **数据分析**（你导出数据后，一起）——按第6节方法跑RQ1/RQ2的数字，质性编码T3/T4/synthesis，专家vs大众交叉对比，挑3-5条匿名引用。
+5. **论文填空**（先起草，你审核定稿）——Ch5 Participants/Study Procedure/Results/Discussion of Results、Ch6 Design Improvements after User Study、Ch7 RQ1结论、Abstract最后一句。
+6. **全文校对+去AI味第二轮**（你主要负责）——新写的Results/Discussion部分要重新过一遍"减少AI写作痕迹"的检查；Discussion部分建议你自己加入真实的个人反思语气，这一步别人代劳不了。Acknowledgements你自己写。
+7. **最终编译与格式检查**（你编译，配合看报错）——完整PDF排版检查、页数是否符合学院要求、Appendix完整性复查。
+8. **提交论文**（你）——走学校/学院提交流程。
+9. **项目彻底结束后的仓库收尾**（论文交完之后才做）——仓库大文件清理（任务#35）、三个日期快照文件夹要不要合并（任务#37）、GitHub social preview图片如果还没传、可选的简历/作品集项目简介精简版。
+
+唯一不能压缩的是第3步的14天；其余步骤基本都能并行准备。
+
 ---
 
 ## 9. 风险与注意事项 / Risks & Reminders
