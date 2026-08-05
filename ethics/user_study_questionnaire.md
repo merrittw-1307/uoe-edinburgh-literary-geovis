@@ -195,6 +195,8 @@
 
 （全部已实测确认可正常打开，2026年8月核实 / all verified live as of August 2026）
 
+**注意 / Note：** 这六个链接是固定、盲测、不带作者切换功能的独立页面——这正是本问卷需要的实验条件（参与者只能看图判断，不能自己换作者）。项目里另有一个`combined_interface.html`（整合界面，可自由切换全部408位作者），那是**给导师看的演示工具，不要发给参与者，也不要放进这份问卷**，否则会破坏F1/T1等题目"仅凭图形本身识别"的测试前提。/ These six links are fixed, blinded, single-author pages with no author-switching — that constraint is exactly what the study needs (participants judge the image alone, they cannot swap in a different author). The project also has a separate `combined_interface.html` ("Combined Interface") with free switching across all 408 authors; that is a **supervisor-facing demo tool and must not be sent to participants or linked from this questionnaire**, as doing so would undermine the "identify from the image alone" premise behind questions like F1 and T1.
+
 ---
 
 ## 题目清单一览（给你自己核对用，不给参与者看）/ Question Count Summary (for your own reference)

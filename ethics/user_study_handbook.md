@@ -94,6 +94,12 @@ The study is **online, unmoderated, self-paced** (Qualtrics), taking approximate
 
 **你还需要准备的只有一件事**：注册/登录Qualtrics（爱丁堡大学学生有机构账号，登录 https://ed.qualtrics.com），把 `ethics/user_study_questionnaire.md` 里的内容录入进去。
 
+**关于"Combined Interface"（整合界面）——它不是问卷材料，不要发给参与者：**
+
+中文：项目里还有一个`combined_interface.html`（整合界面，https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/combined/d3/combined_interface.html ），把六个设计放进同一个页面、支持自由切换作者（含2026年8月新增的"全部408位作者"大规模探索选项）、跨图联动高亮。**这是给导师看的演示/汇报工具，不是正式问卷材料**——正式问卷里的六个任务链接（见第4节链接表）永远是各自独立的标准页面，固定展示五位盲测作者中的一位，不带作者切换功能，这样才能保证"冷启动识别"这个RQ1的实验条件不被破坏（如果参与者能自己切换作者，就不再是"仅凭图形本身认出作者"的测试了）。给导师发材料时可以两个链接都发（问卷链接+Combined Interface链接），但发给正式参与者的招募邮件/问卷Welcome页只应该包含Qualtrics问卷链接，不要额外附上Combined Interface链接，避免参与者提前看到其他作者的数据而影响判断。
+
+English: The project also has a `combined_interface.html` ("Combined Interface", https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/combined/d3/combined_interface.html ) that puts all six designs on one page with free author-switching (including an "All 408 authors" large-scale-exploration preset added in August 2026) and cross-view highlighting. **This is a supervisor-facing demo/review tool, not part of the formal study instrument.** The six task links used in the actual questionnaire (see the URL table in Section 4) remain separate, standalone pages that each show one fixed, blinded author with no author-switching — this is what keeps RQ1's "cold" identification test valid (if participants could switch authors themselves, it would no longer test whether the image alone is self-explanatory). It's fine to send both links to your supervisor, but the recruitment email / questionnaire Welcome screen sent to actual participants should only ever contain the Qualtrics link, not the Combined Interface link, so participants aren't inadvertently shown other authors' data before completing the tasks.
+
 ---
 
 ## 3. 完整问卷内容 / Full Questionnaire
