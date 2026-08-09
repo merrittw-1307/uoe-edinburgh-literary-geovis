@@ -1,0 +1,285 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Author Spatial Fingerprints — Radar Chart v2</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #F8F9FC;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+  }
+  h1 { font-size: 20px; color: #21295C; margin-bottom: 4px; text-align: center; }
+  .subtitle { font-size: 12px; color: #888; margin-bottom: 4px; text-align: center; }
+  .source { font-size: 10px; color: #BBB; margin-bottom: 20px; text-align: center; font-style: italic; }
+  .main { display: flex; gap: 24px; align-items: flex-start; justify-content: center; flex-wrap: wrap; }
+  #chart { position: relative; flex-shrink: 0; }
+  .legend {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-top: 20px;
+    min-width: 180px;
+  }
+  .legend-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+    font-size: 13px;
+    color: #333;
+    padding: 6px 12px;
+    border-radius: 20px;
+    border: 1.5px solid #E0E4F0;
+    background: white;
+    transition: all 0.2s;
+    user-select: none;
+  }
+  .legend-item:hover { background: #F0F2FA; border-color: #B0B8D0; }
+  .legend-item.inactive { opacity: 0.35; }
+  .legend-item.active-only { border-color: #21295C; background: #F0F2FA; }
+  .legend-dot { width: 12px; height: 12px; border-radius: 50%; flex-shrink: 0; }
+  .legend-hint { font-size: 10px; color: #AAA; margin-top: 4px; padding: 0 4px; }
+
+  /* Detail panel */
+  #detail-panel {
+    min-width: 260px;
+    max-width: 300px;
+    background: white;
+    border: 1px solid #E0E4F0;
+    border-radius: 12px;
+    padding: 16px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.07);
+    display: none;
+    margin-top: 20px;
+  }
+  #detail-panel .dp-author {
+    font-size: 13px;
+    font-weight: bold;
+    margin-bottom: 2px;
+  }
+  #detail-panel .dp-sector {
+    font-size: 16px;
+    font-weight: bold;
+    color: #21295C;
+    margin-bottom: 4px;
+  }
+  #detail-panel .dp-pct {
+    font-size: 12px;
+    color: #888;
+    margin-bottom: 12px;
+    padding-bottom: 10px;
+    border-bottom: 1px solid #EEE;
+  }
+  #detail-panel h4 {
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    color: #999;
+    margin-bottom: 6px;
+    margin-top: 10px;
+  }
+  #detail-panel .place-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 3px 0;
+    font-size: 12px;
+    border-bottom: 1px solid #F5F5F5;
+  }
+  #detail-panel .place-bar {
+    height: 4px;
+    border-radius: 2px;
+    margin-top: 2px;
+    margin-bottom: 4px;
+  }
+  #detail-panel .book-row {
+    font-size: 11px;
+    color: #555;
+    padding: 3px 0;
+    border-bottom: 1px solid #F5F5F5;
+    display: flex;
+    justify-content: space-between;
+    gap: 8px;
+  }
+  #detail-panel .book-title {
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  #detail-panel .book-count {
+    color: #999;
+    flex-shrink: 0;
+  }
+  #detail-panel .close-btn {
+    float: right;
+    cursor: pointer;
+    color: #CCC;
+    font-size: 16px;
+    line-height: 1;
+    margin-top: -2px;
+  }
+  #detail-panel .close-btn:hover { color: #666; }
+  #detail-panel .place-row.has-quote { cursor: help; }
+  .tooltip .tt-quote { font-style: italic; max-width: 240px; }
+  .tooltip .tt-source { color: #999; font-size: 10px; margin-top: 4px; display: block; }
+
+  .tooltip {
+    position: fixed;
+    background: white;
+    border: 1px solid #E0E4F0;
+    border-radius: 8px;
+    padding: 8px 12px;
+    font-size: 12px;
+    color: #333;
+    pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: none;
+    z-index: 100;
+  }
+</style>
+</head>
+<body>
+<h1>Author Spatial Fingerprint</h1>
+<div class="subtitle">Edinburgh place-name distribution by Neighbourhood Partnership Area · hover a point for its value</div>
+<div class="source">Sector boundaries: City of Edinburgh Council NP Areas &amp; Natural Neighbourhoods (Open Government Licence v3.0)</div>
+
+<div class="main">
+  <div style="display:flex;flex-direction:column;align-items:center;">
+    <div id="chart">
+      <div class="tooltip" id="tooltip"></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const colors = {
+  "Walter Scott": "#C9A227"
+};
+
+const sectors = [
+  "Almond","Canongate","Craigentinny/Duddingston","Forth","Inverleith",
+  "Leith","Liberton/Gilmerton","New Town","Old Town","Pentlands",
+  "Portobello/Craigmillar","South Central","South West","Western Edinburgh"
+];
+
+const rawData = [
+  { author: "Walter Scott",           values: {"Almond":0.0174,"Canongate":0.1594,"Craigentinny/Duddingston":0.0536,"Forth":0.0014,"Inverleith":0.0159,"Leith":0.0957,"Liberton/Gilmerton":0.0928,"New Town":0.0725,"Old Town":0.3203,"Pentlands":0.0217,"Portobello/Craigmillar":0.0696,"South Central":0.0507,"South West":0.0101,"Western Edinburgh":0.0188}}
+];
+
+const detailData = {};
+
+const placeSentences = {};
+
+const N = sectors.length;
+const angleStep = (2 * Math.PI) / N;
+const angle = i => i * angleStep - Math.PI / 2;
+const maxVal = d3.max(rawData, d => d3.max(sectors, s => d.values[s]));
+const W = 680, H = 680, cx = W/2, cy = H/2, R = 250;
+
+const svg = d3.select("#chart")
+  .append("svg")
+  .attr("width", W)
+  .attr("height", H);
+
+[1,2,3,4,5].forEach(l => {
+  svg.append("circle")
+    .attr("cx", cx).attr("cy", cy)
+    .attr("r", R * l / 5)
+    .attr("fill", "none")
+    .attr("stroke", "#D0D8E8")
+    .attr("stroke-width", 0.8);
+  svg.append("text")
+    .attr("x", cx + 4)
+    .attr("y", cy - R * l / 5 + 3)
+    .attr("font-size", "9px")
+    .attr("fill", "#AAA")
+    .text(Math.round(maxVal * l / 5 * 100) + "%");
+});
+
+sectors.forEach((s, i) => {
+  const a = angle(i);
+  svg.append("line")
+    .attr("x1", cx).attr("y1", cy)
+    .attr("x2", cx + R * Math.cos(a))
+    .attr("y2", cy + R * Math.sin(a))
+    .attr("stroke", "#C0C8D8").attr("stroke-width", 0.8);
+
+  const lx = cx + (R + 34) * Math.cos(a);
+  const ly = cy + (R + 34) * Math.sin(a);
+  svg.append("text")
+    .attr("x", lx).attr("y", ly)
+    .attr("text-anchor", "middle")
+    .attr("dominant-baseline", "central")
+    .attr("font-size", "9.5px")
+    .attr("fill", "#333")
+    .attr("font-weight", "600")
+    .text(s);
+});
+
+const g = svg.append("g").attr("transform", `translate(${cx},${cy})`);
+
+const line = d3.lineRadial()
+  .radius(d => d / maxVal * R)
+  .angle((d, i) => i * angleStep)
+  .curve(d3.curveLinearClosed);
+
+const paths = {}, areas = {};
+const activeAuthors = new Set(rawData.map(a => a.author));
+
+rawData.forEach(author => {
+  const vals = sectors.map(s => author.values[s]);
+  areas[author.author] = g.append("path")
+    .datum(vals).attr("d", line)
+    .attr("fill", colors[author.author])
+    .attr("fill-opacity", 0.1)
+    .attr("stroke", "none");
+  paths[author.author] = g.append("path")
+    .datum(vals).attr("d", line)
+    .attr("fill", "none")
+    .attr("stroke", colors[author.author])
+    .attr("stroke-width", 2.2)
+    .attr("stroke-linejoin", "round");
+});
+
+const tooltip = document.getElementById("tooltip");
+
+// Hover dots (blinded task version: no legend, no click-through detail panel,
+// no author name or book titles anywhere -- only the sector value itself).
+rawData.forEach(author => {
+  sectors.forEach((sector, i) => {
+    const a = angle(i);
+    const val = author.values[sector];
+    const px = (val / maxVal) * R * Math.cos(a);
+    const py = (val / maxVal) * R * Math.sin(a);
+
+    g.append("circle")
+      .attr("cx", px).attr("cy", py)
+      .attr("r", 14)
+      .attr("fill", colors[author.author])
+      .attr("opacity", 0)
+      .on("mouseover", function(event) {
+        d3.select(this).attr("opacity", 0.85).attr("r", 16);
+        tooltip.style.display = "block";
+        tooltip.innerHTML = `${sector}: <strong>${(val*100).toFixed(1)}%</strong> of mentions`;
+      })
+      .on("mousemove", function(event) {
+        tooltip.style.left = (event.clientX + 14) + "px";
+        tooltip.style.top  = (event.clientY - 10) + "px";
+      })
+      .on("mouseout", function() {
+        d3.select(this).attr("opacity", 0).attr("r", 14);
+        tooltip.style.display = "none";
+      });
+  });
+});
+</script>
+</body>
+</html>

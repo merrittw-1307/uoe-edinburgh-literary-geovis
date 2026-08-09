@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Author Spatial Fingerprints — Bar-code v3</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #F8F9FC;
+    padding: 30px 40px;
+  }
+  h1 { font-size: 20px; color: #21295C; margin-bottom: 4px; }
+  .subtitle { font-size: 12px; color: #888; margin-bottom: 4px; }
+  .source { font-size: 10px; color: #BBB; margin-bottom: 16px; font-style: italic; }
+  .note { font-size: 10px; color: #C9A227; background: #FFF8E7;
+           border-left: 3px solid #C9A227; padding: 6px 10px;
+           margin-bottom: 16px; border-radius: 0 4px 4px 0; }
+  .controls {
+    display: flex; gap: 12px; align-items: center;
+    flex-wrap: wrap; margin-bottom: 16px;
+  }
+  .ctrl-group { display: flex; align-items: center; gap: 6px; font-size: 12px; color: #555; }
+  .btn {
+    padding: 4px 12px; border-radius: 14px;
+    border: 1.5px solid #C0C8D8; background: white;
+    font-size: 11px; cursor: pointer; color: #333; transition: all 0.15s;
+  }
+  .btn:hover { background: #E8EAF6; border-color: #21295C; }
+  .btn.active { background: #21295C; color: white; border-color: #21295C; }
+  .search-box {
+    padding: 4px 12px; border-radius: 14px;
+    border: 1.5px solid #C0C8D8; font-size: 11px;
+    outline: none; width: 160px;
+  }
+  .search-box:focus { border-color: #21295C; }
+  .sector-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 20px; }
+  .sector-tag {
+    font-size: 10px; padding: 3px 10px; border-radius: 10px;
+    color: white; cursor: pointer; transition: opacity 0.2s; user-select: none;
+  }
+  .sector-tag.muted { opacity: 0.25; }
+  .author-block { margin-bottom: 28px; }
+  .author-header {
+    display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px;
+  }
+  .author-label { font-size: 13px; font-weight: bold; }
+  .author-maxval { font-size: 10px; color: #AAA; }
+  .tooltip {
+    position: fixed; background: white;
+    border: 1px solid #E0E4F0; border-radius: 8px;
+    padding: 8px 12px; font-size: 12px; pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; z-index: 100;
+  }
+  #detail-panel {
+    position: fixed; right: 24px; top: 80px; width: 260px;
+    background: white; border: 1px solid #E0E4F0; border-radius: 12px;
+    padding: 16px; box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+    display: none; z-index: 200; max-height: 80vh; overflow-y: auto;
+  }
+  #detail-panel .dp-close { float: right; cursor: pointer; color: #CCC; font-size: 16px; }
+  #detail-panel .dp-close:hover { color: #666; }
+  #detail-panel .dp-place { font-size: 16px; font-weight: bold; color: #21295C; margin-bottom: 2px; }
+  #detail-panel .dp-meta { font-size: 11px; color: #888; margin-bottom: 10px; padding-bottom: 10px; border-bottom: 1px solid #EEE; }
+  #detail-panel h4 { font-size: 10px; text-transform: uppercase; letter-spacing: 0.05em; color: #999; margin: 10px 0 5px; }
+  #detail-panel .stat { font-size: 22px; font-weight: bold; margin-bottom: 2px; }
+  #detail-panel .book-row {
+    font-size: 11px; padding: 3px 0; border-bottom: 1px solid #F5F5F5;
+    display: flex; justify-content: space-between; gap: 8px;
+  }
+  #detail-panel .book-title { flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #444; }
+  #detail-panel .book-count { color: #999; flex-shrink: 0; }
+  #detail-panel .dp-quote { margin-top: 8px; padding-top: 8px; border-top: 1px solid #EEE; font-style: italic; color: #444; font-size: 11px; line-height: 1.4; }
+  #detail-panel .dp-quote .tt-source { font-style: normal; color: #999; display: block; margin-top: 3px; }
+</style>
+</head>
+<body>
+<h1>Author Spatial Fingerprint — Bar-code Style</h1>
+<div class="subtitle">Each bar = one place · height = % of this author's total mentions</div>
+<div class="source">Sector classification: City of Edinburgh Council NP Areas & Natural Neighbourhoods (OGL v3.0)</div>
+<div class="note">⚠ Hover any bar for its value and mention count.</div>
+
+<div class="controls">
+  <div class="ctrl-group">
+    <span>Order:</span>
+    <button class="btn active" id="btn-sector">By sector</button>
+    <button class="btn" id="btn-freq">By frequency</button>
+    <button class="btn" id="btn-alpha">Alphabetical</button>
+  </div>
+  <div class="ctrl-group">
+    <span>Scale:</span>
+    <button class="btn active" id="btn-pct">Percentage</button>
+    <button class="btn" id="btn-abs">Absolute count</button>
+  </div>
+  <div class="ctrl-group">
+    <input type="text" class="search-box" id="search" placeholder="🔍 Search place...">
+  </div>
+</div>
+
+<div class="sector-legend" id="sector-legend"></div>
+<div id="chart"></div>
+
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const authorsData = [{"author": "John Gibson Lockhart", "values": [{"place": "Leith", "value": 0.0938, "sector": "Leith", "abs": 48, "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 22}, {"title": "Life of Walter Scott", "count": 8}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 8}, {"title": "Peter's letters to his kinsfolk, vol. 1", "count": 6}, {"title": "Peter's letters to his kinsfolk, vol. 3", "count": 4}]}, {"place": "Leith Walk", "value": 0.0039, "sector": "Leith", "abs": 2, "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 2}]}, {"place": "Water of Leith", "value": 0.0, "sector": "Leith", "abs": 0, "books": []}, {"place": "Calton Hill", "value": 0.0312, "sector": "Leith", "abs": 16, "books": [{"title": "Peter's letters to his kinsfolk, vol. 1", "count": 6}, {"title": "Life of Walter Scott", "count": 4}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 4}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, {"place": "Scotland Street", "value": 0.0, "sector": "Inverleith", "abs": 0, "books": []}, {"place": "Stockbridge", "value": 0.0, "sector": "Inverleith", "abs": 0, "books": []}, {"place": "Clarence Street", "value": 0.0, "sector": "Inverleith", "abs": 0, "books": []}, {"place": "Moray Place", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Dundas Street", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Princes Street", "value": 0.0547, "sector": "New Town", "abs": 28, "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 10}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 6}, {"title": "Peter's letters to his kinsfolk, vol. 2", "count": 4}, {"title": "Peter's letters to his kinsfolk, vol. 3", "count": 4}, {"title": "Life of Walter Scott", "count": 2}]}, {"place": "New Town", "value": 0.0312, "sector": "New Town", "abs": 16, "books": [{"title": "Peter's letters to his kinsfolk, vol. 1", "count": 8}, {"title": "Peter's letters to his kinsfolk, vol. 2", "count": 6}, {"title": "Life of Walter Scott", "count": 2}]}, {"place": "Drummond Place", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Cumberland Bar", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Queen Street", "value": 0.0078, "sector": "New Town", "abs": 4, "books": [{"title": "Life of Walter Scott", "count": 2}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, {"place": "India Street", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Castle Street", "value": 0.1914, "sector": "New Town", "abs": 98, "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 54}, {"title": "Life of Walter Scott", "count": 32}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 12}]}, {"place": "Heriot Row", "value": 0.0039, "sector": "New Town", "abs": 2, "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, {"place": "Howe Street", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Waverley Station", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Lothian Road", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Jenners", "value": 0.0, "sector": "New Town", "abs": 0, "books": []}, {"place": "Great King Street", "value": 0.0039, "sector": "New Town", "abs": 2, "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 2}]}, {"place": "Cramond", "value": 0.0039, "sector": "Almond", "abs": 2, "books": [{"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, {"place": "Holyrood", "value": 0.0664, "sector": "Old Town", "abs": 34, "books": [{"title": "Life of Walter Scott", "count": 14}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 10}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 6}, {"title": "Peter's letters to his kinsfolk, vol. 1", "count": 2}, {"title": "Peter's letters to his kinsfolk, vol. 3", "count": 2}]}, {"place": "High Street", "value": 0.0312, "sector": "Old Town", "abs": 16, "books": [{"title": "Life of Walter Scott", "count": 6}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 6}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 4}]}, {"place": "The Meadows", "value": 0.0, "sector": "Old Town", "abs": 0, "books": []}, {"place": "Old Town", "value": 0.0391, "sector": "Old Town", "abs": 20, "books": [{"title": "Peter's letters to his kinsfolk, vol. 1", "count": 10}, {"title": "Peter's letters to his kinsfolk, vol. 2", "count": 6}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}, {"title": "Peter's letters to his kinsfolk, vol. 3", "count": 2}]}, {"place": "Grassmarket", "value": 0.0234, "sector": "Old Town", "abs": 12, "books": [{"title": "Life of Walter Scott", "count": 6}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 4}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, {"place": "Cowgate", "value": 0.0117, "sector": "Old Town", "abs": 6, "books": [{"title": "Life of Walter Scott", "count": 2}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 2}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, {"place": "St Giles", "value": 0.0352, "sector": "Old Town", "abs": 18, "books": [{"title": "Peter's letters to his kinsfolk, vol. 3", "count": 8}, {"title": "Peter's letters to his kinsfolk, vol. 2", "count": 6}, {"title": "Life of Walter Scott", "count": 2}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 2}]}, {"place": "Canongate", "value": 0.2109, "sector": "Canongate", "abs": 108, "books": [{"title": "Life of Walter Scott", "count": 44}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 44}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 16}, {"title": "Peter's letters to his kinsfolk, vol. 1", "count": 4}]}, {"place": "Scottish Parliament", "value": 0.0, "sector": "Canongate", "abs": 0, "books": []}, {"place": "Arthur's Seat", "value": 0.0352, "sector": "Craigentinny/Duddingston", "abs": 18, "books": [{"title": "Life of Walter Scott", "count": 4}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 4}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 4}, {"title": "Peter's letters to his kinsfolk, vol. 3", "count": 4}, {"title": "Peter's letters to his kinsfolk, vol. 1", "count": 2}]}, {"place": "Musselburgh", "value": 0.043, "sector": "Portobello/Craigmillar", "abs": 22, "books": [{"title": "Life of Walter Scott", "count": 18}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 4}]}, {"place": "Bruntsfield", "value": 0.0, "sector": "South Central", "abs": 0, "books": []}, {"place": "Morningside", "value": 0.0, "sector": "South Central", "abs": 0, "books": []}, {"place": "University of Edinburgh", "value": 0.0547, "sector": "South Central", "abs": 28, "books": [{"title": "Peter's letters to his kinsfolk, vol. 1", "count": 10}, {"title": "Life of Walter Scott", "count": 8}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 8}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 7-9", "count": 2}]}, {"place": "Southside", "value": 0.0, "sector": "South Central", "abs": 0, "books": []}, {"place": "Tollcross", "value": 0.0, "sector": "South West", "abs": 0, "books": []}, {"place": "Dalkeith", "value": 0.0234, "sector": "Liberton/Gilmerton", "abs": 12, "books": [{"title": "Life of Walter Scott", "count": 8}, {"title": "Memoirs of the life of Sir Walter Scott, vol. 4-6", "count": 2}, {"title": "Peter's letters to his kinsfolk, vol. 2", "count": 2}]}]}];
+const sectorColors = {"Forth": "#4A90D9", "Leith": "#1C7293", "Inverleith": "#2980B9", "New Town": "#8E44AD", "Almond": "#5D6D7E", "Old Town": "#C0392B", "Canongate": "#E74C3C", "Western Edinburgh": "#7F8C8D", "Craigentinny/Duddingston": "#D35400", "Portobello/Craigmillar": "#E67E22", "South Central": "#27AE60", "South West": "#1E8449", "Liberton/Gilmerton": "#2ECC71", "Pentlands": "#196F3D"};
+const authorColors = {"John Gibson Lockhart": "#2C5F2D"};
+const sectorGroupsBase = [{"sector": "Leith", "start": 0, "color": "#1C7293"}, {"sector": "Inverleith", "start": 4, "color": "#2980B9"}, {"sector": "New Town", "start": 7, "color": "#8E44AD"}, {"sector": "Almond", "start": 22, "color": "#5D6D7E"}, {"sector": "Old Town", "start": 23, "color": "#C0392B"}, {"sector": "Canongate", "start": 30, "color": "#E74C3C"}, {"sector": "Craigentinny/Duddingston", "start": 32, "color": "#D35400"}, {"sector": "Portobello/Craigmillar", "start": 33, "color": "#E67E22"}, {"sector": "South Central", "start": 34, "color": "#27AE60"}, {"sector": "South West", "start": 38, "color": "#1E8449"}, {"sector": "Liberton/Gilmerton", "start": 39, "color": "#2ECC71"}];
+const sectorOrder = ["Leith", "Inverleith", "New Town", "Almond", "Old Town", "Canongate", "Craigentinny/Duddingston", "Portobello/Craigmillar", "South Central", "South West", "Liberton/Gilmerton"];
+const freqOrder = ["Leith", "Canongate", "Princes Street", "Holyrood", "Castle Street", "New Town", "High Street", "Arthur's Seat", "Scotland Street", "Old Town", "St Giles", "Dalkeith", "Scottish Parliament", "Heriot Row", "Grassmarket", "University of Edinburgh", "Calton Hill", "Musselburgh", "Cramond", "Leith Walk", "Cowgate", "Lothian Road", "Moray Place", "Dundas Street", "Queen Street", "Tollcross", "Southside", "Drummond Place", "Water of Leith", "Cumberland Bar", "Stockbridge", "India Street", "Waverley Station", "Morningside", "The Meadows", "Bruntsfield", "Howe Street", "Clarence Street", "Great King Street", "Jenners"];
+const alphaOrder = ["Arthur's Seat", "Bruntsfield", "Calton Hill", "Canongate", "Castle Street", "Clarence Street", "Cowgate", "Cramond", "Cumberland Bar", "Dalkeith", "Drummond Place", "Dundas Street", "Grassmarket", "Great King Street", "Heriot Row", "High Street", "Holyrood", "Howe Street", "India Street", "Jenners", "Leith", "Leith Walk", "Lothian Road", "Moray Place", "Morningside", "Musselburgh", "New Town", "Old Town", "Princes Street", "Queen Street", "Scotland Street", "Scottish Parliament", "Southside", "St Giles", "Stockbridge", "The Meadows", "Tollcross", "University of Edinburgh", "Water of Leith", "Waverley Station"];
+const placeToSector = {"Leith": "Leith", "Leith Walk": "Leith", "Water of Leith": "Leith", "Calton Hill": "Leith", "Scotland Street": "Inverleith", "Stockbridge": "Inverleith", "Clarence Street": "Inverleith", "Moray Place": "New Town", "Dundas Street": "New Town", "Princes Street": "New Town", "New Town": "New Town", "Drummond Place": "New Town", "Cumberland Bar": "New Town", "Queen Street": "New Town", "India Street": "New Town", "Castle Street": "New Town", "Heriot Row": "New Town", "Howe Street": "New Town", "Waverley Station": "New Town", "Lothian Road": "New Town", "Jenners": "New Town", "Great King Street": "New Town", "Cramond": "Almond", "Holyrood": "Old Town", "High Street": "Old Town", "The Meadows": "Old Town", "Old Town": "Old Town", "Grassmarket": "Old Town", "Cowgate": "Old Town", "St Giles": "Old Town", "Canongate": "Canongate", "Scottish Parliament": "Canongate", "Arthur's Seat": "Craigentinny/Duddingston", "Musselburgh": "Portobello/Craigmillar", "Bruntsfield": "South Central", "Morningside": "South Central", "University of Edinburgh": "South Central", "Southside": "South Central", "Tollcross": "South West", "Dalkeith": "Liberton/Gilmerton"};
+
+const placeSentences = {};
+
+let currentOrder = 'sector';
+let currentScale = 'pct';
+let activeSectors = new Set(sectorOrder);
+let searchTerm = '';
+
+const W = 1100, H = 90;
+const tooltip = document.getElementById('tooltip');
+const panel = document.getElementById('detail-panel');
+
+// Sector legend
+const legendDiv = document.getElementById('sector-legend');
+sectorGroupsBase.forEach(g => {
+  const tag = document.createElement('div');
+  tag.className = 'sector-tag';
+  tag.style.background = g.color;
+  tag.textContent = g.sector;
+  tag.dataset.sector = g.sector;
+  tag.title = g.sector;
+  tag.addEventListener('click', () => {
+    if (activeSectors.has(g.sector)) {
+      activeSectors.delete(g.sector);
+      tag.classList.add('muted');
+    } else {
+      activeSectors.add(g.sector);
+      tag.classList.remove('muted');
+    }
+    redraw();
+  });
+  legendDiv.appendChild(tag);
+});
+
+function getOrderedPlaces() {
+  let base = authorsData[0].values.map(v => v.place);
+  if (currentOrder === 'freq') base = [...freqOrder];
+  else if (currentOrder === 'alpha') base = [...alphaOrder];
+  return base.filter(p => activeSectors.has(placeToSector[p] || ''));
+}
+
+function getSectorGroups(orderedPlaces) {
+  const groups = [];
+  let current = null;
+  orderedPlaces.forEach((p, i) => {
+    const s = placeToSector[p] || '';
+    if (s !== current) {
+      groups.push({sector: s, start: i, color: sectorColors[s] || '#999'});
+      current = s;
+    }
+  });
+  return groups;
+}
+
+function redraw() {
+  document.getElementById('chart').innerHTML = '';
+  const orderedPlaces = getOrderedPlaces();
+  const sectorGroups = getSectorGroups(orderedPlaces);
+  const N = orderedPlaces.length;
+  if (N === 0) return;
+  const barW = Math.max(W / N, 6);
+
+  authorsData.forEach(author => {
+    const color = authorColors[author.author];
+    const vals = orderedPlaces.map(p => {
+      const v = author.values.find(x => x.place === p);
+      return v || {place: p, value: 0, abs: 0, sector: placeToSector[p]||'', books: []};
+    });
+
+    // PER-AUTHOR max value for independent Y axis
+    const maxVal = currentScale === 'pct'
+      ? d3.max(vals, d => d.value)
+      : d3.max(vals, d => d.abs);
+
+    const maxLabel = currentScale === 'pct'
+      ? (maxVal * 100).toFixed(1) + '%'
+      : maxVal.toString();
+
+    const block = document.createElement('div');
+    block.className = 'author-block';
+
+    const header = document.createElement('div');
+    header.className = 'author-header';
+    header.innerHTML = `<div class="author-maxval">max: ${maxLabel}</div>`;
+    block.appendChild(header);
+
+    const container = document.createElement('div');
+    const svgW = barW * N + 50;
+    const svg = d3.select(container).append('svg')
+      .attr('width', svgW).attr('height', H + 28)
+      .style('overflow', 'visible');
+
+    // sector backgrounds + dividers
+    sectorGroups.forEach((g, gi) => {
+      const nextStart = gi + 1 < sectorGroups.length ? sectorGroups[gi+1].start : N;
+      const gW = (nextStart - g.start) * barW;
+      svg.append('rect')
+        .attr('x', g.start * barW).attr('y', 0)
+        .attr('width', gW).attr('height', H)
+        .attr('fill', g.color).attr('opacity', 0.07);
+
+      // sector color strip at bottom instead of text
+      svg.append('rect')
+        .attr('x', g.start * barW).attr('y', H + 2)
+        .attr('width', gW - 1).attr('height', 4)
+        .attr('fill', g.color).attr('rx', 1);
+
+      // sector label only if wide enough
+      if (gW > 40 && currentOrder === 'sector') {
+        svg.append('text')
+          .attr('x', g.start * barW + gW/2)
+          .attr('y', H + 18)
+          .attr('text-anchor', 'middle')
+          .attr('font-size', '8px')
+          .attr('fill', g.color)
+          .attr('font-weight', '600')
+          .text(gW > 80 ? g.sector : g.sector.split('/')[0]);
+      }
+
+      if (g.start > 0) {
+        svg.append('line')
+          .attr('x1', g.start * barW).attr('y1', 0)
+          .attr('x2', g.start * barW).attr('y2', H)
+          .attr('stroke', '#CCC').attr('stroke-width', 0.8)
+          .attr('stroke-dasharray', '3,2');
+      }
+    });
+
+    const yScale = d3.scaleLinear().domain([0, maxVal]).range([0, H]);
+
+    vals.forEach((d, i) => {
+      const rawVal = currentScale === 'pct' ? d.value : d.abs;
+      const barH = Math.max(yScale(rawVal), rawVal > 0 ? 1 : 0);
+      const isMatch = searchTerm && d.place.toLowerCase().includes(searchTerm);
+      const isSearching = searchTerm.length > 0;
+
+      svg.append('rect')
+        .attr('x', i * barW).attr('y', H - barH)
+        .attr('width', Math.max(barW - 0.5, 1)).attr('height', barH)
+        .attr('fill', isMatch ? '#F0A500' : color)
+        .attr('opacity', isSearching && !isMatch ? 0.12 : 0.85)
+        .attr('cursor', 'pointer')
+        .on('mouseover', function(event) {
+          d3.select(this).attr('opacity', 1);
+          tooltip.style.display = 'block';
+          tooltip.innerHTML = `
+            <strong style="color:${color}">${d.place}</strong><br>
+            <span style="color:${sectorColors[d.sector]||'#999'};font-size:10px">● ${d.sector}</span><br>
+            ${(d.value*100).toFixed(2)}% &nbsp;·&nbsp; ${d.abs} mentions`;
+        })
+        .on('mousemove', function(event) {
+          tooltip.style.left = (event.clientX + 14) + 'px';
+          tooltip.style.top  = (event.clientY - 10) + 'px';
+        })
+        .on('mouseout', function() {
+          d3.select(this).attr('opacity', isSearching && !isMatch ? 0.12 : 0.85);
+          tooltip.style.display = 'none';
+        });
+    });
+
+    // Y axis
+    svg.append('line')
+      .attr('x1', 0).attr('y1', H).attr('x2', barW*N).attr('y2', H)
+      .attr('stroke', '#DDD').attr('stroke-width', 1);
+    svg.append('text')
+      .attr('x', -4).attr('y', 4)
+      .attr('text-anchor', 'end').attr('font-size', '8px').attr('fill', '#AAA')
+      .text(maxLabel);
+    svg.append('text')
+      .attr('x', -4).attr('y', H)
+      .attr('text-anchor', 'end').attr('font-size', '8px').attr('fill', '#AAA')
+      .text('0');
+
+    block.appendChild(container);
+    document.getElementById('chart').appendChild(block);
+  });
+}
+
+['btn-sector','btn-freq','btn-alpha'].forEach(id => {
+  document.getElementById(id).addEventListener('click', () => {
+    currentOrder = id.replace('btn-','');
+    document.querySelectorAll('#btn-sector,#btn-freq,#btn-alpha').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    redraw();
+  });
+});
+
+['btn-pct','btn-abs'].forEach(id => {
+  document.getElementById(id).addEventListener('click', () => {
+    currentScale = id.replace('btn-','');
+    document.querySelectorAll('#btn-pct,#btn-abs').forEach(b => b.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    redraw();
+  });
+});
+
+document.getElementById('search').addEventListener('input', function() {
+  searchTerm = this.value.toLowerCase().trim();
+  redraw();
+});
+
+redraw();
+</script>
+</body>
+</html>

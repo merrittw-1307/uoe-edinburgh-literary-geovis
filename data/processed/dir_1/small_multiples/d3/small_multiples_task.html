@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Author Spatial Fingerprints — Small Multiples v2</title>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  font-family: "Helvetica Neue", Arial, sans-serif;
+  background: #F4F6FA;
+  padding: 28px 36px;
+}
+h1 { font-size: 20px; color: #21295C; margin-bottom: 4px; }
+.subtitle { font-size: 12px; color: #888; margin-bottom: 4px; }
+.source { font-size: 10px; color: #BBB; margin-bottom: 20px; font-style: italic; }
+
+.controls {
+  display: flex; gap: 12px; align-items: center;
+  flex-wrap: wrap; margin-bottom: 14px;
+}
+.ctrl-label { font-size: 12px; color: #555; }
+.btn {
+  padding: 4px 12px; border-radius: 14px;
+  border: 1.5px solid #C0C8D8; background: white;
+  font-size: 11px; cursor: pointer; color: #333; transition: all 0.15s;
+}
+.btn:hover { background: #E8EAF6; border-color: #21295C; }
+.btn.active { background: #21295C; color: white; border-color: #21295C; }
+.sync-btn {
+  padding: 4px 14px; border-radius: 14px;
+  border: 1.5px solid #C9A227; background: #FFF8E7;
+  font-size: 11px; cursor: pointer; color: #856404;
+}
+.sync-btn.on { background: #C9A227; color: white; border-color: #C9A227; }
+select.compare-select {
+  padding: 4px 10px; border-radius: 14px; border: 1.5px solid #C0C8D8;
+  font-size: 11px; color: #333; background: white;
+}
+
+.sector-legend { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 18px; }
+.sector-tag {
+  font-size: 10px; padding: 3px 10px; border-radius: 10px;
+  color: white; cursor: pointer; transition: opacity 0.2s; user-select: none;
+}
+.sector-tag.muted { opacity: 0.25; }
+
+.compare-row { display: none; gap: 10px; align-items: center; margin-bottom: 14px; }
+.compare-row.visible { display: flex; }
+
+.grid {
+  display: flex; flex-wrap: wrap;
+  gap: 18px; justify-content: center;
+}
+.panel {
+  background: white; border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+  overflow: hidden;
+}
+.panel-title {
+  font-size: 13px; font-weight: bold;
+  padding: 10px 14px 6px;
+  display: flex; justify-content: space-between; align-items: center;
+}
+.panel-stats { font-size: 10px; color: #AAA; font-weight: normal; }
+
+/* Leaflet popup override */
+.leaflet-popup-content-wrapper {
+  border-radius: 8px !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.12) !important;
+  padding: 0 !important;
+}
+.leaflet-popup-content { margin: 0 !important; }
+.popup-inner { padding: 10px 14px; font-family: "Helvetica Neue", Arial, sans-serif; max-width: 240px; }
+.popup-place { font-size: 14px; font-weight: bold; margin-bottom: 3px; }
+.popup-count { font-size: 12px; color: #555; margin-bottom: 6px; }
+.popup-pct { font-size: 11px; color: #888; }
+.popup-quote { font-style: italic; font-size: 11px; color: #444; margin-top: 6px; padding-top: 6px; border-top: 1px solid #EEE; line-height: 1.4; }
+.popup-quote .tt-source { font-style: normal; color: #999; display: block; margin-top: 3px; }
+.leaflet-popup-tip-container { display: none; }
+</style>
+</head>
+<body>
+<h1>Author Spatial Fingerprint — Small Multiples</h1>
+<div class="subtitle">Bubble size = mention frequency (log scale) · hover or click a bubble for its value · zoom &amp; pan the map</div>
+<div class="source">Basemap: © CartoDB Positron, © OpenStreetMap contributors</div>
+
+<div class="controls">
+  <span class="ctrl-label">Bubble size:</span>
+  <button class="btn active" id="btn-log">Log scale</button>
+  <button class="btn" id="btn-linear">Linear scale</button>
+  <span class="ctrl-label" style="margin-left:8px">Map:</span>
+  <button class="btn" id="btn-reset">Reset view</button>
+</div>
+
+<div class="sector-legend" id="sector-legend"></div>
+<div class="grid" id="grid"></div>
+
+<script>
+const colors = {
+  "Robert Louis Stevenson": "#7F77DD"
+};
+
+const sectorColors = {"Forth":"#4A90D9","Leith":"#1C7293","Inverleith":"#2980B9","New Town":"#8E44AD","Almond":"#5D6D7E","Old Town":"#C0392B","Canongate":"#E74C3C","Western Edinburgh":"#7F8C8D","Craigentinny/Duddingston":"#D35400","Portobello/Craigmillar":"#E67E22","South Central":"#27AE60","South West":"#1E8449","Liberton/Gilmerton":"#2ECC71","Pentlands":"#196F3D","Outer Scotland":"#999999"};
+const sectorOrder = ["Leith","Inverleith","New Town","Almond","Old Town","Canongate","Craigentinny/Duddingston","Portobello/Craigmillar","South Central","South West","Liberton/Gilmerton","Forth","Western Edinburgh","Pentlands","Outer Scotland"];
+
+const data = {"Robert Louis Stevenson": [{"place": "Leith", "lat": 55.9757865, "lon": -3.1680197, "mention_count": 56, "sector": "Leith", "books": [{"title": "David Balfour", "count": 18}, {"title": "Catriona", "count": 14}, {"title": "Edinburgh: picturesque notes", "count": 14}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 6}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 6}], "sentences": [{"text": "\"I praise God for your kindness, dear,\" said I. \"Farewell, my little friend !\"\" giving her that name which she had given to herself; witli which I bowed and left her. My way was down the glen of the Leith River, towards\u2026", "book": "David Balfour"}, {"text": "There were six passengers besides our two selves, which made of it a full cabin. Three were solid merchants out of Leith, Kirkaldy, and. Dundee, all engaged in the same adventure into High Germany ; one was a Hollander\u2026", "book": "David Balfour"}, {"text": "My way was down the glen of the Leith River, towards Stockbridge and Silvermills. A path led in the foot of it, the water bickered and sang in the midst; the sunbeams overhead struck out of the west among long shadows\u2026", "book": "Catriona"}]}, {"place": "Princes Street", "lat": 55.9526, "lon": -3.193, "mention_count": 46, "sector": "New Town", "books": [{"title": "St. Ives", "count": 16}, {"title": "Edinburgh: picturesque notes", "count": 12}, {"title": "Lay morals, and other papers", "count": 6}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 6}, {"title": "The Misadventures of John Nicholson", "count": 4}], "sentences": [{"text": "But I and a good-humoured mechanic came up together; and I instantly developed a latent faculty for setting the hearts of children at rest. Master Tommy Murphy (such was his name) soon stopped crying, and allowed me to\u2026", "book": "Letters and Miscellanies of Robert Louis Stevenson, vol.1"}, {"text": "And yet 'twould surprise you how fast we are advancing in Edinburgh. Camilla dear, that Miss Scrym- geour has edged her China crape with the very ribbon trimmings \u2014 black satin with pearl edge \u2014 we saw in that new shop\u2026", "book": "St. Ives"}, {"text": "It was Saturday ; and except that he had a matter of four hundred pounds in his pocket which it was his duty to hand over to the British Linen Company's Bank, he had the whole afternoon at his disposal. He went by\u2026", "book": "The Misadventures of John Nicholson"}]}, {"place": "Cramond", "lat": 55.9705707, "lon": -3.3065489, "mention_count": 36, "sector": "Almond", "books": [{"title": "St. Ives", "count": 22}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 12}, {"title": "Kidnapped", "count": 6}, {"title": "Edinburgh: picturesque notes", "count": 2}], "sentences": [{"text": "f ^ My goo' frien',\" says he, and at the first word I pricked my ears, ^' my goo' frien', will you oblishe me with lil nesh- ary infamation ? Whish roa' t' Cramond ? \"", "book": "St. Ives"}, {"text": "26 Picturesque Notes on Edinburgh. homely, with their gables and their creeping plants, their outside stairs and running mill-streams; there were corners that smelt like the end of the country garden where I spent my\u2026", "book": "Edinburgh: picturesque notes"}, {"text": "The persons mentioned below in the fourth paragraph are cousins of the writer and playmates of his childhood; two of them, named Lewis like himself, after their Balfour grandfather, had been nicknamed after their\u2026", "book": "Letters and Miscellanies of Robert Louis Stevenson, vol.1"}]}, {"place": "Swanston", "lat": 55.8956657, "lon": -3.2181884, "mention_count": 32, "sector": "Pentlands", "books": [{"title": "St. Ives", "count": 12}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 10}, {"title": "Memories and portraits", "count": 4}, {"title": "Edinburgh: picturesque notes", "count": 2}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 2}], "sentences": [{"text": "He was busy with the essay \"Ordered South,\" and with that on Victor Hugo's Romances, which was afterwards his first contribution to the Cornbill Magazine ; was full of a thousand dreams and projects for future work; and\u2026", "book": "Letters and Miscellanies of Robert Louis Stevenson, vol.1"}, {"text": "SWANSTON, Wednesday, [Autumn] I HAVE been hard at work all yesterday, and besides had to write a long letter to Bob, so I found no time until quite late, and then was sleepy. Last night it blew a fearful gale; I was\u2026", "book": "Letters and Miscellanies of Robert Louis Stevenson, vol.1"}, {"text": "Write by return of post and tell me what to do. If possible, I should like to cut the business and come right slick out to Swanston. \u2014 1 remain, your affectionate son, R. L.", "book": "Letters and Miscellanies of Robert Louis Stevenson, new letters"}]}, {"place": "High Street", "lat": 55.9501, "lon": -3.1882, "mention_count": 32, "sector": "Old Town", "books": [{"title": "Edinburgh: picturesque notes", "count": 22}, {"title": "The Misadventures of John Nicholson", "count": 4}, {"title": "Across the plains with other memories and essays", "count": 2}, {"title": "Catriona", "count": 2}, {"title": "David Balfour", "count": 2}], "sentences": [{"text": "Archie passed by his friends in the High Street with incoherent words and gestures. He saw Holyrood in a dream, remembrance of its romance awoke in him and faded ; he had a vision of the old radiant stories, of Queen\u2026", "book": "Weir of Hermiston"}, {"text": "You, Flora, you can pack John into my bed, for which I have no further use to-night. As for me, I am off to the post-office, and thence to the High Street about the dead body. The police ought to know, you see, and they\u2026", "book": "The Misadventures of John Nicholson"}, {"text": "something heart-breaking in this gradual declension at so advanced an age ; you would have thought a man of sixty out of the reach of these calamities ; you would have thought that he was niched by that time into a safe\u2026", "book": "Edinburgh: picturesque notes"}]}, {"place": "Calton Hill", "lat": 55.9556726, "lon": -3.1824089, "mention_count": 30, "sector": "Leith", "books": [{"title": "The Misadventures of John Nicholson", "count": 12}, {"title": "Edinburgh: picturesque notes", "count": 8}, {"title": "Catriona", "count": 2}, {"title": "David Balfour", "count": 2}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 2}], "sentences": [{"text": "This is a map of the environs of Edinburgh circa 1750. It must contain Hope Park, Hunter's Bog, Calton Hill, the Mouter Hill, Lang Dykes, Nor' Loch, West Kirk, Village of Dean, pass down the water to Stockbridge, Silver\u2026", "book": "Letters and Miscellanies of Robert Louis Stevenson, new letters"}, {"text": "He proceeded slowly back along the terrace in a tender glow; and when he came to Greenside Church, he halted in a doubtful mind. Over the crown of the Calton Hill, to his left, lay the way to Colette's, where Alan would\u2026", "book": "The Misadventures of John Nicholson"}, {"text": "\"On the Calton Hill about twelve last night.\"", "book": "The Misadventures of John Nicholson"}]}, {"place": "Arthur's Seat", "lat": 55.9441043, "lon": -3.1618477, "mention_count": 28, "sector": "Craigentinny/Duddingston", "books": [{"title": "Edinburgh: picturesque notes", "count": 18}, {"title": "Lay morals, and other papers", "count": 4}, {"title": "Catriona", "count": 2}, {"title": "David Balfour", "count": 2}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 2}], "sentences": [{"text": "On the opposite side of the loch, the ground rises to Craigmillar Castle, a place friendly to Stuart Mariolaters. It is worth a climb, even in summer, to look down upon the loch from Arthur's Seat ; but it is tenfold\u2026", "book": "Edinburgh: picturesque notes"}, {"text": "To turn to the other, is like a piece of travel. Far out in the lowlands PZdinburgh shows herself, making a great smoke on clear days and spreading her suburbs about her for miles ; the Castle rises darkly in the midst\u2026", "book": "Edinburgh: picturesque notes"}, {"text": "He wore his hat on one side. He was active, volatile, and went to the top of Arthur's Seat on the Sunday forenoon. He was as quiet in a debating society as he was loud", "book": "Lay morals, and other papers"}]}, {"place": "Heriot Row", "lat": 55.9553, "lon": -3.2023, "mention_count": 26, "sector": "New Town", "books": [{"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 22}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 4}], "sentences": [{"text": "17 HERIOT Row, EDINBURGH [July 28, 1879], MY DEAR COLVIN, I am just in the middle of your ' ' Rembrandt. \" The taste for Bummkopf and his works is agreeably dissembled so far as I have gone; and the reins have never for\u2026", "book": "Letters and Miscellanies of Robert Louis Stevenson, vol.1"}, {"text": "17 HERIOT Row, EDINBURGH [April, i8jg\\.", "book": "Letters and Miscellanies of Robert Louis Stevenson, vol.1"}, {"text": "17 Heriot Row, Edinburgh, October, 1872.", "book": "Letters and Miscellanies of Robert Louis Stevenson, new letters"}]}, {"place": "Old Town", "lat": 55.9471293, "lon": -3.2002511, "mention_count": 26, "sector": "Old Town", "books": [{"title": "Edinburgh: picturesque notes", "count": 22}, {"title": "St. Ives", "count": 4}], "sentences": [{"text": "This upon your left. Upon the right, the roofs and spires of the Old Town climb one above another to where the citadel prints its broad bulk and jagged crown of bastions on the western sky. - Perhaps it is now one in\u2026", "book": "Edinburgh: picturesque notes"}, {"text": "If you could see as people are to see in heaven, if you had eyes such as you can fancy for a superior race, if you could take clear note of the objects of vision, not only a few yards, but a few miles from where you\u2026", "book": "Edinburgh: picturesque notes"}, {"text": "That was all decided. But the most of the shops were on tlie other side of the valley, in the Old Town ; and it was now my strange discovery that I was physically unable to cross the North Bridge ! It was as though a\u2026", "book": "St. Ives"}]}, {"place": "New Town", "lat": 55.9583198, "lon": -3.1992422, "mention_count": 26, "sector": "New Town", "books": [{"title": "Edinburgh: picturesque notes", "count": 20}, {"title": "St. Ives", "count": 6}], "sentences": [{"text": "THE VILLA QUARTERS. Mr. RUSKIN'S denunciation of the New Town of Edinburgh includes, as I have heard it repeated, nearly all the stone and lime we have to show. Many however find a grand air and something settled and\u2026", "book": "Edinburgh: picturesque notes"}, {"text": "Thus the broad and comely approach to Prince's Street from the east, lined with hotels and public offices, makes a leap over the gorge of the Low Calton ; if you cast a glance over the parapet, you look direct into that\u2026", "book": "Edinburgh: picturesque notes"}, {"text": "I was glad to set foot on the flagstones, and to escape from the crowd that had assembled to receive the mail. Here we were, with but little daylight before us, and that on Saturday afternoon, the eve of the famous\u2026", "book": "St. Ives"}]}, {"place": "Greyfriars", "lat": 55.9468, "lon": -3.1914, "mention_count": 24, "sector": "Old Town", "books": [{"title": "Edinburgh: picturesque notes", "count": 18}, {"title": "Lay morals, and other papers", "count": 4}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 2}], "sentences": [{"text": "Every mason was a pedestrian Holbein : he had a deep consciousness of death, and loved to put its terrors pithily before the churchyard loiterer ; he was brimful of rough hints upon mortality, and any dead farmer was\u2026", "book": "Edinburgh: picturesque notes"}, {"text": "\"Halt, passenger; sake heed what thou dost see, This tomb doth show for what some men did die\" Monument, Greyfriars' Churchyard, Edinburgh, 1661-1668.'", "book": "Lay morals, and other papers"}, {"text": "Greyfriars. 2 1 which Dr. Johnson passed a critical eye is in many ways sacred to the memory of the men whom Mackenzie persecuted.", "book": "Edinburgh: picturesque notes"}]}, {"place": "Swanston Cottage", "lat": 55.89504, "lon": -3.221463, "mention_count": 24, "sector": "Pentlands", "books": [{"title": "St. Ives", "count": 12}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, vol.1", "count": 10}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 2}], "sentences": [{"text": "[SWANSTON COTTAGE, LOTHIANBURN, July, 1876.'} HERE I am, here, and very well too. I am glad you liked \"Walking Tours\"; I like it, too; I think it 's prose; and I own with contrition that I have not always written prose.", "book": "Letters and Miscellanies of Robert Louis Stevenson, vol.1"}, {"text": "I shall send this off to-day to let you know of my new address Swanston Cottage, Lothianburn, Edinburgh. Salute the faithful in my name.", "book": "Letters and Miscellanies of Robert Louis Stevenson, vol.1"}, {"text": "The next two letters are addressed to an old friend and fellow-mem- ber of the Speculative Society, who had passed Advocate six years before, on the same day as R. L. S. himself, and is now Lord Guthrie, a Senator of\u2026", "book": "Letters and Miscellanies of Robert Louis Stevenson, new letters"}]}, {"place": "Edinburgh Castle", "lat": 55.94867, "lon": -3.200924, "mention_count": 22, "sector": "Old Town", "books": [{"title": "St. Ives", "count": 20}, {"title": "Edinburgh: picturesque notes", "count": 2}], "sentences": [{"text": "It is contrary to my principles to discourage admiration for myself ; and, slipping back the shoulder of the dress- ing-gown, I silently exhibited the scar which I had received in Edinburgh Castle. He looked at it with\u2026", "book": "St. Ives"}, {"text": "of speech, those that would not have held a hook uj^side- down would have torn the pages out for pipelights. For I must repeat again that our body of prisoners was exceptional ; there was in Edinburgh Castle none of\u2026", "book": "St. Ives"}, {"text": "I hastened on deck in time to shake hands with my companions and confide the letter to Byfield with instructions for posting it. '^ And if your share in our adventures should come into public question,^' said I, ^^you\u2026", "book": "St. Ives"}]}, {"place": "Silvermills", "lat": 55.9593, "lon": -3.2041, "mention_count": 20, "sector": "Inverleith", "books": [{"title": "David Balfour", "count": 20}, {"title": "Catriona", "count": 14}], "sentences": [{"text": "Yet, when I remember the days of our explorations, I am not without hojje. There should be left in our native city some seed of the elect ; some long-legged, hotheaded youth must repeat to-day our dreams and wanderings\u2026", "book": "David Balfour"}, {"text": "VllL CONTENTS CHAPTER YII PAGE I MAKE A Fault ix Honour \u2022.,... 74 CHAPTER Vlir The Bravo 90 CHAPTER IX The Heather on Fire 103 CHAPTER X The Red-headed Man 114 CHAPTER XI The Wood by Silvermills 128 CHAPTER XII On the\u2026", "book": "David Balfour"}, {"text": "CHAPTER XI THE WOOD BY SILVERMILLS I LOST no time, but down through the valley and by Stoekbrig and Silvermills as hard as I could stave. It was Alan's tryst to lie every night between twelve and two \"in a bit scrog of\u2026", "book": "David Balfour"}]}, {"place": "Pilrig", "lat": 55.9680589, "lon": -3.1817222, "mention_count": 20, "sector": "Leith", "books": [{"title": "David Balfour", "count": 14}, {"title": "Catriona", "count": 4}, {"title": "Essays by Robert Louis Stevenson", "count": 2}, {"title": "Kidnapped", "count": 2}, {"title": "Letters and Miscellanies of Robert Louis Stevenson, new letters", "count": 2}], "sentences": [{"text": "I was thus in the poorest of spirits, though still pretty resolved, when I came in view of Pilrig, a pleasant gabled house set by the walkside among some brave young woods. The laird's horse was standing saddled at the\u2026", "book": "Catriona"}, {"text": "You are not to suppose my education was neglected, on the contrary I was kept extremely busy. I studied the French, so as to be more prepared to go to Leyden ; I set myself to the fencing, and wrought hard, sometimes\u2026", "book": "David Balfour"}, {"text": "1892 Walk, Leith, Pilrig, Lochend, Figgate Whins, And I ^^' '^^ would like a piece in a corner, giving for the same period Figgate Whins, Musselburgh, Inveresk, Prestonpans, battlefield of Gladsmuir, Cockenzie, Gullane\u2026", "book": "Letters and Miscellanies of Robert Louis Stevenson, new letters"}]}, {"place": "St Giles", "lat": 55.9493396, "lon": -3.1905294, "mention_count": 18, "sector": "Old Town", "books": [{"title": "Edinburgh: picturesque notes", "count": 16}, {"title": "Lay morals, and other papers", "count": 2}], "sentences": [{"text": "Nor was the vision unsuitable to the locality ; for after an hospital, what uglier piece is there in civilisation than a court of law ? Hither come envy, malice and all uncharitableness to wrestle it out in public\u2026", "book": "Edinburgh: picturesque notes"}, {"text": "THE PARLIAMENT CLOSE. Time has wrought its changes most notably around the precinct of St. Giles's Church- The church itself, if it were not for the spire, would be unrecognisable ; the K mines are all gone, not a shop\u2026", "book": "Edinburgh: picturesque notes"}, {"text": "Perhaps he wandered down into the land of Thomas the Rhymer, and some day, when it is least expected, may take a thought to revisit the sunlit upper world. That will be a strange moment for the cabmen on the stance\u2026", "book": "Edinburgh: picturesque notes"}]}, {"place": "Randolph Crescent", "lat": 55.951934, "lon": -3.211707, "mention_count": 16, "sector": "New Town", "books": [{"title": "The Misadventures of John Nicholson", "count": 14}, {"title": "The Wrecker", "count": 2}], "sentences": [{"text": "Between these two considerations, at least, he was more than usually moved; and when he got to Randolph Crescent, he quite forgot the four hundred pounds in the inner pocket of his great-coat, hung up the coat, with its\u2026", "book": "The Misadventures of John Nicholson"}, {"text": "glass, which had been recently occluded by the figure of the jarvey, he beheld the tree-tops of the rookery in Randolph Crescent. He was close to home home, where he had thought, at that hour, to be sitting in the\u2026", "book": "The Misadventures of John Nicholson"}, {"text": "Alexander, the younger brother, was sickly, clever, fond of books and drawing, and full of satirical remarks. In the midst of these, imagine that natural, clumsy, unintelligent, and mirthful animal, John; mighty\u2026", "book": "The Misadventures of John Nicholson"}]}]};
+
+const authorOrder = ["Robert Louis Stevenson"];
+
+const LAT_MIN=55.85, LAT_MAX=56.02, LON_MIN=-3.35, LON_MAX=-3.05;
+const DEFAULT_CENTER = [55.945, -3.192];
+const DEFAULT_ZOOM = 12;
+
+let scaleMode = 'log';
+let syncMode = false;
+let isSyncing = false;
+
+const usedSectors = sectorOrder.filter(s => Object.values(data).some(places => places.some(p => p.sector === s)));
+let activeSectors = new Set(usedSectors);
+
+const maps = {};
+const markerLayers = {};
+
+function calcRadius(count, maxCount) {
+  if (scaleMode === 'log') {
+    return Math.max(Math.log1p(count / maxCount * 100) * 3.8, 3);
+  } else {
+    return Math.max((count / maxCount) * 22, 3);
+  }
+}
+
+function buildMarkers(author) {
+  const places = data[author].filter(d =>
+    d.lat >= LAT_MIN && d.lat <= LAT_MAX &&
+    d.lon >= LON_MIN && d.lon <= LON_MAX &&
+    activeSectors.has(d.sector)
+  );
+  const color = colors[author];
+  const maxCount = Math.max(...data[author].map(d => d.mention_count));
+  const totalMentions = data[author].reduce((s, d) => s + d.mention_count, 0);
+
+  const layer = L.layerGroup();
+
+  places.forEach(d => {
+    const r = calcRadius(d.mention_count, maxCount);
+    const pct = (d.mention_count / totalMentions * 100).toFixed(1);
+    const marker = L.circleMarker([d.lat, d.lon], {
+      radius: r,
+      fillColor: color,
+      color: 'white',
+      weight: 1.5,
+      fillOpacity: 0.75
+    });
+
+    marker.bindPopup(`
+      <div class="popup-inner">
+        <div class="popup-place" style="color:${color}">${d.place}</div>
+        <div class="popup-count">${d.mention_count} mentions</div>
+        <div class="popup-pct">${pct}% of total · ${d.sector}</div>
+      </div>`, {
+      closeButton: false,
+      offset: [0, -r]
+    });
+
+    marker.on('mouseover', function() { this.openPopup(); });
+    marker.on('mouseout', function() { this.closePopup(); });
+    marker.on('click', function() {
+      this.openPopup();
+      marker.off('mouseout');
+      marker.on('mouseout', function(){});
+    });
+
+    layer.addLayer(marker);
+  });
+
+  return layer;
+}
+
+function refreshMarkers() {
+  Object.keys(maps).forEach(author => {
+    const map = maps[author];
+    if (markerLayers[author]) map.removeLayer(markerLayers[author]);
+    markerLayers[author] = buildMarkers(author);
+    markerLayers[author].addTo(map);
+  });
+}
+
+function teardownMaps() {
+  Object.values(maps).forEach(map => map.remove());
+  for (const k in maps) delete maps[k];
+  for (const k in markerLayers) delete markerLayers[k];
+}
+
+function buildGrid(authorsToShow, panelW, panelH) {
+  teardownMaps();
+  document.getElementById('grid').innerHTML = '';
+
+  authorsToShow.forEach(author => {
+    const places = data[author].filter(d =>
+      d.lat >= LAT_MIN && d.lat <= LAT_MAX && d.lon >= LON_MIN && d.lon <= LON_MAX
+    );
+    const totalMentions = data[author].reduce((s,d) => s+d.mention_count, 0);
+    const color = colors[author];
+
+    const panel = document.createElement('div');
+    panel.className = 'panel';
+    panel.style.width = panelW + 'px';
+
+    const titleDiv = document.createElement('div');
+    titleDiv.className = 'panel-title';
+    titleDiv.innerHTML = `
+      <span class="panel-stats">${places.length} places · ${totalMentions.toLocaleString()} mentions</span>`;
+    panel.appendChild(titleDiv);
+
+    const mapWrap = document.createElement('div');
+    mapWrap.style.width = panelW + 'px';
+    mapWrap.style.height = panelH + 'px';
+    const mapId = 'map-' + author.replace(/\s+/g,'-');
+    mapWrap.id = mapId;
+    panel.appendChild(mapWrap);
+    document.getElementById('grid').appendChild(panel);
+
+    const map = L.map(mapId, {
+      center: DEFAULT_CENTER,
+      zoom: DEFAULT_ZOOM,
+      zoomControl: true,
+      attributionControl: false
+    });
+
+    L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+      subdomains: 'abcd', maxZoom: 18
+    }).addTo(map);
+
+    maps[author] = map;
+
+    map.on('moveend zoomend', function() {
+      if (!syncMode || isSyncing) return;
+      isSyncing = true;
+      const center = map.getCenter();
+      const zoom = map.getZoom();
+      authorsToShow.forEach(a => {
+        if (a !== author) maps[a].setView(center, zoom, {animate: false});
+      });
+      isSyncing = false;
+    });
+  });
+
+  refreshMarkers();
+}
+
+// Sector legend
+const legendDiv = document.getElementById('sector-legend');
+usedSectors.forEach(s => {
+  const tag = document.createElement('div');
+  tag.className = 'sector-tag';
+  tag.style.background = sectorColors[s] || '#999';
+  tag.textContent = s;
+  tag.dataset.sector = s;
+  tag.addEventListener('click', () => {
+    if (activeSectors.has(s)) {
+      activeSectors.delete(s);
+      tag.classList.add('muted');
+    } else {
+      activeSectors.add(s);
+      tag.classList.remove('muted');
+    }
+    refreshMarkers();
+  });
+  legendDiv.appendChild(tag);
+});
+
+buildGrid(authorOrder, 640, 460);
+
+// Controls
+document.getElementById('btn-log').addEventListener('click', () => {
+  scaleMode = 'log';
+  document.getElementById('btn-log').classList.add('active');
+  document.getElementById('btn-linear').classList.remove('active');
+  refreshMarkers();
+});
+document.getElementById('btn-linear').addEventListener('click', () => {
+  scaleMode = 'linear';
+  document.getElementById('btn-linear').classList.add('active');
+  document.getElementById('btn-log').classList.remove('active');
+  refreshMarkers();
+});
+document.getElementById('btn-reset').addEventListener('click', () => {
+  Object.keys(maps).forEach(a => maps[a].setView(DEFAULT_CENTER, DEFAULT_ZOOM));
+});
+</script>
+</body>
+</html>
