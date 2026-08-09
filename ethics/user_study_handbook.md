@@ -115,17 +115,21 @@ English: The project also has a `combined_interface.html` ("Combined Interface",
 
 **预计用时因此从30-40分钟调整为35-50分钟**，PIS文件（`ethics/PIS_Merritt_final.docx`及对应PDF）已经同步改过这个数字，不需要你再手动改。
 
-**⚠️ 2026年8月9日做了两轮结构性加强，这两次的时间改动PIS文件里都还没有同步**：
+**⚠️ 2026年8月9日做了三轮结构性加强，这几次的时间改动PIS文件里都还没有同步**：
 
 第一轮——Fingerprint部分（Task 1）原本"看参考版→猜盲测版单个作者"两步，加了第三步：把5个未署名图形一次性配对到5个作者（Matrix Table题型，M1）+ 一道主观区分度评分（M2）。加这一步是因为单独的盲测一次只测1个图对5个名字，只能拿到一个"对/错"的bit，信息量有限；配对能拿到完整的5×5混淆矩阵，能看出"哪两位作者的图形最容易被搞混"，是对RQ1"图形彼此是否可区分"这个问题信息量大得多的验证方式。
 
 第二轮——为了让题型更多样、同时避免题目太简单（天花板效应，所有人都答对，看不出设计之间的差异）或太难（地板效应，大家干脆瞎猜或跳过），又在Fingerprint和Topology两部分各加了两道题，全部基于真实数据计算出来，不是随便设计的：
 - **F1b**（第二猜测）：F1猜错了的话，你的第二猜测是谁——捕捉"完全瞎猜"和"缩小到2个候选人但选错了"之间的差异。
 - **P1**（针对性两选一）：用余弦相似度从真实数据里挑出每个设计里**最相似、最难分辨**的一对作者，做成二选一，保证这道题不会因为5个图形本来就很不一样而变得太简单。三个设计选的是不同的作者对（Radar: Lockhart vs Scott；Bar-code: Scott vs Welsh；Small Multiples: Lockhart vs Stevenson），避免两个设计选到完全一样的一对导致参与者靠"上次也是这两个人"蒙对。
-- **T-Strength**（评分矩阵）：给3对**真实权重强/中/弱**的地名（New Town-Princes Street权重18／Lochend-Waverley Station权重4／Leith-Silvermills权重2，均来自`network_enriched.json`），让参与者打分——即使T1本身因为最强那对（Leith-Princes Street权重28）太突出而饱和，这题依然能看出参与者对"强弱"的感知有多准。
-- **T-ClusterVerify**（识别型选择题）：给3组地名，只有1组是真实紧密关联的（metro用"Lockhart's Edinburgh"线路站点；network/linear用对共现图跑Louvain社群检测得到的真实社群），另外2组是跨群组混搭的干扰项，用来跟T4的开放式回答互相印证，同时避免T4没人填写导致完全没有量化数据。
+- **T-Strength**（评分矩阵）：给3对**真实权重强/中/弱**的地名，让参与者打分——即使T1本身因为最强那对（Leith-Princes Street权重28）太突出而饱和，这题依然能看出参与者对"强弱"的感知有多准。
+- **T-ClusterVerify**（识别型选择题）：给3组地名，只有1组是真实紧密关联的，另外2组是跨群组混搭的干扰项，用来跟T4的开放式回答互相印证，同时避免T4没人填写导致完全没有量化数据。
 
-两轮加完，题目总数从最初的46题涨到64题，**预计用时相应从35-50分钟涨到45-60分钟**，但PIS文件（`ethics/PIS_Merritt_final.docx`及`dissertation/5Aug/pis.pdf`）**还没有更新**，需要你自己打开确认要不要把时间区间同步改一下——如果伦理审批的PIS版本对时间区间有要求，改之前最好先确认是否需要重新走一次伦理修订。用同一个思路，招募邮件草稿（本手册第64行附近）和Overview里"约35-50分钟"（第33行附近）等提到具体时间的地方，最好等PIS定稿改好之后再统一核对一遍，避免几处文件时间不一致。
+第三轮——Merritt发现前两轮的设计里存在两处可以**靠死记硬背而不是真正理解图形绕过测试**的漏洞，两处都已修复：
+1. **盲测版图形颜色跟参考版一模一样**：比如参考版里Scott是金色，盲测版里Scott也是金色——参与者完全不需要看形状，只要记住"参考图里金色的是Scott"这一个颜色标签就能在F1蒙对，测出来的是颜色记忆力，不是"图形能不能被学会认出来"，跟RQ1想验证的东西完全不是一回事。**修复**：三个盲测版文件（`radar_task.html`/`barcode_task.html`/`small_multiples_task.html`）的图形颜色统一改成中性灰蓝色`#5B6B8C`，跟参考版颜色不再一样。匹配版和P1用的图从设计之初就是中性色，不受影响。
+2. **Network/Linear/Metro三个拓扑设计共享同一份数据，导致正确答案完全相同、可以跨设计抄答案**：T1（哪两个地方最强）、以及第二轮加的T-Strength/T-ClusterVerify，在三个设计里问的是完全一样的地名/群组，参与者只要在第一个拓扑设计里答对一次，后两个直接照抄同一个答案就行，根本不需要理解后两张图具体怎么画的。**修复**：新增**T1b**（要求写出"具体是这张图的什么特征让你这样判断"，抄答案但解释文字跟当前设计画法明显对不上的情况能在质性编码时被识别出来），并把T-Strength/T-ClusterVerify的具体地名/群组改成三个设计各不相同（虽然背后数据一样，但参与者必须在当前这张图上重新找到题目问的具体内容才能作答）。
+
+三轮加完，题目总数从最初的46题涨到67题，**预计用时相应从35-50分钟涨到50-65分钟**，但PIS文件（`ethics/PIS_Merritt_final.docx`及`dissertation/5Aug/pis.pdf`）**还没有更新**，需要你自己打开确认要不要把时间区间同步改一下——如果伦理审批的PIS版本对时间区间有要求，改之前最好先确认是否需要重新走一次伦理修订。用同一个思路，招募邮件草稿（本手册第64行附近）和Overview里"约35-50分钟"（第33行附近）等提到具体时间的地方，最好等PIS定稿改好之后再统一核对一遍，避免几处文件时间不一致。
 
 **详见 `ethics/user_study_questionnaire.md`**，里面还附了九个可视化链接（3参考版+3盲测版+3匹配版）的完整链接表、匹配任务的固定答案对照表、和题目数量统计。
 
@@ -139,7 +143,7 @@ English: The project also has a `combined_interface.html` ("Combined Interface",
 
 1. **登录Qualtrics**：https://ed.qualtrics.com ，用爱丁堡大学账号登录（机构账号，免费）。
 2. **新建调查**：Create a new project → Survey → From scratch。
-3. **按build guide顺序建16个Block**：Welcome、Consent（4道独立必答题）、Background、Fingerprint说明、三个指纹任务block（每个内部是"参考版链接→Page Break→盲测版链接+F1/F1b/F2/F3/F4→Page Break→匹配版链接+M1矩阵+M2评分+P1两选一"）、排名、拓扑说明、三个拓扑任务block（每个内部是"原版链接+T1+T2+T-Strength评分矩阵+T3+T4+T-ClusterVerify识别题+T5"）、排名、反思、结束语。
+3. **按build guide顺序建16个Block**：Welcome、Consent（4道独立必答题）、Background、Fingerprint说明、三个指纹任务block（每个内部是"参考版链接→Page Break→盲测版链接+F1/F1b/F2/F3/F4→Page Break→匹配版链接+M1矩阵+M2评分+P1两选一"）、排名、拓扑说明、三个拓扑任务block（每个内部是"原版链接+T1+T1b解释+T2+T-Strength评分矩阵+T3+T4+T-ClusterVerify识别题+T5"，注意T-Strength/T-ClusterVerify在三个block里的具体地名/选项要各不相同）、排名、反思、结束语。
 4. **Consent不用Skip Logic**：4道题都设成Force Response必答，没勾选就点不了下一页，效果等同"没同意就不能继续"，不需要额外配置跳转逻辑。
 5. **设置随机化**：进入 Survey Flow（左侧菜单）→ 把三个指纹任务block拖进一个"Randomizer"元素，勾选"Randomly present X of Y elements"设为3（即全部随机顺序展示）→ 对三个拓扑任务block重复同样操作。
 6. **插入可视化链接**：**具体每个block放哪个链接、Fingerprint为什么要放三个链接（参考版+盲测版+匹配版），必须照`qualtrics_build_guide.md`第5节来，这里不再重复列表，避免两处链接不一致**。Topology三个block用原版链接（network.html/linear.html/metro.html）即可，同样详见build guide。全部链接建议设置成"在新标签页打开"（Qualtrics里可以用富文本编辑器插入`<a href="..." target="_blank">`)。
@@ -151,7 +155,7 @@ English: The project also has a `combined_interface.html` ("Combined Interface",
 
 1. Log in at ed.qualtrics.com with your University of Edinburgh account.
 2. Create Survey → From scratch.
-3. Build all 16 blocks per the build guide (each Fingerprint block internally has "reference link → page break → blind link + F1/F1b/F2/F3/F4 → page break → matching link + M1 matrix + M2 rating + P1 forced choice"; each Topology block internally has "link + T1 + T2 + T-Strength rating grid + T3 + T4 + T-ClusterVerify recognition choice + T5").
+3. Build all 16 blocks per the build guide (each Fingerprint block internally has "reference link → page break → blind link + F1/F1b/F2/F3/F4 → page break → matching link + M1 matrix + M2 rating + P1 forced choice"; each Topology block internally has "link + T1 + T1b justification + T2 + T-Strength rating grid + T3 + T4 + T-ClusterVerify recognition choice + T5" — note T-Strength/T-ClusterVerify use different specific place names/options in each of the three blocks).
 4. Consent needs no Skip Logic: make all four checkboxes Force Response, which alone prevents proceeding without agreeing.
 5. Use Survey Flow → Randomizer around the three fingerprint task blocks (present all 3, randomised), and again around the three topology task blocks.
 6. **Follow `qualtrics_build_guide.md` Section 5 for exactly which link(s) go in each block** — Fingerprint blocks need a reference (labelled, all five authors), a blind (single author, no name), and a matching (all five, all unlabelled, shuffled order) link; this file no longer duplicates that table, to avoid the two documents drifting out of sync with each other.
@@ -204,12 +208,16 @@ English: The project also has a `combined_interface.html` ("Combined Interface",
 - **P1**：这道题的正确率有一个**已知的、由数据算出来的难度基线**——因为题目问的就是每个设计里最相似的那一对作者，理论上应该是全部两两组合里最难分辨的。如果参与者在P1上的正确率明显高于随机蒙（50%），说明即使是"最难分辨的一对"，这个设计依然能让人看出差异，这是对这个设计整体可区分度非常有力的证据；反过来，如果P1正确率接近50%，说明这一对确实是这个设计的"盲点"，可以在Discussion里具体点名讨论"哪两位作者的图形在哪个设计下最容易被搞混"
 
 **RQ2 — 最核心的数字（T1/T2题）**
-- 对每个拓扑设计，把参与者填的"两个地方"与该数据集里真实权重最高的一对（比如network/linear是Leith & Princes Street，metro看具体是哪条线的哪一对）比对，算"识别正确率"
+- 对每个拓扑设计，把参与者填的"两个地方"与该数据集里真实权重最高的一对（Network/Linear/Metro三个设计的真实答案都是Leith & Princes Street，因为背后是同一份数据）比对，算"识别正确率"
 - **在识别正确的人里**，看有多少人同时选了"远/较远"——这个百分比就是RQ2最直接的证据
 - 按第3步分组（专家 vs 大众）交叉对比上面所有数字
 
-**RQ2 — T-Strength评分矩阵、T-ClusterVerify识别题（★2026年8月9日第二轮新增，同样是为了防天花板/地板效应）**
-- **T-Strength**：把参与者对3对地名（New Town-Princes Street/Lochend-Waverley Station/Leith-Silvermills）的评分和这3对的真实权重（18/4/2）算一个相关系数（Excel的CORREL函数就够用，不需要跑回归）。相关系数越高，说明这个设计把"连接强弱"这个信息传达得越准确——三个设计（network/linear/metro）用的是同一组地名对，相关系数可以直接拿来横向比较，这是T1万一饱和时唯一还能看出设计差异的数字
+**RQ2 — T1b解释题（★2026年8月9日第三轮新增，专门用来识别"跨设计抄答案"）**
+- Network/Linear/Metro的T1正确答案完全一样，一个参与者理论上可以在第一个拓扑设计里答对之后，后两个直接照抄，完全不看图。T1b要求参与者写出"具体是这张图的什么特征让你这样判断"，分析时对照该设计**实际使用的视觉编码方式**（network/linear主要靠线的粗细或节点距离，metro靠同一条彩色线）人工判断解释是否合理——如果一个参与者三次T1b写的内容明显雷同、或者跟当前设计的实际画法对不上（比如在metro图里写"因为线特别粗"），这是抄答案而非真正读图的信号，建议在数据清洗阶段单独标记这类记录，必要时在Discussion的方法局限部分讨论，或在计算T1/T-Strength/T-ClusterVerify正确率时做敏感性分析（去掉可疑记录后结果是否有变化）
+- 反过来，如果三次T1b的解释都具体、且各自贴合对应设计的实际编码方式，这本身就是"参与者认真看图、理解了每种设计具体怎么编码"的正面证据，可以作为数据质量的佐证
+
+**RQ2 — T-Strength评分矩阵、T-ClusterVerify识别题（★2026年8月9日第二轮新增用于防天花板/地板效应，第三轮改成三个设计各不相同用于防跨设计抄答案）**
+- **T-Strength**：把参与者对3对地名的评分和这3对的真实权重算一个相关系数（Excel的CORREL函数就够用，不需要跑回归）。相关系数越高，说明这个设计把"连接强弱"这个信息传达得越准确——三个设计现在用的是**不同**的具体地名对（详见`qualtrics_build_guide.md`第8节末尾的汇总表），相关系数仍然可以直接拿来横向比较三个设计的表现，这是T1万一饱和时唯一还能看出设计差异的数字
 - **T-ClusterVerify**：算每个设计的正确率（选中真实群组的比例），并且跟T4里参与者自己写的分组做交叉核对——如果一个参与者在T4里独立写出的地名组合跟T-ClusterVerify选对的那组高度重合，这是双重证据，比单独任何一处都更有说服力，务必在Discussion里挑几个这样的案例具体展开
 
 **RQ2 — 深度发现（T3/T4/Cross-design synthesis，这是这次加深的重点，分析方法如下）**
@@ -229,9 +237,11 @@ English: The project also has a `combined_interface.html` ("Combined Interface",
 - Self-explanatoriness: % "Yes, easily" per design
 - **Matching task (M1/M2, added 9 August 2026)**: build a 5×5 confusion matrix per design (true author × selected author) from the Matrix Table responses, scored against the fixed answer key documented in `qualtrics_build_guide.md` §5. Diagonal weight = overall distinguishability; off-diagonal hot spots identify which specific author pairs get confused. Compare matching-task accuracy (diagonal / total) against the single-item F1 accuracy — divergence between the two (e.g. high F1 accuracy but low matching accuracy) suggests a design is recognisable in isolation but not reliably distinguishable when all five are seen together, which is a genuinely different and finer-grained finding than accuracy alone. Compare M2's subjective distinctiveness rating against the objective M1 accuracy as a secondary check for over/under-confidence.
 - **F1b/P1 (added 9 August 2026, second round — ceiling/floor guards)**: compute a "Top-2" accuracy (F1 correct, or F1 wrong but F1b correct) alongside plain F1 (Top-1) accuracy — a design with low Top-1 but much higher Top-2 accuracy is still conveying learnable visual information, just not enough to win the single forced choice outright. P1 targets the single most-confusable author pair per design by construction (highest cosine similarity), so its accuracy against the known 50% chance baseline is a built-in difficulty floor: well-above-chance P1 accuracy is strong evidence the design remains distinguishable even in its hardest case; near-chance P1 accuracy pinpoints exactly which author pair is that design's blind spot, worth naming explicitly in the Discussion.
+- **Anti-memorisation fixes (added 9 August 2026, third round)**: the blind single-author stimulus (`_task.html`) previously reused that author's own colour from the reference view, letting a participant answer F1 correctly from a remembered colour swatch alone with no engagement with the shape at all — colours in all three `_task.html` files are now neutral (`#5B6B8C`), matching what the matching-view files already used. Separately, because Network/Linear/Metro render identical underlying co-occurrence weights, T1's correct answer (and, before this fix, T-Strength's and T-ClusterVerify's) was literally identical across all three topology blocks, letting a participant who solved it once on the first design simply repeat that answer without engaging with the other two renderings at all. T1b (a free-text justification of what visual feature led to the T1 answer) and design-specific T-Strength/T-ClusterVerify content (different place pairs and cluster options per design, documented in `qualtrics_build_guide.md` §8) are added as a fix — see below.
 - RQ2 core metric: among participants who correctly identified the strongest pair, % who judged it geographically far
+- **T1b (added 9 August 2026, third round)**: manually check whether a participant's justification for T1 actually references that specific design's own visual encoding (edge thickness/proximity for network, arc height for linear, shared-line colour for metro); generic, absent, or mismatched justifications across a participant's three T1 answers are a signal the later answers may have been copied rather than freshly read, and should be flagged for a sensitivity check on T1/T-Strength/T-ClusterVerify accuracy with and without those records.
 - RQ2 deep-insight items (T3/T4/synthesis): manually cross-check reported "surprising connections" and "clusters" against the real edge weights and metro line groupings — independent agreement between a participant's unprompted cluster and the algorithm's community-detection output is the strongest possible validation of the method, stronger than any accuracy number, and should be a headline point in the Discussion chapter if it occurs
-- **T-Strength/T-ClusterVerify (added 9 August 2026, second round)**: correlate participants' 1-5 ratings of the three fixed place pairs against their real co-occurrence weights (18/4/2) — a simple correlation coefficient per design, directly comparable across network/linear/metro since all three share identical underlying weights, and the only remaining signal if T1 itself saturates. Score T-ClusterVerify accuracy (% selecting the genuine cluster) and cross-check it against what participants independently wrote in T4 — convergence between the two is treated as corroborating evidence and worth quoting specific cases of in the Discussion.
+- **T-Strength/T-ClusterVerify (added 9 August 2026, second round; content diversified per design in the third round)**: correlate participants' 1-5 ratings of each design's three place pairs against their real co-occurrence weights — a simple correlation coefficient per design, still directly comparable across network/linear/metro even though the specific pairs now differ, and the only remaining signal if T1 itself saturates. Score T-ClusterVerify accuracy (% selecting the genuine cluster) and cross-check it against what participants independently wrote in T4 — convergence between the two is treated as corroborating evidence and worth quoting specific cases of in the Discussion.
 - Cross-tabulate all of the above by expert vs. general-public (from background Q3)
 - Thematic coding: read all free-text responses once, tag recurring themes, count frequency
 - Pull 3-5 representative anonymised quotes (labelled P1, P2, ...) for the Discussion chapter

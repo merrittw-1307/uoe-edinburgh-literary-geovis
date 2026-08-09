@@ -2,9 +2,9 @@
 
 **这份文档的用途**：跟着从上到下一步步做，照抄英文文字进Qualtrics，就能把问卷完整搭出来，不需要再回头查别的文档。题目内容跟 `ethics/user_study_questionnaire.md`（问卷正本）以及论文 `dissertation/5Aug/dissertation.tex` 的 Appendix A 完全一致——这份文档只是把那份内容翻译成"在Qualtrics里具体怎么点"的操作步骤。
 
-**预计搭建时间**：3–4小时（Fingerprint部分是"参考版 → 盲测版 → 匹配版"三步结构，每个设计内部还多了F1b、P1两道新题；Topology每个设计也多了T-Strength矩阵评分和T-ClusterVerify识别题两道新题；第一次用Qualtrics会慢一些，跟着做不用自己想措辞）。
+**预计搭建时间**：3–4小时（Fingerprint部分是"参考版 → 盲测版 → 匹配版"三步结构，每个设计内部还多了F1b、P1两道新题；Topology每个设计多了T1b、T-Strength矩阵评分、T-ClusterVerify识别题三道新题，且Strength/ClusterVerify在三个设计里内容各不相同，需要分别录入；第一次用Qualtrics会慢一些，跟着做不用自己想措辞）。
 
-**链接核实状态**：2026年8月9日更新（当天三次修改）——Fingerprint任务每个block用三个链接：Step 1参考版（原本的`radar.html`/`barcode.html`/`small_multiples.html`，5人都标名字，用来让参与者自主总结规律）→ Step 2盲测版（`radar_task.html`/`barcode_task.html`/`small_multiples_task.html`，去掉名字，只留1位作者，用来回答F1/F1b/F2/F3/F4）→ Step 3匹配版（`radar_matching.html`/`barcode_matching.html`/`small_multiples_matching.html`，5位作者全部再出现一次、全部不署名、顺序打乱，用来回答M1/M2/P1）；Topology任务每个block只用一个原版链接，但每个block内部新增了T-Strength（评分矩阵）和T-ClusterVerify（识别选择题）两道不需要额外链接的新题，原因分别见第5节和第8节。全部链接（3参考版 + 3盲测版 + 3匹配版 + Topology原版3个 + PIS）当天逐一实测，全部200正常返回。
+**链接核实状态**：2026年8月9日更新（当天四次修改）——Fingerprint任务每个block用三个链接：Step 1参考版（原本的`radar.html`/`barcode.html`/`small_multiples.html`，5人都标名字，用来让参与者自主总结规律）→ Step 2盲测版（`radar_task.html`/`barcode_task.html`/`small_multiples_task.html`，去掉名字，只留1位作者，图形颜色也已改成中性色（不再沿用参考版的作者专属颜色），用来回答F1/F1b/F2/F3/F4）→ Step 3匹配版（`radar_matching.html`/`barcode_matching.html`/`small_multiples_matching.html`，5位作者全部再出现一次、全部不署名、顺序打乱、同样是中性色，用来回答M1/M2/P1）；Topology任务每个block只用一个原版链接，但每个block内部新增了T1b（自由文本解释）、T-Strength（评分矩阵）和T-ClusterVerify（识别选择题）三道不需要额外链接的新题，且后两道题在Network/Linear/Metro三个block里具体内容各不相同（原因见第5、8节——都是为了避免参与者不看图直接照抄记忆/上一个设计的答案）。全部链接（3参考版 + 3盲测版 + 3匹配版 + Topology原版3个 + PIS）当天逐一实测，全部200正常返回。
 
 ---
 
@@ -69,13 +69,13 @@
 - 链接下面继续粘贴：
 
   ```
-  This should take about 45–60 minutes. There are no right or wrong answers — we're interested in your honest first impressions.
+  This should take about 50–65 minutes. There are no right or wrong answers — we're interested in your honest first impressions.
 
   This project has ethics approval from the Informatics Research Ethics Committee (reference 446635).
   ```
 
 - 这道题不需要设置 Force Response（纯说明文字，没有交互）。
-- **⚠️ 时间区间已从"35–50分钟"→"40–55分钟"→"45–60分钟"（2026年8月9日两次修改：第一次加了Step 3匹配环节，第二次又给Fingerprint加了F1b/P1、给Topology加了T-Strength/T-ClusterVerify）**：这里改的只是Qualtrics题目里的文字。已经定稿的PIS文件（`ethics/PIS_Merritt_final.docx` / `dissertation/5Aug/pis.pdf`）用的还是最早的"35-50分钟"，这份文件不由这份操作手册管，需要Merritt自己打开确认要不要同步改成"45-60分钟"——参见 `user_study_handbook.md` 里的提醒。
+- **⚠️ 时间区间已从"35–50分钟"→"40–55分钟"→"45–60分钟"→"50–65分钟"（2026年8月9日三次修改：加Step 3匹配环节 → 加F1b/P1/T-Strength/T-ClusterVerify → 加T1b）**：这里改的只是Qualtrics题目里的文字。已经定稿的PIS文件（`ethics/PIS_Merritt_final.docx` / `dissertation/5Aug/pis.pdf`）用的还是最早的"35-50分钟"，这份文件不由这份操作手册管，需要Merritt自己打开确认要不要同步改成"50-65分钟"——参见 `user_study_handbook.md` 里的提醒。
 
 ---
 
@@ -276,6 +276,8 @@ Please confirm the following before continuing:
 **为什么要分三步**：如果只给盲测版，参与者是在对一个从没见过任何参照的陌生人名字凭空瞎猜，对不了解这几位作者的人来说这个任务没有意义——这是2026年8月9日发现并修正的问题。现在先让参与者看5人都标名字的参考版、自己总结规律，再看去掉名字的盲测版尝试识别单个图形，测的是"图形本身能不能承载可学习、可辨认的特征"，不再要求参与者本来就认识这几位作者。
 
 **为什么单纯的盲测（Step 2）还不够、要再加一个匹配环节（Step 3）**：Step 2一次只给1个图配5个名字选，命中率基线是20%，答对/答错只是一个bit的信息，看不出"作者A和作者C的图形是不是特别容易被搞混"这种更细致的问题。Step 3让参与者一次性把全部5个图配对到5个名字，可以拿到完整的5×5混淆矩阵——这是Merritt在原有盲测基础上提出的加强版验证，直接对应RQ1"不同作者的指纹是否彼此可区分"这个问题，也让分析时能说清楚"哪两位作者最容易被认错、为什么"，而不只是一个笼统的准确率数字。
+
+**⚠️ Step 2盲测版的图形颜色已改成中性色，不再沿用Step 1参考版的作者专属颜色（2026年8月9日第三次修改，Merritt指出的问题）**：早期版本里`_task.html`用的是那位作者在参考版里原本的颜色（比如Scott在参考版是金色，盲测版也是金色）——这意味着参与者根本不需要看形状，只要记住"参考图里金色的是Scott"这一个颜色标签就能在F1蒙对，测出来的是参与者的颜色记忆力，不是"图形能不能被学会认出来"，完全偏离了RQ1想验证的东西。现在三个`_task.html`文件的图形颜色都已经统一改成中性灰蓝色`#5B6B8C`，跟参考版的颜色不一样，参与者只能靠形状本身判断。Step 3匹配版和Fingerprint的P1从设计之初就已经是中性色，不受影响。
 
 ### Block 5 — 命名为 `Fingerprint - Radar`
 
@@ -613,7 +615,9 @@ Please confirm the following before continuing:
 
 ## 8. Block 10/11/12 — Topology Tasks ×3
 
-同样是三个独立block，结构完全一样，只有链接不同。
+同样是三个独立block，题目**结构**完全一样（T1、T1b、T2、T-Strength、T3、T4、T-ClusterVerify、T5），但T-Strength和T-ClusterVerify的**具体内容**（地名对、群组选项）三个block各不相同，链接当然也不同。
+
+**⚠️ 为什么T-Strength/T-ClusterVerify的内容不能三个block都一样（2026年8月9日第三次修改，Merritt指出的问题）**：Network/Linear/Metro三个设计背后其实是**同一份共现权重数据**——如果T1、T-Strength、T-ClusterVerify在三个block里问的是完全相同的地名/群组，参与者只要在第一个拓扑设计里答对一次（甚至只是蒙对，或者本来就知道"Leith和Princes Street"这类爱丁堡地标常识），后面两个设计可以直接照抄同一个答案，根本不需要理解第二、第三张图具体是怎么画的。这样测出来的是"参与者记不记得自己刚才的答案"，不是"这个设计有没有把连接强弱/群组关系讲清楚"，跟RQ2想验证的东西完全不是一回事。T1本身没法这样处理（三个设计的真实最强一对本来就是同一对，不能为了防作弊就故意换成假答案），所以改用两个办法补救：给T1加一道T1b（要求写出"具体是这张图的什么特征让你这样判断"，抄答案但解释文字跟当前设计画法对不上的情况能被识别出来），以及把T-Strength/T-ClusterVerify的具体地名/群组换成三个设计各不相同（详见各block下方的说明和本节末尾的汇总表）。
 
 ### Block 10 — 命名为 `Topology - Network`
 
@@ -643,6 +647,17 @@ Please confirm the following before continuing:
   - 第一行标签：`Place A`
   - 第二行标签：`Place B`
 - Force Response On
+
+#### Q-TP-Network-T1b *(★2026年8月9日新增)*
+- **Question Type**：`Text Entry`，格式选 **Essay**
+- **Question Text**：
+
+  ```
+  What about this diagram made you think these two places are the most connected? (for example: the thickest line between them, how close together they're drawn, being on the same coloured line)
+  ```
+
+- Force Response On
+- **为什么加这道题**：Network/Linear/Metro三个设计背后是**同一份共现权重数据**，"哪两个地方最强"这道题的正确答案在三个block里完全一样。这意味着参与者只要在第一个拓扑设计里答对（哪怕是蒙对，或者本来就知道"Leith和Princes Street"这类爱丁堡地标常识），后面两个设计可以直接照抄同一个答案，根本不需要看懂后两张图的具体画法——这样测出来的是"记不记得自己刚才的答案"，不是"这个设计有没有把连接强弱讲清楚"。加这道题是为了留下一个可以核查的痕迹：如果参与者的解释明显不符合当前这个设计的视觉语言（比如在metro图里却写"因为线特别粗"，但metro根本不是用线粗细表示强度的），说明这个答案大概率是照抄、没有真正看图，分析时可以据此标记或排除这类可疑记录。
 
 #### Q-TP-Network-T2
 - **Question Type**：`Multiple Choice`，Single Answer
@@ -691,7 +706,8 @@ Please confirm the following before continuing:
   ```
 
 - Force Response On
-- **为什么加这道题、这三对地名怎么选的**：T1只让参与者自己找"最强的一对"，如果这一对在图上过于突出（这份数据里Leith-Princes Street权重28，确实明显比其他都高），T1很可能出现天花板效应——几乎人人都答对，看不出三个Topology设计之间在"传达连接强度"这件事上到底谁做得更好。这道题反过来，直接给三对**真实权重分别是强(New Town-Princes Street，权重18)/中(Lochend-Waverley Station，权重4)/弱(Leith-Silvermills，权重2)**的地名（数据来自`data/processed/dir_2/network/data/network_enriched.json`的edges列表，故意避开了T1本来就该被参与者自己找出来的最强那一对，避免完全重复），让参与者对每一对打分。这样即使T1饱和，这道题依然能看出"参与者对连接强弱的感知"跟"真实权重"匹配到什么程度，三个设计（Network/Linear/Metro）用的是同一组共现权重数据，可以直接互相比较评分结果。
+- **为什么加这道题、这三对地名怎么选的**：T1只让参与者自己找"最强的一对"，如果这一对在图上过于突出（这份数据里Leith-Princes Street权重28，确实明显比其他都高），T1很可能出现天花板效应——几乎人人都答对，看不出三个Topology设计之间在"传达连接强度"这件事上到底谁做得更好。这道题反过来，直接给三对**真实权重分别是强/中/弱**的地名（数据来自`data/processed/dir_2/network/data/network_enriched.json`的edges列表，故意避开了T1本来就该被参与者自己找出来的最强那一对，避免完全重复），让参与者对每一对打分。这样即使T1饱和，这道题依然能看出"参与者对连接强弱的感知"跟"真实权重"匹配到什么程度。
+- **⚠️ 三个设计选的地名对不一样**（Block 5-7的Fingerprint P1也是同样的处理逻辑）：虽然Network/Linear/Metro背后是同一份共现权重数据，但如果三个设计问一模一样的三对地名，参与者只要记住第一个设计里给的评分，后面两个直接照抄，完全不需要在新图上重新判断——这道题的具体地名对因此在Block 10/11/12里各不相同（都是"强/中/弱"各一对，只是选了数据里不同的具体地名），具体见Block 11/12的说明。Network（本block）用：New Town-Princes Street（权重18，强）/ Lochend-Waverley Station（权重4，中）/ Leith-Silvermills（权重2，弱）。
 
 #### Q-TP-Network-T3
 - **Question Type**：`Text Entry`，Essay
@@ -756,16 +772,42 @@ Please confirm the following before continuing:
 
 ### Block 11 — 命名为 `Topology - Linear`
 
-跟Block 10完全一样的7道题（T1、T2、Strength、T3、T4、ClusterVerify、T5文字全部直接复制，Strength和ClusterVerify的选项也完全一样，因为network和linear背后是同一份共现权重数据），**唯一区别是链接**：
+跟Block 10结构完全一样的8道题（T1、T1b、T2、T3、T4、T5文字直接复制），**但Strength和ClusterVerify的具体内容要换成下面这套，不要跟Block 10一样**——原因见上面Q-TP-Network-Strength的说明：Network/Linear背后是同一份数据，如果两个block问一模一样的地名对/群组，参与者可以直接照抄上一个block的答案，完全不需要在Linear这张新图上重新判断。
 
+**Q-TP-Linear-Strength**（题干、量表跟Network完全一样，只换Statements）：
+```
+Dundas Street & Princes Street
+Old Town & Princes Street
+Arthur's Seat & Haddington
+```
+（权重分别是17/强、6/中、2/弱，同样来自`network_enriched.json`——地名跟Network block用的完全不同，但都是同一份数据里真实的强/中/弱地名对）
+
+**Q-TP-Linear-ClusterVerify**（题干、Randomize choice order设置跟Network完全一样，只换Answer Choices）：
+```
+Leith Walk, Lochend, Pilrig, Waverley Station
+Leith Walk, New Town, Grassmarket, Dalkeith
+Lochend, Stockbridge, Canongate, Musselburgh
+```
+正确答案是第一条——对network共现边数据跑Louvain社群检测得到的**另一个**真实社群（跟Network block用的那个社群是两个不同的真实社群，不是同一个换了个名字），另外两条是跨社群混搭的干扰项。
+
+**链接**：
 ```
 https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_2/linear/d3/linear.html
 ```
 
 ### Block 12 — 命名为 `Topology - Metro`
 
-T1、T2、Strength、T3、T4、T5文字跟Block 10完全一样直接复制（Strength的三对地名也一样，因为metro背后也是同一份共现权重数据）。**只有ClusterVerify的选项要换成metro自己的线路分组**，因为metro有现成的"线路"这个概念，其他两个设计没有：
+T1、T1b、T2、T3、T4、T5文字跟Block 10完全一样直接复制。**Strength和ClusterVerify同样要换成metro自己的一套，不要跟Block 10/11重复**：
 
+**Q-TP-Metro-Strength**：
+```
+Bruntsfield & Dundas Street
+Howe Street & Stockbridge
+Dalkeith & Linlithgow
+```
+（权重分别是16/强、6/中、2/弱，同一份`network_enriched.json`数据，跟Network、Linear两个block选的地名对都不一样）
+
+**Q-TP-Metro-ClusterVerify**（因为metro有现成的"线路"这个概念，正确答案换成基于metro自己的线路分组，不是社群检测结果）：
 ```
 Which of the following groups of places looks like it forms the tightest cluster of interconnections in this visualisation?
 ```
@@ -781,6 +823,15 @@ Moray Place, Grassmarket, Dalkeith, Hanover Street
 ```
 https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_2/metro/d3/metro.html
 ```
+
+**⚠️ 汇总一下三个block Strength/ClusterVerify的固定答案（导出数据后打分用）**：
+
+| | Network | Linear | Metro |
+|---|---|---|---|
+| Strength-强 | New Town & Princes Street (18) | Dundas Street & Princes Street (17) | Bruntsfield & Dundas Street (16) |
+| Strength-中 | Lochend & Waverley Station (4) | Old Town & Princes Street (6) | Howe Street & Stockbridge (6) |
+| Strength-弱 | Leith & Silvermills (2) | Arthur's Seat & Haddington (2) | Dalkeith & Linlithgow (2) |
+| ClusterVerify正确答案 | New Town, Princes Street, Dundas Street, Stockbridge | Leith Walk, Lochend, Pilrig, Waverley Station | University of Edinburgh, Royal Society of Edinburgh, Castle Street, St Giles |
 
 **同样建议用 Copy Block 复制Block 10两次，只改链接、ClusterVerify的三个选项、和block名字。**
 
@@ -968,7 +1019,7 @@ Debrief
 - **Survey Termination**：把默认的"结束语"改成尽量简短，或者留空——因为咱们自己的 `Debrief` block已经包含完整的感谢语，不需要Qualtrics再弹一个重复的默认感谢页。
 - **Security → Anonymize Responses**：打开。这跟PIS和伦理申请里"数据最小化"的承诺一致——不记录IP地址等可识别信息。
 - **General → Back Button**：建议打开，让参与者可以往回改之前的答案（更友好，不强制）。
-- **General → Progress Bar**：建议开启，选 "Text"（显示"还剩几题"或百分比），让64题的问卷显得没那么令人却步。
+- **General → Progress Bar**：建议开启，选 "Text"（显示"还剩几题"或百分比），让67题的问卷显得没那么令人却步。
 
 ---
 
@@ -979,14 +1030,16 @@ Debrief
 - [ ] 16个block全部按顺序出现，两处Randomizer确实在打乱顺序（多刷新预览几次看看顺序有没有变）
 - [ ] 九个可视化链接（3参考版+3盲测版+3匹配版）加上Topology 3个原版，点开都是正确的页面，且都在新标签页打开（不是跳转覆盖掉问卷页面）
 - [ ] **重点检查**：三个Fingerprint block（5/6/7）里，Step 1参考版链接打开后应该看到**5种颜色/5行/5张地图，图例上5个真名都在**；Step 2盲测版链接（`_task.html`结尾）打开后应该看到**只有1个图形/1行/1张地图，完全没有图例、没有作者名字**；Step 3匹配版链接（`_matching.html`结尾）打开后应该看到**5个图形/5行/5张地图全部同时出现，全部只标字母（Shape/Row/Map A-E），没有任何一个标真名**——三者反过来都会出问题（参考版如果只显示1个作者，参与者就没法自主总结规律；盲测版如果显示5个名字，F1这题就直接被剧透了；匹配版如果标了真名，M1就没有意义了）。三个Topology链接（`network.html`/`linear.html`/`metro.html`）打开后应该是**5位作者合并的完整数据**，这个不用区分参考/盲测，本来就只有一种版本
+- [ ] **（★2026年8月9日新增，防记忆作弊）**Step 2盲测版（`_task.html`）里图形的颜色应该是中性灰蓝色（`#5B6B8C`），**不应该**跟Step 1参考版里那位作者的专属颜色一样（比如Scott在参考版里是金色，盲测版里不能也是金色）——如果颜色跟参考版对上了，说明这次改动没生效或者被还原了，参与者能靠记颜色蒙对F1，必须再检查一次源代码里的`colors`/`authorColors`
 - [ ] Fingerprint每个block里，Step 1→2、Step 2→3之间各有一个Page Break且都生效——预览时确认看完参考版点Next翻到新的一屏才看到盲测版链接，看完F4点Next再翻一屏才看到匹配版链接，不是所有内容挤在同一屏
 - [ ] M1矩阵表（Q-FP-Radar/Barcode/SmallMultiples-M1）5行都能正常单选，不选满直接点Next会被Force Response拦住；确认行标签在三个block里分别是"Shape A-E"/"Row A-E"/"Map A-E"，不是三个都写成同一套字母含义
 - [ ] **（★2026年8月9日新增）**F1b在F1下面正常出现，选项是5个作者（没有"I don't know"）；P1在M2下面正常出现，题干里提到的两个字母（比如Radar的"Shape D"和"Shape E"）跟Step 3匹配版页面上实际显示的字母对得上，三个Fingerprint block的P1题干和答案选项**互不相同**（不是三个都问同一对作者）
-- [ ] **（★2026年8月9日新增）**Topology三个block里，T-Strength矩阵表3行都能正常评分（New Town&Princes Street / Lochend&Waverley Station / Leith&Silvermills），Network和Linear的T-Strength文字应完全一样；T-ClusterVerify的三个选项已经打开"Randomize choice order"（多刷新几次预览，确认三个选项的顺序真的在变，不是每次都一样），Metro的T-ClusterVerify选项应该是三条地铁线站点组合，跟Network/Linear的选项（New Town/Princes Street那组）不一样
+- [ ] **（★2026年8月9日新增）**T1后面紧跟着T1b（自由文本"是这张图的什么特征让你这样判断"），三个Topology block都要有
+- [ ] **（★2026年8月9日新增，防抄答案）**T-Strength和T-ClusterVerify在Network/Linear/Metro三个block里的**具体地名和选项要各不相同**（不能三个block长得一模一样）——对照第8节末尾的汇总表逐个核实：Network的Strength是New Town&Princes Street/Lochend&Waverley Station/Leith&Silvermills，Linear应该是Dundas Street&Princes Street/Old Town&Princes Street/Arthur's Seat&Haddington，Metro应该是Bruntsfield&Dundas Street/Howe Street&Stockbridge/Dalkeith&Linlithgow——如果三个block填的是同一套地名，说明复制Block时忘了改，参与者会直接抄上一个block的答案；T-ClusterVerify的三个选项也已经打开"Randomize choice order"（多刷新几次预览，确认三个选项的顺序真的在变，不是每次都一样）
 - [ ] Consent页四个复选框不勾选、直接点Next，确认页面**不会**往下走（会提示"请完成必答题"）
 - [ ] T1那道"Place A / Place B"的双填空框显示正常
 - [ ] B3的"Other (please specify)"选中后确实弹出了填空框
-- [ ] 从头到尾自己填一遍，看总用时是否落在45-60分钟区间（如果太快，说明填得太随意，正常参与者会更慢；这一步主要是确认题目数量和长度感觉对不对）
+- [ ] 从头到尾自己填一遍，看总用时是否落在50-65分钟区间（如果太快，说明填得太随意，正常参与者会更慢；这一步主要是确认题目数量和长度感觉对不对）
 - [ ] 预览完成后回到 Data & Analysis，**删除你自己这条预览/测试产生的记录**，避免混进正式数据
 
 全部确认无误后，点 **Publish**，然后去 **Distributions** 标签页 → **Anonymous Link**，复制生成的链接——这就是要发给参与者、以及明天要发给Uta的那个问卷链接。
