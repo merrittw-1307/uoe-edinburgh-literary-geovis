@@ -27,7 +27,7 @@
 ### 中文
 
 本研究评估六个可视化原型（三个"作者指纹"设计 + 三个"叙事拓扑"设计）是否能让人：
-- **RQ1**：仅凭图形本身认出某个可视化代表哪位作者（不给任何解释，冷启动测试）
+- **RQ1**：先自主观察5位作者都标名字的参考图、总结出规律，再看一张去掉名字的单作者图，能不能凭学到的规律认出是哪位作者（2026年8月9日之前的版本是让参与者完全凭空瞎猜、没有任何参照，这样对不了解这几位作者的人毫无意义，已经改成"先学后测"）
 - **RQ2**：从共现关系图里自发判断出"叙事关系强的两个地方"未必"地理上近"
 
 研究采用**在线、无主持人、自助式**问卷形式（Qualtrics），参与者按自己的节奏完成，全程约35-50分钟。这个格式已经写进PIS，不能中途改成有主持人的访谈形式（会跟已批准的伦理描述不符）。
@@ -35,7 +35,7 @@
 ### English
 
 This study evaluates whether the six visualisation prototypes (three "author fingerprint" designs, three "narrative topology" designs) allow participants to:
-- **RQ1**: identify which author a fingerprint visualisation represents from the image alone, with no explanation given (a "cold" self-explanatoriness test)
+- **RQ1**: after studying a labelled reference view showing all five authors' fingerprints and forming their own impression of how the patterns differ, identify which author a single unlabelled fingerprint represents (the pre-9 August 2026 version asked participants to guess with no reference at all, which is meaningless for anyone unfamiliar with these five authors specifically; the task now tests whether the visual pattern is learnable and recognisable, not prior literary knowledge)
 - **RQ2**: spontaneously recognise, from a co-occurrence visualisation, that two narratively-connected places need not be geographically close
 
 The study is **online, unmoderated, self-paced** (Qualtrics), taking approximately 35–50 minutes per participant. This format is already specified in the approved PIS and should not be changed to a moderated interview format without a fresh ethics amendment.
@@ -96,9 +96,9 @@ The study is **online, unmoderated, self-paced** (Qualtrics), taking approximate
 
 **关于"Combined Interface"（整合界面）——它不是问卷材料，不要发给参与者：**
 
-中文：项目里还有一个`combined_interface.html`（整合界面，https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/combined/d3/combined_interface.html ），把六个设计放进同一个页面、支持自由切换作者（含2026年8月新增的"全部408位作者"大规模探索选项）、跨图联动高亮。**这是给导师看的演示/汇报工具，不是正式问卷材料**——正式问卷里的六个任务链接（见第4节链接表）永远是各自独立的标准页面，固定展示五位盲测作者中的一位，不带作者切换功能，这样才能保证"冷启动识别"这个RQ1的实验条件不被破坏（如果参与者能自己切换作者，就不再是"仅凭图形本身认出作者"的测试了）。给导师发材料时可以两个链接都发（问卷链接+Combined Interface链接），但发给正式参与者的招募邮件/问卷Welcome页只应该包含Qualtrics问卷链接，不要额外附上Combined Interface链接，避免参与者提前看到其他作者的数据而影响判断。
+中文：项目里还有一个`combined_interface.html`（整合界面，https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/combined/d3/combined_interface.html ），把六个设计放进同一个页面、支持自由切换作者（含2026年8月新增的"全部408位作者"大规模探索选项）、跨图联动高亮。**这是给导师看的演示/汇报工具，不是正式问卷材料**——正式问卷里Fingerprint任务用的是两组固定链接（Step 1参考版：5位作者都标名字的标准页面；Step 2盲测版：单作者、不标名字的专用页面，见`ethics/study_stimuli/`），Topology任务用三个标准页面，全部都不带"自由切换到任意作者"这种功能，这样才能保证RQ1的实验条件不被破坏——参与者只能在我们规定的"先看哪5个人、再猜哪一个"这个范围内操作，不能自己跳出去看任何其他作者的数据。给导师发材料时可以两个链接都发（问卷链接+Combined Interface链接），但发给正式参与者的招募邮件/问卷Welcome页只应该包含Qualtrics问卷链接，不要额外附上Combined Interface链接，避免参与者提前看到其他作者的数据而影响判断。
 
-English: The project also has a `combined_interface.html` ("Combined Interface", https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/combined/d3/combined_interface.html ) that puts all six designs on one page with free author-switching (including an "All 408 authors" large-scale-exploration preset added in August 2026) and cross-view highlighting. **This is a supervisor-facing demo/review tool, not part of the formal study instrument.** The six task links used in the actual questionnaire (see the URL table in Section 4) remain separate, standalone pages that each show one fixed, blinded author with no author-switching — this is what keeps RQ1's "cold" identification test valid (if participants could switch authors themselves, it would no longer test whether the image alone is self-explanatory). It's fine to send both links to your supervisor, but the recruitment email / questionnaire Welcome screen sent to actual participants should only ever contain the Qualtrics link, not the Combined Interface link, so participants aren't inadvertently shown other authors' data before completing the tasks.
+English: The project also has a `combined_interface.html` ("Combined Interface", https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/combined/d3/combined_interface.html ) that puts all six designs on one page with free author-switching (including an "All 408 authors" large-scale-exploration preset added in August 2026) and cross-view highlighting. **This is a supervisor-facing demo/review tool, not part of the formal study instrument.** The Fingerprint tasks in the actual questionnaire use two fixed link sets instead (Step 1 reference: the standard all-five-labelled page; Step 2 blind: a single-author, no-name page built specifically for this task, in `ethics/study_stimuli/`), and the Topology tasks use the three standard pages — none of them let a participant freely switch to see any other author's data. Combined Interface's free-switching would break that boundary. It's fine to send both links to your supervisor, but the recruitment email / questionnaire Welcome screen sent to actual participants should only ever contain the Qualtrics link, not the Combined Interface link.
 
 ---
 
@@ -127,22 +127,11 @@ English: The project also has a `combined_interface.html` ("Combined Interface",
 
 1. **登录Qualtrics**：https://ed.qualtrics.com ，用爱丁堡大学账号登录（机构账号，免费）。
 2. **新建调查**：Create a new project → Survey → From scratch。
-3. **按第3节顺序建Block**：每个"Block X"对应上面一个标题（Welcome、Consent、Background、Fingerprint说明、三个指纹任务block、排名、拓扑说明、三个拓扑任务block、排名、反思、结束语）。
-4. **设置分支逻辑（Consent失败退出）**：在Consent题上加"Skip Logic"——如果4个复选框任意一个没勾，跳到"Survey ends"的最后一屏。
+3. **按build guide顺序建16个Block**：Welcome、Consent（4道独立必答题）、Background、Fingerprint说明、三个指纹任务block（每个内部是"参考版链接→Page Break→盲测版链接+F1-F4"）、排名、拓扑说明、三个拓扑任务block、排名、反思、结束语。
+4. **Consent不用Skip Logic**：4道题都设成Force Response必答，没勾选就点不了下一页，效果等同"没同意就不能继续"，不需要额外配置跳转逻辑。
 5. **设置随机化**：进入 Survey Flow（左侧菜单）→ 把三个指纹任务block拖进一个"Randomizer"元素，勾选"Randomly present X of Y elements"设为3（即全部随机顺序展示）→ 对三个拓扑任务block重复同样操作。
-6. **插入可视化链接**：每个任务block里，把对应链接换成下面的真实网址（六个都已核对，跟GitHub Pages上线内容完全一致）：
-
-   | 设计 | 网址 |
-   |---|---|
-   | Radar chart | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/radar/d3/radar.html` |
-   | Bar-code | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/barcode/d3/barcode.html` |
-   | Small multiples | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/small_multiples/d3/small_multiples.html` |
-   | Force-directed network | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_2/network/d3/network.html` |
-   | Linear connection diagram | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_2/linear/d3/linear.html` |
-   | Metro-style map | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_2/metro/d3/metro.html` |
-
-   建议设置成"在新标签页打开"（Qualtrics里可以用富文本编辑器插入`<a href="..." target="_blank">`)。
-7. **预览测试**：自己先完整走一遍（Qualtrics有Preview功能），确认链接能打开、随机化生效、跳转逻辑正确。
+6. **插入可视化链接**：**具体每个block放哪个链接、Fingerprint为什么要放两个链接（参考版+盲测版），必须照`qualtrics_build_guide.md`第5节来，这里不再重复列表，避免两处链接不一致**。Topology三个block用原版链接（network.html/linear.html/metro.html）即可，同样详见build guide。全部链接建议设置成"在新标签页打开"（Qualtrics里可以用富文本编辑器插入`<a href="..." target="_blank">`)。
+7. **预览测试**：自己先完整走一遍（Qualtrics有Preview功能），确认链接能打开（Fingerprint的参考版要看到5人、盲测版要看到1人无名字）、随机化生效、Consent不勾选点不了下一页。
 8. **发布**：点击"Publish"，生成的匿名链接就是发给参与者的问卷链接。
 9. **收集期设置**：可以在Survey Options里设置一个自动关闭日期（比如发布后7天自动停止收集）。
 
@@ -150,10 +139,10 @@ English: The project also has a `combined_interface.html` ("Combined Interface",
 
 1. Log in at ed.qualtrics.com with your University of Edinburgh account.
 2. Create Survey → From scratch.
-3. Build one Block per section above.
-4. Add Skip Logic on the consent question (any box unchecked → jump to end).
+3. Build all 16 blocks per the build guide (each Fingerprint block internally has "reference link → page break → blind link + F1-F4").
+4. Consent needs no Skip Logic: make all four checkboxes Force Response, which alone prevents proceeding without agreeing.
 5. Use Survey Flow → Randomizer around the three fingerprint task blocks (present all 3, randomised), and again around the three topology task blocks.
-6. Paste the real GitHub Pages URLs into each task block, set links to open in a new tab.
+6. **Follow `qualtrics_build_guide.md` Section 5 for exactly which link(s) go in each block** — Fingerprint blocks need both a reference (labelled, all five authors) and a blind (single author, no name) link; this file no longer duplicates that table, to avoid the two documents drifting out of sync with each other.
 7. Preview and test the full flow yourself before publishing.
 8. Publish → distribute the anonymous link.
 9. Set an auto-close date under Survey Options if you want a hard cutoff.
@@ -187,9 +176,10 @@ English: The project also has a `combined_interface.html` ("Combined Interface",
 - 平均置信度 = 该设计所有置信度评分的平均值（1-5分）
 - ➕新增的"自解释性"题：算出每个设计"Yes, easily"的比例
 - 用Excel/Google Sheets做透视表（按设计分组）就够了，不需要统计软件
+- **2026年8月9日后的重要提醒**：现在Fingerprint任务是"先看5人都标名字的参考版、自主总结规律，再看盲测版尝试识别"，不再是完全凭空瞎猜——所以整体准确率大概率会比"纯冷启动"设计高不少（这是预期之内、也是我们想要的，因为现在测的是"图形能不能被学会认出来"，不是"图形本身够不够有名"）。写进论文的时候不要拿这个准确率跟一个假设的"随机瞎猜20%基线"简单对比，而要强调：如果准确率明显高于20%，说明参与者确实从参考版里学到了可迁移的视觉特征；如果某个设计的准确率明显低于其他两个，说明这个设计的"可学习性"不如另外两个——这才是三个设计之间真正可比的地方。
 
 **RQ1 — 质性编码**
-- 把每个设计的"依据是什么"自由文本导出，通读一遍，标记重复出现的主题（比如"提到了New Town""提到了颜色分布""纯粹瞎猜"），数一下每个主题出现的次数
+- 把每个设计的F3自由文本（"具体是什么形状特征让你这样判断"）导出，通读一遍，标记重复出现的主题（比如"提到了某个方向的尖峰""提到了分布均匀/集中""说自己是瞎猜的"），数一下每个主题出现的次数——这里尤其要留意有没有人明确提到"我记得参考图里这个作者是这样的"这类说法，这直接证明了参考版确实被使用、确实起到了作用
 
 **RQ2 — 最核心的数字（T1/T2题）**
 - 对每个拓扑设计，把参与者填的"两个地方"与该数据集里真实权重最高的一对（比如network/linear是Leith & Princes Street，metro看具体是哪条线的哪一对）比对，算"识别正确率"

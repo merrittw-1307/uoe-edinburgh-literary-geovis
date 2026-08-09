@@ -62,27 +62,36 @@
 
 > **Part 1: Author Fingerprints**
 >
-> You're about to see three different visualisations, one at a time. Each one shows how a single author distributes place names across Edinburgh in their writing — but we won't tell you which author it is, or how to read the chart. Just look at it, form your own impression, and answer the questions that follow.
+> Each of the next three visualisations shows five authors' individual "fingerprints" — how each of them distributes place names across Edinburgh in their writing. For each one, you'll first see all five authors' fingerprints together, each labelled with the author's name. Take a few minutes to look at them and get a feel for how each author's pattern differs from the others — there's no trick to look for, just notice whatever stands out to you.
 >
-> Please open each visualisation in a new browser tab using the link provided, look at it for as long as you like, then come back to this page to answer.
+> Then we'll show you one of those five fingerprints again on its own, with the name hidden, and ask which author you think it is, based on the pattern you just looked at. You're welcome to go back and check the labelled view again before answering — this isn't a memory test.
+>
+> Please open each link in a new browser tab, and come back to this page to answer.
 
 ---
 
 ## Screens 5a / 5b / 5c — Fingerprint Task ×3
 *(Qualtrics: put these three blocks in a Randomizer, "present all 3, randomised order")*
 
-**⚠️ 用下面"盲测版链接"表里的`_task.html`链接，不要用六可视化正文里的`radar.html`/`barcode.html`/`small_multiples.html`——那三个原版一次性显示全部5位作者、图例上直接写着真名，参与者根本没法"猜"，点开详情面板还能看到书名/例句，等于变相剧透。`_task.html`版本才是专门为这道盲测题做的：每个只显示1位作者、完全不出现姓名、关掉了详情面板。**
+**⚠️ 每个block有两个链接，顺序不能反：**
+1. **先给"参考版"链接**——就是六可视化正文里原本的`radar.html`/`barcode.html`/`small_multiples.html`，5位作者都在、都标真名。这是给参与者"自主学习总结规律"用的，不是废弃的旧文件。
+2. **再给"盲测版"链接**（`_task.html`结尾）——只有1位作者、不出现姓名、关掉了详情面板，这是真正用来回答F1-F4的图。
 
-> **Visualisation [1 of 3]**
-> 👉 Open this link in a new tab: **[Radar chart / Bar-code / Small Multiples — see "盲测版链接" table below]**
+如果只发盲测版、不发参考版，参与者就是在凭空猜一个从没见过任何参照的陌生人名字，对完全不懂这几位作者的人来说毫无意义——这是Merritt指出的问题，已经改成"先学参考图、再认盲测图"这个结构。
+
+> **Step 1 — Reference view [1 of 3]**
+> 👉 Open this link in a new tab, and take a few minutes to compare all five authors: **[Radar chart / Bar-code / Small Multiples — see "参考版链接" table below]**
+
+> **Step 2 — Now try this one on its own**
+> 👉 Open this link in a new tab (the reference view from Step 1 is still there if you want to check it again): **[see "盲测版链接" table below]**
 >
-> **F1.** Which of the following five authors do you think this visualisation represents?
+> **F1.** Which of the following five authors do you think this represents?
 > ○ Alexander McCall Smith ○ Irvine Welsh ○ John Gibson Lockhart ○ Walter Scott ○ Robert Louis Stevenson ○ I don't know
 >
 > **F2.** How confident are you in this answer?
 > ○ Not at all confident ○ Slightly confident ○ Moderately confident ○ Confident ○ Very confident
 >
-> **F3.** In one or two sentences, what about the visualisation led you to that answer?
+> **F3.** What specific feature of the shape led you to that answer? (for example, an unusually large spike in one area, or a shape that's spread evenly across many areas)
 > [free text]
 >
 > **F4.** If no one had told you anything about this visualisation, would you have understood how to read it just by looking?
@@ -184,9 +193,21 @@
 
 ## 六个可视化链接 / Visualisation URLs
 
-**Fingerprint任务（F1-F4）用"盲测版"链接，Topology任务（T1-T5）用原版链接**——这两组链接的用途不一样，千万别用混：
+**Fingerprint任务（F1-F4）每个设计要用两个链接（参考版+盲测版），Topology任务（T1-T5）只用原版链接**——三组链接用途都不一样，千万别用混：
 
-### 盲测版链接（Fingerprint Task专用，Screens 5a/5b/5c）
+### 参考版链接（Step 1，Fingerprint Task专用，Screens 5a/5b/5c）
+
+就是六可视化正文里原本的`radar.html`/`barcode.html`/`small_multiples.html`——5位作者都在、都标真名，一个字节都没改过。这一步是让参与者"自主观察、自己总结每个作者的图形有什么不一样"，不设标准答案。
+
+| 设计 Design | 网址 URL |
+|---|---|
+| Radar chart | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/radar/d3/radar.html` |
+| Bar-code | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/barcode/d3/barcode.html` |
+| Small multiples | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/small_multiples/d3/small_multiples.html` |
+
+### 盲测版链接（Step 2，Fingerprint Task专用，Screens 5a/5b/5c）
+
+参与者看完上面的参考版、自己总结出规律之后，再看这个去掉了姓名和详情面板的单作者版本，回答F1-F4。
 
 | 设计 Design | 盲测对象 | 网址 URL |
 |---|---|---|
@@ -194,7 +215,7 @@
 | Bar-code | John Gibson Lockhart | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/barcode_task.html` |
 | Small multiples | Robert Louis Stevenson | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/small_multiples_task.html` |
 
-**这三个链接是2026年8月9日新加的，专门为F1这道"猜作者"题做的**：原本的`radar.html`/`barcode.html`/`small_multiples.html`是一次性展示全部5位作者、图例上直接写真名的探索工具，参与者点开根本不用猜，直接读图例上的名字就行——这是Merritt发现的一个真实设计漏洞。`_task.html`这三个新文件每个只画1位作者、图例整个拿掉、点击查看书名/例句的详情面板也关掉了（书名本身就能暴露作者，比如看到《Trainspotting》就知道是Welsh），只留下形状和悬停读数这两样，跟F1-F4题目的设计初衷完全对上。三个设计故意用了三个不同的作者（而不是同一个人在三种图里反复出现），这样参与者猜完第一个设计之后不会带着"记忆效应"去猜后面两个。
+**为什么要分两步 / 2026年8月9日修改的原因**：一开始只给盲测版链接，等于让完全不了解这几位作者的参与者凭空对应一个从没见过任何参照的陌生人名字——对没有文学背景的大众组参与者来说这个任务没有意义，也测不出"图形本身能不能承载可学习、可辨认的个人特征"这个我们真正想知道的问题（Merritt指出的问题）。现在改成"先看参考版自主总结规律，再看盲测版尝试识别"，测的是图形的**可学习性和可辨识度**，不再依赖参与者本来就认识这几位作者。三个设计故意用了三个不同的盲测作者（而不是同一个人反复出现），避免参与者带着"记忆效应"把第一个设计的猜测原样套到后两个。
 
 ### 原版链接（Topology Task专用，Screens 8a/8b/8c）
 
@@ -224,6 +245,6 @@
 | Cross-design synthesis | 1题（★新增，专门用来捕捉自发的深度发现） |
 | Topology ranking | 2题 |
 | Reflection | 5题 |
-| **合计** | **46题**（含多项选择+自由文本，预计35-50分钟） |
+| **合计** | **46题**（含多项选择+自由文本，预计35-50分钟——Fingerprint任务改成"先看参考版再看盲测版"两步之后，实际用时大概率偏向50分钟这一端，PIS里的35-50分钟区间还够用，不用改） |
 
 **关于深度**：T3、T4、Screen 9这三处是专门为了让被试自发说出"某些地名之间有意外的关系""某几个地名好像是一伙的"这类观察而设计的——不设标准答案，鼓励自由发挥，分析时重点编码这三处的自由文本。T4尤其关键：如果参与者能不看任何提示、自己说出"这几个站好像是一条线上的"，就是对社群检测方法本身最有力的独立验证。

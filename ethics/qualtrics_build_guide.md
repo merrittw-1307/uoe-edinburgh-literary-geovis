@@ -2,9 +2,9 @@
 
 **这份文档的用途**：跟着从上到下一步步做，照抄英文文字进Qualtrics，就能把问卷完整搭出来，不需要再回头查别的文档。题目内容跟 `ethics/user_study_questionnaire.md`（问卷正本）以及论文 `dissertation/5Aug/dissertation.tex` 的 Appendix A 完全一致——这份文档只是把那份内容翻译成"在Qualtrics里具体怎么点"的操作步骤。
 
-**预计搭建时间**：1.5–2.5小时（第一次用Qualtrics会慢一些，跟着做不用自己想措辞）。
+**预计搭建时间**：2–3小时（Fingerprint部分现在是"参考版+盲测版"两步结构，比纯单链接多一点搭建量；第一次用Qualtrics会慢一些，跟着做不用自己想措辞）。
 
-**链接核实状态**：2026年8月9日更新——Fingerprint任务三个链接已经换成盲测版（`radar_task.html`/`barcode_task.html`/`small_multiples_task.html`），原因见第5节的警告框。全部链接（3个盲测版 + Topology原版3个 + PIS）当天逐一实测，全部200正常返回。
+**链接核实状态**：2026年8月9日更新——Fingerprint任务每个block现在用两个链接：Step 1参考版（原本的`radar.html`/`barcode.html`/`small_multiples.html`，5人都标名字，用来让参与者自主总结规律）+ Step 2盲测版（`radar_task.html`/`barcode_task.html`/`small_multiples_task.html`，去掉名字用来测试识别），原因见第5节。全部链接（3个参考版 + 3个盲测版 + Topology原版3个 + PIS）当天逐一实测，全部200正常返回。
 
 ---
 
@@ -250,9 +250,11 @@ Please confirm the following before continuing:
   ```
   Part 1: Author Fingerprints
 
-  You're about to see three different visualisations, one at a time. Each one shows how a single author distributes place names across Edinburgh in their writing — but we won't tell you which author it is, or how to read the chart. Just look at it, form your own impression, and answer the questions that follow.
+  Each of the next three visualisations shows five authors' individual "fingerprints" — how each of them distributes place names across Edinburgh in their writing. For each one, you'll first see all five authors' fingerprints together, each labelled with the author's name. Take a few minutes to look at them and get a feel for how each author's pattern differs from the others — there's no trick to look for, just notice whatever stands out to you.
 
-  Please open each visualisation in a new browser tab using the link provided, look at it for as long as you like, then come back to this page to answer.
+  Then we'll show you one of those five fingerprints again on its own, with the name hidden, and ask which author you think it is, based on the pattern you just looked at. You're welcome to go back and check the labelled view again before answering — this isn't a memory test.
+
+  Please open each link in a new browser tab, and come back to this page to answer.
   ```
 
 - 不需要Force Response
@@ -261,21 +263,44 @@ Please confirm the following before continuing:
 
 ## 5. Block 5/6/7 — Fingerprint Tasks ×3
 
-**这里要建三个独立的block**，因为每个设计要放不同的链接。三个block内部的题目结构完全一样，只有链接和"[1 of 3]"这个说明性文字不同（这个数字提示不影响随机化，只是告诉参与者进度，三个block不管实际展示顺序是第几个，都可以统一写"1 of 3"这种通用说法，或者干脆去掉数字只写"the visualisation below"——推荐后者，更简单不会因为随机化顺序对不上而显得奇怪）。
+**这里要建三个独立的block**，因为每个设计要放不同的链接。三个block内部的结构完全一样，只有链接不同。
 
-**⚠️ 下面链接末尾一定要是`_task.html`，不是`radar.html`/`barcode.html`/`small_multiples.html`。** 原版是探索工具，一次显示全部5位作者、图例直接写真名，F1这道"猜作者"题会直接变成"读图例"——`_task.html`才是专门为这道题做的单作者盲测版本，2026年8月9日刚加的，图例和详情面板都拿掉了。
+**⚠️ 每个block内部分两步，中间要插一个Page Break：**
+1. **Step 1（参考版）**：先给原版链接（`radar.html`/`barcode.html`/`small_multiples.html`，5位作者都标真名），让参与者自己观察、总结每个作者的图形有什么不一样——这一步不设问题，纯展示。
+2. **（插入Page Break）**
+3. **Step 2（盲测版）**：再给`_task.html`结尾的单作者盲测链接，回答F1-F4。
+
+**为什么要分两步**：如果只给盲测版，参与者是在对一个从没见过任何参照的陌生人名字凭空瞎猜，对不了解这几位作者的人来说这个任务没有意义——这是2026年8月9日发现并修正的问题。现在先让参与者看5人都标名字的参考版、自己总结规律，再看去掉名字的盲测版尝试识别，测的是"图形本身能不能承载可学习、可辨认的特征"，不再要求参与者本来就认识这几位作者。
 
 ### Block 5 — 命名为 `Fingerprint - Radar`
 
-#### Q-FP-Radar-Link
+#### Q-FP-Radar-Reference
 - **Question Type**：`Text/Graphic`
 - **Question Text**：
 
   ```
-  Please open the visualisation below in a new tab:
+  Step 1: Take a few minutes to compare all five authors' fingerprints below.
   ```
 
-  在这句话后面插入超链接，显示文字用 `Open visualisation →`，链接地址：
+  插入超链接，显示文字 `Open reference view →`，链接地址（**这个是原版，5人都标名字**）：
+
+  ```
+  https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/radar/d3/radar.html
+  ```
+
+- 不需要Force Response
+
+**➡️ 在这道题后面插入一个Page Break**（题目编辑界面右上角有"Add Page Break"选项，或者在Survey Flow里对应位置插入）。Page Break前后仍然算同一个block，只是分成两屏，参与者必须先经过Step 1这一屏才能翻到Step 2。
+
+#### Q-FP-Radar-Blind
+- **Question Type**：`Text/Graphic`
+- **Question Text**：
+
+  ```
+  Step 2: Now look at one of those five fingerprints again on its own, with the name hidden. The reference view from Step 1 is still open in your other tab if you want to check it again.
+  ```
+
+  插入超链接，显示文字 `Open this one →`，链接地址（**这个是盲测版，只有1个作者、不显示名字**）：
 
   ```
   https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/radar_task.html
@@ -286,7 +311,7 @@ Please confirm the following before continuing:
 - **Question Text**：
 
   ```
-  Which of the following five authors do you think this visualisation represents?
+  Which of the following five authors do you think this represents?
   ```
 
 - **Answer Choices**：
@@ -327,7 +352,7 @@ Please confirm the following before continuing:
 - **Question Text**：
 
   ```
-  In one or two sentences, what about the visualisation led you to that answer?
+  What specific feature of the shape led you to that answer? (for example, an unusually large spike in one area, or a shape that's spread evenly across many areas)
   ```
 
 - Force Response On
@@ -354,23 +379,33 @@ Please confirm the following before continuing:
 
 ### Block 6 — 命名为 `Fingerprint - Barcode`
 
-跟Block 5完全相同的4道题（F1/F2/F3/F4文字一字不改，直接复制上面Block 5里的内容），**唯一区别是链接**：
+跟Block 5完全相同的结构（Reference → Page Break → Blind + F1-F4，文字一字不改），**唯一区别是两个链接**：
 
-```
-https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/barcode_task.html
-```
+- Step 1参考版：
+  ```
+  https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/barcode/d3/barcode.html
+  ```
+- Step 2盲测版：
+  ```
+  https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/barcode_task.html
+  ```
 
 ---
 
 ### Block 7 — 命名为 `Fingerprint - Small Multiples`
 
-同样4道题跟Block 5完全一样，**唯一区别是链接**：
+同样的结构，**唯一区别是两个链接**：
 
-```
-https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/small_multiples_task.html
-```
+- Step 1参考版：
+  ```
+  https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/small_multiples/d3/small_multiples.html
+  ```
+- Step 2盲测版：
+  ```
+  https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/small_multiples_task.html
+  ```
 
-**省时间小技巧**：与其把Block 5的4道题重新打一遍，不如在Block列表里对Block 5点右键（或三个点菜单）选 **Copy Block**，复制出Block 6和Block 7，再进去只改链接和block名字，其余全部不用动。
+**省时间小技巧**：与其把Block 5的两个链接问题、Page Break、F1-F4重新搭一遍，不如在Block列表里对Block 5点右键（或三个点菜单）选 **Copy Block**，复制出Block 6和Block 7（Page Break会一起被复制），再进去只改两个链接和block名字，其余全部不用动。
 
 ---
 
@@ -732,7 +767,8 @@ Debrief
 
 - [ ] 16个block全部按顺序出现，两处Randomizer确实在打乱顺序（多刷新预览几次看看顺序有没有变）
 - [ ] 六个可视化链接点开都是正确的页面，且都在新标签页打开（不是跳转覆盖掉问卷页面）
-- [ ] **重点检查**：三个Fingerprint链接（`_task.html`结尾）打开后，画面上**只有1个图形/1行/1张地图，没有任何图例、没有作者名字**；三个Topology链接（`network.html`/`linear.html`/`metro.html`）打开后是**5位作者合并的完整数据**——如果Fingerprint链接打开后看到5种颜色或者图例列了好几个名字，说明链接放错了，回去检查是不是不小心用了没有`_task`后缀的原版链接
+- [ ] **重点检查**：三个Fingerprint block（5/6/7）里，Step 1参考版链接打开后应该看到**5种颜色/5行/5张地图，图例上5个真名都在**；Step 2盲测版链接（`_task.html`结尾）打开后应该看到**只有1个图形/1行/1张地图，完全没有图例、没有作者名字**——这两个反过来就麻烦了（参考版如果只显示1个作者，参与者就没法自主总结规律；盲测版如果显示5个名字，F1这题就直接被剧透了）。三个Topology链接（`network.html`/`linear.html`/`metro.html`）打开后应该是**5位作者合并的完整数据**，这个不用区分参考/盲测，本来就只有一种版本
+- [ ] Fingerprint每个block里，Step 1和Step 2之间的Page Break生效了——预览时确认看完参考版点Next会翻到新的一屏才看到盲测版链接，不是所有内容挤在同一屏
 - [ ] Consent页四个复选框不勾选、直接点Next，确认页面**不会**往下走（会提示"请完成必答题"）
 - [ ] T1那道"Place A / Place B"的双填空框显示正常
 - [ ] B3的"Other (please specify)"选中后确实弹出了填空框
