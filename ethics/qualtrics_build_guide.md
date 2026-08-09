@@ -278,7 +278,7 @@ Please confirm the following before continuing:
   在这句话后面插入超链接，显示文字用 `Open visualisation →`，链接地址：
 
   ```
-  https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/radar/d3/radar_task.html
+  https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/radar_task.html
   ```
 
 #### Q-FP-Radar-F1
@@ -357,7 +357,7 @@ Please confirm the following before continuing:
 跟Block 5完全相同的4道题（F1/F2/F3/F4文字一字不改，直接复制上面Block 5里的内容），**唯一区别是链接**：
 
 ```
-https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/barcode/d3/barcode_task.html
+https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/barcode_task.html
 ```
 
 ---
@@ -367,7 +367,7 @@ https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir
 同样4道题跟Block 5完全一样，**唯一区别是链接**：
 
 ```
-https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/small_multiples/d3/small_multiples_task.html
+https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/small_multiples_task.html
 ```
 
 **省时间小技巧**：与其把Block 5的4道题重新打一遍，不如在Block列表里对Block 5点右键（或三个点菜单）选 **Copy Block**，复制出Block 6和Block 7，再进去只改链接和block名字，其余全部不用动。
@@ -732,6 +732,7 @@ Debrief
 
 - [ ] 16个block全部按顺序出现，两处Randomizer确实在打乱顺序（多刷新预览几次看看顺序有没有变）
 - [ ] 六个可视化链接点开都是正确的页面，且都在新标签页打开（不是跳转覆盖掉问卷页面）
+- [ ] **重点检查**：三个Fingerprint链接（`_task.html`结尾）打开后，画面上**只有1个图形/1行/1张地图，没有任何图例、没有作者名字**；三个Topology链接（`network.html`/`linear.html`/`metro.html`）打开后是**5位作者合并的完整数据**——如果Fingerprint链接打开后看到5种颜色或者图例列了好几个名字，说明链接放错了，回去检查是不是不小心用了没有`_task`后缀的原版链接
 - [ ] Consent页四个复选框不勾选、直接点Next，确认页面**不会**往下走（会提示"请完成必答题"）
 - [ ] T1那道"Place A / Place B"的双填空框显示正常
 - [ ] B3的"Other (please specify)"选中后确实弹出了填空框

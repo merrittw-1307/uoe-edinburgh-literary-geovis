@@ -27,7 +27,7 @@
 > - [ ] I consent to my anonymised responses being used in academic publications and presentations.
 > - [ ] I agree to take part in this study.
 
-*(Qualtrics logic: if any box unchecked → skip to Screen 12 "Not enrolled")*
+*(Qualtrics实现：这四条做成4道独立的Force Response必答题，不用Skip Logic——没勾选就点不了下一页，效果一样但不用配置分支逻辑。参与者如果不同意，直接关掉页面退出即可，不会走到Screen 12。详细步骤见`qualtrics_build_guide.md`第2节。)*
 
 ---
 
@@ -180,8 +180,6 @@
 > *(Optional)* If you'd like a short summary of the results once the study is complete, leave your email below. This will be stored separately from your survey answers and will not be linked to them.
 > Email (optional): ______
 
-*(This is also the screen shown to anyone who didn't complete consent on Screen 2, minus the optional email field.)*
-
 ---
 
 ## 六个可视化链接 / Visualisation URLs
@@ -192,9 +190,9 @@
 
 | 设计 Design | 盲测对象 | 网址 URL |
 |---|---|---|
-| Radar chart | Walter Scott | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/radar/d3/radar_task.html` |
-| Bar-code | John Gibson Lockhart | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/barcode/d3/barcode_task.html` |
-| Small multiples | Robert Louis Stevenson | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/small_multiples/d3/small_multiples_task.html` |
+| Radar chart | Walter Scott | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/radar_task.html` |
+| Bar-code | John Gibson Lockhart | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/barcode_task.html` |
+| Small multiples | Robert Louis Stevenson | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/small_multiples_task.html` |
 
 **这三个链接是2026年8月9日新加的，专门为F1这道"猜作者"题做的**：原本的`radar.html`/`barcode.html`/`small_multiples.html`是一次性展示全部5位作者、图例上直接写真名的探索工具，参与者点开根本不用猜，直接读图例上的名字就行——这是Merritt发现的一个真实设计漏洞。`_task.html`这三个新文件每个只画1位作者、图例整个拿掉、点击查看书名/例句的详情面板也关掉了（书名本身就能暴露作者，比如看到《Trainspotting》就知道是Welsh），只留下形状和悬停读数这两样，跟F1-F4题目的设计初衷完全对上。三个设计故意用了三个不同的作者（而不是同一个人在三种图里反复出现），这样参与者猜完第一个设计之后不会带着"记忆效应"去猜后面两个。
 
