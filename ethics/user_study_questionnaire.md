@@ -71,8 +71,10 @@
 ## Screens 5a / 5b / 5c — Fingerprint Task ×3
 *(Qualtrics: put these three blocks in a Randomizer, "present all 3, randomised order")*
 
+**⚠️ 用下面"盲测版链接"表里的`_task.html`链接，不要用六可视化正文里的`radar.html`/`barcode.html`/`small_multiples.html`——那三个原版一次性显示全部5位作者、图例上直接写着真名，参与者根本没法"猜"，点开详情面板还能看到书名/例句，等于变相剧透。`_task.html`版本才是专门为这道盲测题做的：每个只显示1位作者、完全不出现姓名、关掉了详情面板。**
+
 > **Visualisation [1 of 3]**
-> 👉 Open this link in a new tab: **[Radar chart / Bar-code / Small Multiples — see URL table below]**
+> 👉 Open this link in a new tab: **[Radar chart / Bar-code / Small Multiples — see "盲测版链接" table below]**
 >
 > **F1.** Which of the following five authors do you think this visualisation represents?
 > ○ Alexander McCall Smith ○ Irvine Welsh ○ John Gibson Lockhart ○ Walter Scott ○ Robert Louis Stevenson ○ I don't know
@@ -184,18 +186,31 @@
 
 ## 六个可视化链接 / Visualisation URLs
 
+**Fingerprint任务（F1-F4）用"盲测版"链接，Topology任务（T1-T5）用原版链接**——这两组链接的用途不一样，千万别用混：
+
+### 盲测版链接（Fingerprint Task专用，Screens 5a/5b/5c）
+
+| 设计 Design | 盲测对象 | 网址 URL |
+|---|---|---|
+| Radar chart | Walter Scott | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/radar/d3/radar_task.html` |
+| Bar-code | John Gibson Lockhart | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/barcode/d3/barcode_task.html` |
+| Small multiples | Robert Louis Stevenson | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/small_multiples/d3/small_multiples_task.html` |
+
+**这三个链接是2026年8月9日新加的，专门为F1这道"猜作者"题做的**：原本的`radar.html`/`barcode.html`/`small_multiples.html`是一次性展示全部5位作者、图例上直接写真名的探索工具，参与者点开根本不用猜，直接读图例上的名字就行——这是Merritt发现的一个真实设计漏洞。`_task.html`这三个新文件每个只画1位作者、图例整个拿掉、点击查看书名/例句的详情面板也关掉了（书名本身就能暴露作者，比如看到《Trainspotting》就知道是Welsh），只留下形状和悬停读数这两样，跟F1-F4题目的设计初衷完全对上。三个设计故意用了三个不同的作者（而不是同一个人在三种图里反复出现），这样参与者猜完第一个设计之后不会带着"记忆效应"去猜后面两个。
+
+### 原版链接（Topology Task专用，Screens 8a/8b/8c）
+
 | 设计 Design | 网址 URL |
 |---|---|
-| Radar chart | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/radar/d3/radar.html` |
-| Bar-code | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/barcode/d3/barcode.html` |
-| Small multiples | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/small_multiples/d3/small_multiples.html` |
 | Force-directed network | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_2/network/d3/network.html` |
 | Linear connection diagram | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_2/linear/d3/linear.html` |
 | Metro-style map | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_2/metro/d3/metro.html` |
 
-（全部已实测确认可正常打开，最近一次核实：2026年8月6日 / all verified live, last checked 6 August 2026）
+这三个继续用原版就好——Topology任务问的是"哪两个地方连接最强"，本来就是把5位作者的数据合并在一起看，不存在"猜是谁"的盲测需求，原版没有问题。
 
-**注意 / Note：** 这六个链接是固定、盲测、不带作者切换功能的独立页面——这正是本问卷需要的实验条件（参与者只能看图判断，不能自己换作者）。项目里另有一个`combined_interface.html`（整合界面，可自由切换全部408位作者），那是**给导师看的演示工具，不要发给参与者，也不要放进这份问卷**，否则会破坏F1/T1等题目"仅凭图形本身识别"的测试前提。/ These six links are fixed, blinded, single-author pages with no author-switching — that constraint is exactly what the study needs (participants judge the image alone, they cannot swap in a different author). The project also has a separate `combined_interface.html` ("Combined Interface") with free switching across all 408 authors; that is a **supervisor-facing demo tool and must not be sent to participants or linked from this questionnaire**, as doing so would undermine the "identify from the image alone" premise behind questions like F1 and T1.
+（全部已实测确认可正常打开，最近一次核实：2026年8月9日 / all verified live, last checked 9 August 2026）
+
+**注意 / Note：** 项目里还有一个`combined_interface.html`（整合界面，可自由切换全部408位作者），那是**给导师看的演示工具，不要发给参与者，也不要放进这份问卷**，否则会破坏F1/T1等题目"仅凭图形本身识别"的测试前提。/ The project also has a separate `combined_interface.html` ("Combined Interface") with free switching across all 408 authors; that is a **supervisor-facing demo tool and must not be sent to participants or linked from this questionnaire**, as doing so would undermine the "identify from the image alone" premise behind questions like F1 and T1.
 
 ---
 

@@ -4,7 +4,7 @@
 
 **预计搭建时间**：1.5–2.5小时（第一次用Qualtrics会慢一些，跟着做不用自己想措辞）。
 
-**链接核实状态**：文档里用到的全部7个链接（6个可视化 + PIS）2026年8月6日重新逐一实测，全部200正常返回，Combined Interface整合界面链接同一天也测过，可以放心发给导师。
+**链接核实状态**：2026年8月9日更新——Fingerprint任务三个链接已经换成盲测版（`radar_task.html`/`barcode_task.html`/`small_multiples_task.html`），原因见第5节的警告框。全部链接（3个盲测版 + Topology原版3个 + PIS）当天逐一实测，全部200正常返回。
 
 ---
 
@@ -263,6 +263,8 @@ Please confirm the following before continuing:
 
 **这里要建三个独立的block**，因为每个设计要放不同的链接。三个block内部的题目结构完全一样，只有链接和"[1 of 3]"这个说明性文字不同（这个数字提示不影响随机化，只是告诉参与者进度，三个block不管实际展示顺序是第几个，都可以统一写"1 of 3"这种通用说法，或者干脆去掉数字只写"the visualisation below"——推荐后者，更简单不会因为随机化顺序对不上而显得奇怪）。
 
+**⚠️ 下面链接末尾一定要是`_task.html`，不是`radar.html`/`barcode.html`/`small_multiples.html`。** 原版是探索工具，一次显示全部5位作者、图例直接写真名，F1这道"猜作者"题会直接变成"读图例"——`_task.html`才是专门为这道题做的单作者盲测版本，2026年8月9日刚加的，图例和详情面板都拿掉了。
+
 ### Block 5 — 命名为 `Fingerprint - Radar`
 
 #### Q-FP-Radar-Link
@@ -276,7 +278,7 @@ Please confirm the following before continuing:
   在这句话后面插入超链接，显示文字用 `Open visualisation →`，链接地址：
 
   ```
-  https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/radar/d3/radar.html
+  https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/radar/d3/radar_task.html
   ```
 
 #### Q-FP-Radar-F1
@@ -355,7 +357,7 @@ Please confirm the following before continuing:
 跟Block 5完全相同的4道题（F1/F2/F3/F4文字一字不改，直接复制上面Block 5里的内容），**唯一区别是链接**：
 
 ```
-https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/barcode/d3/barcode.html
+https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/barcode/d3/barcode_task.html
 ```
 
 ---
@@ -365,7 +367,7 @@ https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir
 同样4道题跟Block 5完全一样，**唯一区别是链接**：
 
 ```
-https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/small_multiples/d3/small_multiples.html
+https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_1/small_multiples/d3/small_multiples_task.html
 ```
 
 **省时间小技巧**：与其把Block 5的4道题重新打一遍，不如在Block列表里对Block 5点右键（或三个点菜单）选 **Copy Block**，复制出Block 6和Block 7，再进去只改链接和block名字，其余全部不用动。
