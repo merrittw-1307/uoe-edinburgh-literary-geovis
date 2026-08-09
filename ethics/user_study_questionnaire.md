@@ -62,9 +62,13 @@
 
 > **Part 1: Author Fingerprints**
 >
-> Each of the next three visualisations shows five authors' individual "fingerprints" — how each of them distributes place names across Edinburgh in their writing. For each one, you'll first see all five authors' fingerprints together, each labelled with the author's name. Take a few minutes to look at them and get a feel for how each author's pattern differs from the others — there's no trick to look for, just notice whatever stands out to you.
+> Each of the next three visualisations shows five authors' individual "fingerprints" — how each of them distributes place names across Edinburgh in their writing. For each one, you'll go through three short steps:
 >
-> Then we'll show you one of those five fingerprints again on its own, with the name hidden, and ask which author you think it is, based on the pattern you just looked at. You're welcome to go back and check the labelled view again before answering — this isn't a memory test.
+> 1. **Look at the reference view** — all five authors' fingerprints together, each labelled with the author's name. Take a few minutes to get a feel for how each author's pattern differs from the others — there's no trick to look for, just notice whatever stands out to you.
+> 2. **Identify one on its own** — we'll show you one of those five fingerprints again, with the name hidden, and ask which author you think it is.
+> 3. **Match all five at once** — we'll show you all five fingerprints again, unlabelled and in a new order, and ask you to match each one to an author.
+>
+> You're welcome to go back and check the reference view again at any point before answering — none of this is a memory test.
 >
 > Please open each link in a new browser tab, and come back to this page to answer.
 
@@ -73,11 +77,12 @@
 ## Screens 5a / 5b / 5c — Fingerprint Task ×3
 *(Qualtrics: put these three blocks in a Randomizer, "present all 3, randomised order")*
 
-**⚠️ 每个block有两个链接，顺序不能反：**
-1. **先给"参考版"链接**——就是六可视化正文里原本的`radar.html`/`barcode.html`/`small_multiples.html`，5位作者都在、都标真名。这是给参与者"自主学习总结规律"用的，不是废弃的旧文件。
-2. **再给"盲测版"链接**（`_task.html`结尾）——只有1位作者、不出现姓名、关掉了详情面板，这是真正用来回答F1-F4的图。
+**⚠️ 每个block有三个链接，顺序不能反：**
+1. **"参考版"链接**——就是六可视化正文里原本的`radar.html`/`barcode.html`/`small_multiples.html`，5位作者都在、都标真名。这是给参与者"自主学习总结规律"用的，不是废弃的旧文件。
+2. **"盲测版"链接**（`_task.html`结尾）——只有1位作者、不出现姓名、关掉了详情面板，用来回答F1-F4。
+3. **"匹配版"链接**（`_matching.html`结尾，★2026年8月9日新增）——5位作者全部再出现一次，全部不署名、顺序打乱，用来回答M1-M2。
 
-如果只发盲测版、不发参考版，参与者就是在凭空猜一个从没见过任何参照的陌生人名字，对完全不懂这几位作者的人来说毫无意义——这是Merritt指出的问题，已经改成"先学参考图、再认盲测图"这个结构。
+如果只发盲测版、不发参考版，参与者就是在凭空猜一个从没见过任何参照的陌生人名字，对完全不懂这几位作者的人来说毫无意义——这是Merritt指出的问题，已经改成"先学参考图、再认盲测图"这个结构。而单独的盲测（1个图配5个名字，命中率20%）信息量有限，只能得到"对/错"一个bit；匹配版让参与者一次性给全部5个图配对5个名字，能拿到完整的5×5混淆矩阵——哪两位作者的图形最容易被认错，这是比单次猜对/猜错丰富得多的数据，也更直接回答"这些指纹彼此之间到底有多可区分"这个RQ1的核心问题。
 
 > **Step 1 — Reference view [1 of 3]**
 > 👉 Open this link in a new tab, and take a few minutes to compare all five authors: **[Radar chart / Bar-code / Small Multiples — see "参考版链接" table below]**
@@ -96,6 +101,26 @@
 >
 > **F4.** If no one had told you anything about this visualisation, would you have understood how to read it just by looking?
 > ○ Yes, easily ○ Yes, with a little effort ○ No, I was confused about how to read it
+
+> **Step 3 — Matching all five**
+> 👉 Open this link in a new tab: **[see "匹配版链接" table below]**
+>
+> This shows all five patterns again, without any names, in a new random order. Try to match each one to an author, using what you learned from the reference view.
+>
+> **M1.** Match each of the following to an author *(Matrix Table question — one row per shape/row/map, same 5 authors as answer options in every row; repeats are allowed)*
+>
+> | | Alexander McCall Smith | Irvine Welsh | John Gibson Lockhart | Walter Scott | Robert Louis Stevenson |
+> |---|---|---|---|---|---|
+> | Shape/Row/Map A | ○ | ○ | ○ | ○ | ○ |
+> | Shape/Row/Map B | ○ | ○ | ○ | ○ | ○ |
+> | Shape/Row/Map C | ○ | ○ | ○ | ○ | ○ |
+> | Shape/Row/Map D | ○ | ○ | ○ | ○ | ○ |
+> | Shape/Row/Map E | ○ | ○ | ○ | ○ | ○ |
+>
+> *(In Qualtrics the row label reads "Shape A" for the Radar block, "Row A" for the Bar-code block, "Map A" for the Small Multiples block — match the wording actually shown on the linked page.)*
+>
+> **M2.** Overall, having compared all five side by side, how easy or difficult do you think it would be to mix up any two of these five patterns?
+> ○ Very easy to confuse ○ Somewhat easy to confuse ○ Neutral ○ Somewhat easy to tell apart ○ Very easy to tell apart
 
 ---
 
@@ -193,7 +218,7 @@
 
 ## 六个可视化链接 / Visualisation URLs
 
-**Fingerprint任务（F1-F4）每个设计要用两个链接（参考版+盲测版），Topology任务（T1-T5）只用原版链接**——三组链接用途都不一样，千万别用混：
+**Fingerprint任务每个设计要用三个链接（参考版 → 盲测版[F1-F4] → 匹配版[M1-M2]），Topology任务（T1-T5）只用原版链接**——几组链接用途都不一样，千万别用混：
 
 ### 参考版链接（Step 1，Fingerprint Task专用，Screens 5a/5b/5c）
 
@@ -217,6 +242,28 @@
 
 **为什么要分两步 / 2026年8月9日修改的原因**：一开始只给盲测版链接，等于让完全不了解这几位作者的参与者凭空对应一个从没见过任何参照的陌生人名字——对没有文学背景的大众组参与者来说这个任务没有意义，也测不出"图形本身能不能承载可学习、可辨认的个人特征"这个我们真正想知道的问题（Merritt指出的问题）。现在改成"先看参考版自主总结规律，再看盲测版尝试识别"，测的是图形的**可学习性和可辨识度**，不再依赖参与者本来就认识这几位作者。三个设计故意用了三个不同的盲测作者（而不是同一个人反复出现），避免参与者带着"记忆效应"把第一个设计的猜测原样套到后两个。
 
+### 匹配版链接（Step 3，Fingerprint Task专用，Screens 5a/5b/5c，★2026年8月9日新增）
+
+参与者做完单独识别（F1-F4）之后，再看这个把全部5位作者的图**同时**、**全部不署名**、**顺序打乱**放在一起的版本，回答M1（配对）和M2（主观区分度评分）。
+
+| 设计 Design | 网址 URL |
+|---|---|
+| Radar chart | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/radar_matching.html` |
+| Bar-code | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/barcode_matching.html` |
+| Small multiples | `https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/small_multiples_matching.html` |
+
+**⚠️ 打乱顺序是固定的、写死在文件里的，不是每个参与者随机生成的**——因为这个页面是在Qualtrics之外独立打开的一个静态网页，如果用JS给每个参与者随机洗牌，Qualtrics完全无法知道当时洗出来的是哪一种对应关系，你分析问卷答案时就没法判断"参与者说Shape A是Welsh"到底对不对。所以每个设计各自固定了一种打乱顺序（三个设计之间顺序也彼此不同，避免参与者用"上一题A是谁"去套下一题），**评分时按下表的固定答案核对**：
+
+| Radar (`radar_matching.html`) | Bar-code (`barcode_matching.html`) | Small Multiples (`small_multiples_matching.html`) |
+|---|---|---|
+| Shape A = Irvine Welsh | Row A = Walter Scott | Map A = John Gibson Lockhart |
+| Shape B = Robert Louis Stevenson | Row B = Alexander McCall Smith | Map B = Irvine Welsh |
+| Shape C = Alexander McCall Smith | Row C = Robert Louis Stevenson | Map C = Walter Scott |
+| Shape D = John Gibson Lockhart | Row D = Irvine Welsh | Map D = Robert Louis Stevenson |
+| Shape E = Walter Scott | Row E = John Gibson Lockhart | Map E = Alexander McCall Smith |
+
+三个设计的打乱顺序、以及和F1-F4盲测版用的单一作者，都刻意选得互不相同，防止参与者靠"这个字母上次是谁"这种捷径蒙对，而不是真的靠图形本身分辨。
+
 ### 原版链接（Topology Task专用，Screens 8a/8b/8c）
 
 | 设计 Design | 网址 URL |
@@ -239,12 +286,14 @@
 |---|---|
 | Consent | 4 项确认 |
 | Background | 5题 |
-| Fingerprint tasks（3设计 × 4题） | 12题 |
+| Fingerprint tasks（3设计 ×（F1-F4 共4题 + M1配对 + M2评分）） | 18题（★M1/M2为2026年8月9日新增） |
 | Fingerprint ranking | 2题 |
 | Topology tasks（3设计 × 5题） | 15题 |
 | Cross-design synthesis | 1题（★新增，专门用来捕捉自发的深度发现） |
 | Topology ranking | 2题 |
 | Reflection | 5题 |
-| **合计** | **46题**（含多项选择+自由文本，预计35-50分钟——Fingerprint任务改成"先看参考版再看盲测版"两步之后，实际用时大概率偏向50分钟这一端，PIS里的35-50分钟区间还够用，不用改） |
+| **合计** | **52题**（含多项选择+矩阵表+自由文本，预计40-55分钟——比修改前的35-50分钟略长，因为每个Fingerprint设计新增了配对+评分两步；PIS里如果写的是35-50分钟，需要同步改成40-55分钟，见下方提醒） |
 
 **关于深度**：T3、T4、Screen 9这三处是专门为了让被试自发说出"某些地名之间有意外的关系""某几个地名好像是一伙的"这类观察而设计的——不设标准答案，鼓励自由发挥，分析时重点编码这三处的自由文本。T4尤其关键：如果参与者能不看任何提示、自己说出"这几个站好像是一条线上的"，就是对社群检测方法本身最有力的独立验证。
+
+**⚠️ PIS/同意书时间预估需要同步更新**：新增M1/M2之后总题数从46题涨到52题，预计用时上限从50分钟涨到55分钟左右。请检查Participant Information Sheet和Consent Form里写的时间区间，如果还是"35-50分钟"需要改成"40-55分钟"，避免和实际用时不符。

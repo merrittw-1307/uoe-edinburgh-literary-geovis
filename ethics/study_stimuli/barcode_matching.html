@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fingerprint Matching — Bar-code</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #F8F9FC;
+    padding: 30px 40px;
+  }
+  h1 { font-size: 20px; color: #21295C; margin-bottom: 4px; }
+  .subtitle { font-size: 12px; color: #888; margin-bottom: 20px; max-width: 720px; }
+  .row-block { margin-bottom: 26px; }
+  .row-header { display: flex; align-items: baseline; gap: 10px; margin-bottom: 4px; }
+  .row-label { font-size: 15px; font-weight: bold; color: #21295C; }
+  .row-maxval { font-size: 10px; color: #AAA; }
+  .tooltip {
+    position: fixed; background: white;
+    border: 1px solid #E0E4F0; border-radius: 8px;
+    padding: 8px 12px; font-size: 12px; pointer-events: none;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1); display: none; z-index: 100;
+  }
+</style>
+</head>
+<body>
+<h1>Fingerprint Matching — Bar-code</h1>
+<div class="subtitle">Here are all five patterns again, shown separately and without names, in a new random order. Each bar is one place; height = % of that shape's own total mentions. Hover any bar for its value. Use the reference view you saw earlier to decide which shape belongs to which author.</div>
+
+<div id="chart"></div>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+// Fixed assignment (same for every participant). Answer key documented
+// in qualtrics_build_guide.md for scoring.
+const rows = [{"row": "A", "values": [{"place": "Leith", "value": 0.1486, "sector": "Leith", "abs": 104}, {"place": "Leith Walk", "value": 0.0029, "sector": "Leith", "abs": 2}, {"place": "Water of Leith", "value": 0.0086, "sector": "Leith", "abs": 6}, {"place": "Calton Hill", "value": 0.0086, "sector": "Leith", "abs": 6}, {"place": "Scotland Street", "value": 0.0, "sector": "Inverleith", "abs": 0}, {"place": "Stockbridge", "value": 0.0, "sector": "Inverleith", "abs": 0}, {"place": "Clarence Street", "value": 0.0, "sector": "Inverleith", "abs": 0}, {"place": "Moray Place", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Dundas Street", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Princes Street", "value": 0.02, "sector": "New Town", "abs": 14}, {"place": "New Town", "value": 0.0229, "sector": "New Town", "abs": 16}, {"place": "Drummond Place", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Cumberland Bar", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Queen Street", "value": 0.0029, "sector": "New Town", "abs": 2}, {"place": "India Street", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Castle Street", "value": 0.0086, "sector": "New Town", "abs": 6}, {"place": "Heriot Row", "value": 0.0029, "sector": "New Town", "abs": 2}, {"place": "Howe Street", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Waverley Station", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Lothian Road", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Jenners", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Great King Street", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Cramond", "value": 0.0143, "sector": "Almond", "abs": 10}, {"place": "Holyrood", "value": 0.1343, "sector": "Old Town", "abs": 94}, {"place": "High Street", "value": 0.06, "sector": "Old Town", "abs": 42}, {"place": "The Meadows", "value": 0.0, "sector": "Old Town", "abs": 0}, {"place": "Old Town", "value": 0.0114, "sector": "Old Town", "abs": 8}, {"place": "Grassmarket", "value": 0.0514, "sector": "Old Town", "abs": 36}, {"place": "Cowgate", "value": 0.0343, "sector": "Old Town", "abs": 24}, {"place": "St Giles", "value": 0.02, "sector": "Old Town", "abs": 14}, {"place": "Canongate", "value": 0.1886, "sector": "Canongate", "abs": 132}, {"place": "Scottish Parliament", "value": 0.0971, "sector": "Canongate", "abs": 68}, {"place": "Arthur's Seat", "value": 0.0429, "sector": "Craigentinny/Duddingston", "abs": 30}, {"place": "Musselburgh", "value": 0.0343, "sector": "Portobello/Craigmillar", "abs": 24}, {"place": "Bruntsfield", "value": 0.0, "sector": "South Central", "abs": 0}, {"place": "Morningside", "value": 0.0, "sector": "South Central", "abs": 0}, {"place": "University of Edinburgh", "value": 0.0114, "sector": "South Central", "abs": 8}, {"place": "Southside", "value": 0.0, "sector": "South Central", "abs": 0}, {"place": "Tollcross", "value": 0.0, "sector": "South West", "abs": 0}, {"place": "Dalkeith", "value": 0.0743, "sector": "Liberton/Gilmerton", "abs": 52}]}, {"row": "B", "values": [{"place": "Leith", "value": 0.0249, "sector": "Leith", "abs": 94}, {"place": "Leith Walk", "value": 0.0085, "sector": "Leith", "abs": 16}, {"place": "Water of Leith", "value": 0.0159, "sector": "Leith", "abs": 60}, {"place": "Calton Hill", "value": 0.0053, "sector": "Leith", "abs": 10}, {"place": "Scotland Street", "value": 0.1466, "sector": "Inverleith", "abs": 554}, {"place": "Stockbridge", "value": 0.0265, "sector": "Inverleith", "abs": 100}, {"place": "Clarence Street", "value": 0.0371, "sector": "Inverleith", "abs": 70}, {"place": "Moray Place", "value": 0.0704, "sector": "New Town", "abs": 266}, {"place": "Dundas Street", "value": 0.0688, "sector": "New Town", "abs": 260}, {"place": "Princes Street", "value": 0.0349, "sector": "New Town", "abs": 132}, {"place": "New Town", "value": 0.0386, "sector": "New Town", "abs": 146}, {"place": "Drummond Place", "value": 0.0561, "sector": "New Town", "abs": 212}, {"place": "Cumberland Bar", "value": 0.0508, "sector": "New Town", "abs": 192}, {"place": "Queen Street", "value": 0.045, "sector": "New Town", "abs": 170}, {"place": "India Street", "value": 0.0402, "sector": "New Town", "abs": 152}, {"place": "Castle Street", "value": 0.0016, "sector": "New Town", "abs": 6}, {"place": "Heriot Row", "value": 0.0228, "sector": "New Town", "abs": 86}, {"place": "Howe Street", "value": 0.0254, "sector": "New Town", "abs": 96}, {"place": "Waverley Station", "value": 0.0154, "sector": "New Town", "abs": 58}, {"place": "Lothian Road", "value": 0.0116, "sector": "New Town", "abs": 44}, {"place": "Jenners", "value": 0.0196, "sector": "New Town", "abs": 74}, {"place": "Great King Street", "value": 0.0175, "sector": "New Town", "abs": 66}, {"place": "Cramond", "value": 0.0074, "sector": "Almond", "abs": 14}, {"place": "Holyrood", "value": 0.0064, "sector": "Old Town", "abs": 24}, {"place": "High Street", "value": 0.009, "sector": "Old Town", "abs": 34}, {"place": "The Meadows", "value": 0.0265, "sector": "Old Town", "abs": 100}, {"place": "Old Town", "value": 0.0101, "sector": "Old Town", "abs": 38}, {"place": "Grassmarket", "value": 0.0106, "sector": "Old Town", "abs": 20}, {"place": "Cowgate", "value": 0.0074, "sector": "Old Town", "abs": 28}, {"place": "St Giles", "value": 0.0127, "sector": "Old Town", "abs": 24}, {"place": "Canongate", "value": 0.0042, "sector": "Canongate", "abs": 8}, {"place": "Scottish Parliament", "value": 0.0053, "sector": "Canongate", "abs": 20}, {"place": "Arthur's Seat", "value": 0.0201, "sector": "Craigentinny/Duddingston", "abs": 38}, {"place": "Musselburgh", "value": 0.0042, "sector": "Portobello/Craigmillar", "abs": 16}, {"place": "Bruntsfield", "value": 0.0286, "sector": "South Central", "abs": 108}, {"place": "Morningside", "value": 0.0259, "sector": "South Central", "abs": 98}, {"place": "University of Edinburgh", "value": 0.0159, "sector": "South Central", "abs": 30}, {"place": "Southside", "value": 0.0042, "sector": "South Central", "abs": 8}, {"place": "Tollcross", "value": 0.0064, "sector": "South West", "abs": 24}, {"place": "Dalkeith", "value": 0.0116, "sector": "Liberton/Gilmerton", "abs": 22}]}, {"row": "C", "values": [{"place": "Leith", "value": 0.1081, "sector": "Leith", "abs": 72}, {"place": "Leith Walk", "value": 0.021, "sector": "Leith", "abs": 14}, {"place": "Water of Leith", "value": 0.018, "sector": "Leith", "abs": 6}, {"place": "Calton Hill", "value": 0.048, "sector": "Leith", "abs": 32}, {"place": "Scotland Street", "value": 0.0, "sector": "Inverleith", "abs": 0}, {"place": "Stockbridge", "value": 0.009, "sector": "Inverleith", "abs": 6}, {"place": "Clarence Street", "value": 0.0, "sector": "Inverleith", "abs": 0}, {"place": "Moray Place", "value": 0.006, "sector": "New Town", "abs": 2}, {"place": "Dundas Street", "value": 0.006, "sector": "New Town", "abs": 2}, {"place": "Princes Street", "value": 0.1381, "sector": "New Town", "abs": 46}, {"place": "New Town", "value": 0.0781, "sector": "New Town", "abs": 26}, {"place": "Drummond Place", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Cumberland Bar", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Queen Street", "value": 0.006, "sector": "New Town", "abs": 2}, {"place": "India Street", "value": 0.006, "sector": "New Town", "abs": 2}, {"place": "Castle Street", "value": 0.012, "sector": "New Town", "abs": 4}, {"place": "Heriot Row", "value": 0.0781, "sector": "New Town", "abs": 26}, {"place": "Howe Street", "value": 0.012, "sector": "New Town", "abs": 4}, {"place": "Waverley Station", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Lothian Road", "value": 0.048, "sector": "New Town", "abs": 16}, {"place": "Jenners", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Great King Street", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Cramond", "value": 0.0631, "sector": "Almond", "abs": 42}, {"place": "Holyrood", "value": 0.024, "sector": "Old Town", "abs": 8}, {"place": "High Street", "value": 0.0511, "sector": "Old Town", "abs": 34}, {"place": "The Meadows", "value": 0.0, "sector": "Old Town", "abs": 0}, {"place": "Old Town", "value": 0.0781, "sector": "Old Town", "abs": 26}, {"place": "Grassmarket", "value": 0.009, "sector": "Old Town", "abs": 6}, {"place": "Cowgate", "value": 0.024, "sector": "Old Town", "abs": 8}, {"place": "St Giles", "value": 0.0541, "sector": "Old Town", "abs": 18}, {"place": "Canongate", "value": 0.006, "sector": "Canongate", "abs": 4}, {"place": "Scottish Parliament", "value": 0.0, "sector": "Canongate", "abs": 0}, {"place": "Arthur's Seat", "value": 0.045, "sector": "Craigentinny/Duddingston", "abs": 30}, {"place": "Musselburgh", "value": 0.015, "sector": "Portobello/Craigmillar", "abs": 10}, {"place": "Bruntsfield", "value": 0.006, "sector": "South Central", "abs": 4}, {"place": "Morningside", "value": 0.012, "sector": "South Central", "abs": 4}, {"place": "University of Edinburgh", "value": 0.018, "sector": "South Central", "abs": 6}, {"place": "Southside", "value": 0.0, "sector": "South Central", "abs": 0}, {"place": "Tollcross", "value": 0.0, "sector": "South West", "abs": 0}, {"place": "Dalkeith", "value": 0.0, "sector": "Liberton/Gilmerton", "abs": 0}]}, {"row": "D", "values": [{"place": "Leith", "value": 0.6121, "sector": "Leith", "abs": 650}, {"place": "Leith Walk", "value": 0.0527, "sector": "Leith", "abs": 56}, {"place": "Water of Leith", "value": 0.0132, "sector": "Leith", "abs": 14}, {"place": "Calton Hill", "value": 0.0075, "sector": "Leith", "abs": 8}, {"place": "Scotland Street", "value": 0.0, "sector": "Inverleith", "abs": 0}, {"place": "Stockbridge", "value": 0.0132, "sector": "Inverleith", "abs": 14}, {"place": "Clarence Street", "value": 0.0, "sector": "Inverleith", "abs": 0}, {"place": "Moray Place", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Dundas Street", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Princes Street", "value": 0.0301, "sector": "New Town", "abs": 32}, {"place": "New Town", "value": 0.0151, "sector": "New Town", "abs": 16}, {"place": "Drummond Place", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Cumberland Bar", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Queen Street", "value": 0.0056, "sector": "New Town", "abs": 6}, {"place": "India Street", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Castle Street", "value": 0.0019, "sector": "New Town", "abs": 2}, {"place": "Heriot Row", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Howe Street", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Waverley Station", "value": 0.0301, "sector": "New Town", "abs": 32}, {"place": "Lothian Road", "value": 0.0207, "sector": "New Town", "abs": 22}, {"place": "Jenners", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Great King Street", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Cramond", "value": 0.0038, "sector": "Almond", "abs": 4}, {"place": "Holyrood", "value": 0.0, "sector": "Old Town", "abs": 0}, {"place": "High Street", "value": 0.0075, "sector": "Old Town", "abs": 8}, {"place": "The Meadows", "value": 0.0169, "sector": "Old Town", "abs": 18}, {"place": "Old Town", "value": 0.0038, "sector": "Old Town", "abs": 4}, {"place": "Grassmarket", "value": 0.0094, "sector": "Old Town", "abs": 10}, {"place": "Cowgate", "value": 0.0075, "sector": "Old Town", "abs": 8}, {"place": "St Giles", "value": 0.0, "sector": "Old Town", "abs": 0}, {"place": "Canongate", "value": 0.0, "sector": "Canongate", "abs": 0}, {"place": "Scottish Parliament", "value": 0.0056, "sector": "Canongate", "abs": 6}, {"place": "Arthur's Seat", "value": 0.0113, "sector": "Craigentinny/Duddingston", "abs": 12}, {"place": "Musselburgh", "value": 0.0019, "sector": "Portobello/Craigmillar", "abs": 2}, {"place": "Bruntsfield", "value": 0.0056, "sector": "South Central", "abs": 6}, {"place": "Morningside", "value": 0.0075, "sector": "South Central", "abs": 8}, {"place": "University of Edinburgh", "value": 0.0019, "sector": "South Central", "abs": 2}, {"place": "Southside", "value": 0.0584, "sector": "South Central", "abs": 62}, {"place": "Tollcross", "value": 0.0565, "sector": "South West", "abs": 60}, {"place": "Dalkeith", "value": 0.0, "sector": "Liberton/Gilmerton", "abs": 0}]}, {"row": "E", "values": [{"place": "Leith", "value": 0.0938, "sector": "Leith", "abs": 48}, {"place": "Leith Walk", "value": 0.0039, "sector": "Leith", "abs": 2}, {"place": "Water of Leith", "value": 0.0, "sector": "Leith", "abs": 0}, {"place": "Calton Hill", "value": 0.0312, "sector": "Leith", "abs": 16}, {"place": "Scotland Street", "value": 0.0, "sector": "Inverleith", "abs": 0}, {"place": "Stockbridge", "value": 0.0, "sector": "Inverleith", "abs": 0}, {"place": "Clarence Street", "value": 0.0, "sector": "Inverleith", "abs": 0}, {"place": "Moray Place", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Dundas Street", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Princes Street", "value": 0.0547, "sector": "New Town", "abs": 28}, {"place": "New Town", "value": 0.0312, "sector": "New Town", "abs": 16}, {"place": "Drummond Place", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Cumberland Bar", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Queen Street", "value": 0.0078, "sector": "New Town", "abs": 4}, {"place": "India Street", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Castle Street", "value": 0.1914, "sector": "New Town", "abs": 98}, {"place": "Heriot Row", "value": 0.0039, "sector": "New Town", "abs": 2}, {"place": "Howe Street", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Waverley Station", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Lothian Road", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Jenners", "value": 0.0, "sector": "New Town", "abs": 0}, {"place": "Great King Street", "value": 0.0039, "sector": "New Town", "abs": 2}, {"place": "Cramond", "value": 0.0039, "sector": "Almond", "abs": 2}, {"place": "Holyrood", "value": 0.0664, "sector": "Old Town", "abs": 34}, {"place": "High Street", "value": 0.0312, "sector": "Old Town", "abs": 16}, {"place": "The Meadows", "value": 0.0, "sector": "Old Town", "abs": 0}, {"place": "Old Town", "value": 0.0391, "sector": "Old Town", "abs": 20}, {"place": "Grassmarket", "value": 0.0234, "sector": "Old Town", "abs": 12}, {"place": "Cowgate", "value": 0.0117, "sector": "Old Town", "abs": 6}, {"place": "St Giles", "value": 0.0352, "sector": "Old Town", "abs": 18}, {"place": "Canongate", "value": 0.2109, "sector": "Canongate", "abs": 108}, {"place": "Scottish Parliament", "value": 0.0, "sector": "Canongate", "abs": 0}, {"place": "Arthur's Seat", "value": 0.0352, "sector": "Craigentinny/Duddingston", "abs": 18}, {"place": "Musselburgh", "value": 0.043, "sector": "Portobello/Craigmillar", "abs": 22}, {"place": "Bruntsfield", "value": 0.0, "sector": "South Central", "abs": 0}, {"place": "Morningside", "value": 0.0, "sector": "South Central", "abs": 0}, {"place": "University of Edinburgh", "value": 0.0547, "sector": "South Central", "abs": 28}, {"place": "Southside", "value": 0.0, "sector": "South Central", "abs": 0}, {"place": "Tollcross", "value": 0.0, "sector": "South West", "abs": 0}, {"place": "Dalkeith", "value": 0.0234, "sector": "Liberton/Gilmerton", "abs": 12}]}];
+const sectorColors = {"Forth": "#4A90D9", "Leith": "#1C7293", "Inverleith": "#2980B9", "New Town": "#8E44AD", "Almond": "#5D6D7E", "Old Town": "#C0392B", "Canongate": "#E74C3C", "Western Edinburgh": "#7F8C8D", "Craigentinny/Duddingston": "#D35400", "Portobello/Craigmillar": "#E67E22", "South Central": "#27AE60", "South West": "#1E8449", "Liberton/Gilmerton": "#2ECC71", "Pentlands": "#196F3D"};
+const NEUTRAL = "#5B6B8C";
+
+const W = 1000, H = 90;
+const tooltip = document.getElementById('tooltip');
+const chart = document.getElementById('chart');
+
+rows.forEach(row => {
+  const N = row.values.length;
+  const barW = Math.max(W / N, 8);
+  const maxVal = d3.max(row.values, d => d.value);
+  const maxLabel = (maxVal * 100).toFixed(1) + '%';
+
+  const block = document.createElement('div');
+  block.className = 'row-block';
+
+  const header = document.createElement('div');
+  header.className = 'row-header';
+  header.innerHTML = `<div class="row-label">Row ${row.row}</div><div class="row-maxval">max: ${maxLabel}</div>`;
+  block.appendChild(header);
+
+  const container = document.createElement('div');
+  const svgW = barW * N + 40;
+  const svg = d3.select(container).append('svg')
+    .attr('width', svgW).attr('height', H + 10).style('overflow', 'visible');
+
+  const yScale = d3.scaleLinear().domain([0, maxVal]).range([0, H]);
+
+  row.values.forEach((d, i) => {
+    const barH = Math.max(yScale(d.value), d.value > 0 ? 1 : 0);
+    svg.append('rect')
+      .attr('x', i * barW).attr('y', H - barH)
+      .attr('width', Math.max(barW - 0.5, 1)).attr('height', barH)
+      .attr('fill', NEUTRAL).attr('opacity', 0.8).attr('cursor', 'pointer')
+      .on('mouseover', function() {
+        d3.select(this).attr('opacity', 1);
+        tooltip.style.display = 'block';
+        tooltip.innerHTML = `
+          <strong>${d.place}</strong><br>
+          <span style="color:${sectorColors[d.sector]||'#999'};font-size:10px">&#9679; ${d.sector}</span><br>
+          ${(d.value*100).toFixed(2)}% &nbsp;&middot;&nbsp; ${d.abs} mentions`;
+      })
+      .on('mousemove', function(event) {
+        tooltip.style.left = (event.clientX + 14) + 'px';
+        tooltip.style.top  = (event.clientY - 10) + 'px';
+      })
+      .on('mouseout', function() {
+        d3.select(this).attr('opacity', 0.8);
+        tooltip.style.display = 'none';
+      });
+  });
+
+  svg.append('line')
+    .attr('x1', 0).attr('y1', H).attr('x2', barW*N).attr('y2', H)
+    .attr('stroke', '#DDD').attr('stroke-width', 1);
+
+  block.appendChild(container);
+  chart.appendChild(block);
+});
+</script>
+</body>
+</html>

@@ -96,9 +96,9 @@ The study is **online, unmoderated, self-paced** (Qualtrics), taking approximate
 
 **关于"Combined Interface"（整合界面）——它不是问卷材料，不要发给参与者：**
 
-中文：项目里还有一个`combined_interface.html`（整合界面，https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/combined/d3/combined_interface.html ），把六个设计放进同一个页面、支持自由切换作者（含2026年8月新增的"全部408位作者"大规模探索选项）、跨图联动高亮。**这是给导师看的演示/汇报工具，不是正式问卷材料**——正式问卷里Fingerprint任务用的是两组固定链接（Step 1参考版：5位作者都标名字的标准页面；Step 2盲测版：单作者、不标名字的专用页面，见`ethics/study_stimuli/`），Topology任务用三个标准页面，全部都不带"自由切换到任意作者"这种功能，这样才能保证RQ1的实验条件不被破坏——参与者只能在我们规定的"先看哪5个人、再猜哪一个"这个范围内操作，不能自己跳出去看任何其他作者的数据。给导师发材料时可以两个链接都发（问卷链接+Combined Interface链接），但发给正式参与者的招募邮件/问卷Welcome页只应该包含Qualtrics问卷链接，不要额外附上Combined Interface链接，避免参与者提前看到其他作者的数据而影响判断。
+中文：项目里还有一个`combined_interface.html`（整合界面，https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/combined/d3/combined_interface.html ），把六个设计放进同一个页面、支持自由切换作者（含2026年8月新增的"全部408位作者"大规模探索选项）、跨图联动高亮。**这是给导师看的演示/汇报工具，不是正式问卷材料**——正式问卷里Fingerprint任务用的是三组固定链接（Step 1参考版：5位作者都标名字的标准页面；Step 2盲测版：单作者、不标名字的专用页面；Step 3匹配版：5位作者全部不署名+顺序打乱的专用页面，三者均见`ethics/study_stimuli/`），Topology任务用三个标准页面，全部都不带"自由切换到任意作者"这种功能，这样才能保证RQ1的实验条件不被破坏——参与者只能在我们规定的范围内操作，不能自己跳出去看任何其他作者的数据。给导师发材料时可以两个链接都发（问卷链接+Combined Interface链接），但发给正式参与者的招募邮件/问卷Welcome页只应该包含Qualtrics问卷链接，不要额外附上Combined Interface链接，避免参与者提前看到其他作者的数据而影响判断。
 
-English: The project also has a `combined_interface.html` ("Combined Interface", https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/combined/d3/combined_interface.html ) that puts all six designs on one page with free author-switching (including an "All 408 authors" large-scale-exploration preset added in August 2026) and cross-view highlighting. **This is a supervisor-facing demo/review tool, not part of the formal study instrument.** The Fingerprint tasks in the actual questionnaire use two fixed link sets instead (Step 1 reference: the standard all-five-labelled page; Step 2 blind: a single-author, no-name page built specifically for this task, in `ethics/study_stimuli/`), and the Topology tasks use the three standard pages — none of them let a participant freely switch to see any other author's data. Combined Interface's free-switching would break that boundary. It's fine to send both links to your supervisor, but the recruitment email / questionnaire Welcome screen sent to actual participants should only ever contain the Qualtrics link, not the Combined Interface link.
+English: The project also has a `combined_interface.html` ("Combined Interface", https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/combined/d3/combined_interface.html ) that puts all six designs on one page with free author-switching (including an "All 408 authors" large-scale-exploration preset added in August 2026) and cross-view highlighting. **This is a supervisor-facing demo/review tool, not part of the formal study instrument.** The Fingerprint tasks in the actual questionnaire use three fixed link sets instead (Step 1 reference: the standard all-five-labelled page; Step 2 blind: a single-author, no-name page; Step 3 matching: an all-five, all-unlabelled, shuffled-order page — all three in `ethics/study_stimuli/`), and the Topology tasks use the three standard pages — none of them let a participant freely switch to see any other author's data. Combined Interface's free-switching would break that boundary. It's fine to send both links to your supervisor, but the recruitment email / questionnaire Welcome screen sent to actual participants should only ever contain the Qualtrics link, not the Combined Interface link.
 
 ---
 
@@ -115,7 +115,9 @@ English: The project also has a `combined_interface.html` ("Combined Interface",
 
 **预计用时因此从30-40分钟调整为35-50分钟**，PIS文件（`ethics/PIS_Merritt_final.docx`及对应PDF）已经同步改过这个数字，不需要你再手动改。
 
-**详见 `ethics/user_study_questionnaire.md`**，里面还附了六个可视化的完整链接表和题目数量统计。
+**⚠️ 2026年8月9日又做了一次结构性加强，这次的时间改动PIS文件里还没有同步**：Fingerprint部分（Task 1）原本"看参考版→猜盲测版单个作者"两步，现在加了第三步——把5个未署名图形一次性配对到5个作者（Matrix Table题型，M1）+ 一道主观区分度评分（M2）。加这一步是因为单独的盲测一次只测1个图对5个名字，只能拿到一个"对/错"的bit，信息量有限；配对能拿到完整的5×5混淆矩阵，能看出"哪两位作者的图形最容易被搞混"，是对RQ1"图形彼此是否可区分"这个问题信息量大得多的验证方式。题目总数从46题涨到52题，**预计用时相应从35-50分钟涨到40-55分钟**，但这次PIS文件（`ethics/PIS_Merritt_final.docx`及`dissertation/5Aug/pis.pdf`）**还没有更新**，需要你自己打开确认要不要把时间区间同步改一下——如果伦理审批的PIS版本对时间区间有要求，改之前最好先确认是否需要重新走一次伦理修订。
+
+**详见 `ethics/user_study_questionnaire.md`**，里面还附了九个可视化链接（3参考版+3盲测版+3匹配版）的完整链接表、匹配任务的固定答案对照表、和题目数量统计。
 
 ---
 
@@ -127,11 +129,11 @@ English: The project also has a `combined_interface.html` ("Combined Interface",
 
 1. **登录Qualtrics**：https://ed.qualtrics.com ，用爱丁堡大学账号登录（机构账号，免费）。
 2. **新建调查**：Create a new project → Survey → From scratch。
-3. **按build guide顺序建16个Block**：Welcome、Consent（4道独立必答题）、Background、Fingerprint说明、三个指纹任务block（每个内部是"参考版链接→Page Break→盲测版链接+F1-F4"）、排名、拓扑说明、三个拓扑任务block、排名、反思、结束语。
+3. **按build guide顺序建16个Block**：Welcome、Consent（4道独立必答题）、Background、Fingerprint说明、三个指纹任务block（每个内部是"参考版链接→Page Break→盲测版链接+F1-F4→Page Break→匹配版链接+M1矩阵+M2评分"）、排名、拓扑说明、三个拓扑任务block、排名、反思、结束语。
 4. **Consent不用Skip Logic**：4道题都设成Force Response必答，没勾选就点不了下一页，效果等同"没同意就不能继续"，不需要额外配置跳转逻辑。
 5. **设置随机化**：进入 Survey Flow（左侧菜单）→ 把三个指纹任务block拖进一个"Randomizer"元素，勾选"Randomly present X of Y elements"设为3（即全部随机顺序展示）→ 对三个拓扑任务block重复同样操作。
-6. **插入可视化链接**：**具体每个block放哪个链接、Fingerprint为什么要放两个链接（参考版+盲测版），必须照`qualtrics_build_guide.md`第5节来，这里不再重复列表，避免两处链接不一致**。Topology三个block用原版链接（network.html/linear.html/metro.html）即可，同样详见build guide。全部链接建议设置成"在新标签页打开"（Qualtrics里可以用富文本编辑器插入`<a href="..." target="_blank">`)。
-7. **预览测试**：自己先完整走一遍（Qualtrics有Preview功能），确认链接能打开（Fingerprint的参考版要看到5人、盲测版要看到1人无名字）、随机化生效、Consent不勾选点不了下一页。
+6. **插入可视化链接**：**具体每个block放哪个链接、Fingerprint为什么要放三个链接（参考版+盲测版+匹配版），必须照`qualtrics_build_guide.md`第5节来，这里不再重复列表，避免两处链接不一致**。Topology三个block用原版链接（network.html/linear.html/metro.html）即可，同样详见build guide。全部链接建议设置成"在新标签页打开"（Qualtrics里可以用富文本编辑器插入`<a href="..." target="_blank">`)。
+7. **预览测试**：自己先完整走一遍（Qualtrics有Preview功能），确认链接能打开（Fingerprint的参考版要看到5人、盲测版要看到1人无名字、匹配版要看到5个都不署名）、随机化生效、Consent不勾选点不了下一页。
 8. **发布**：点击"Publish"，生成的匿名链接就是发给参与者的问卷链接。
 9. **收集期设置**：可以在Survey Options里设置一个自动关闭日期（比如发布后7天自动停止收集）。
 
@@ -139,10 +141,10 @@ English: The project also has a `combined_interface.html` ("Combined Interface",
 
 1. Log in at ed.qualtrics.com with your University of Edinburgh account.
 2. Create Survey → From scratch.
-3. Build all 16 blocks per the build guide (each Fingerprint block internally has "reference link → page break → blind link + F1-F4").
+3. Build all 16 blocks per the build guide (each Fingerprint block internally has "reference link → page break → blind link + F1-F4 → page break → matching link + M1 matrix + M2 rating").
 4. Consent needs no Skip Logic: make all four checkboxes Force Response, which alone prevents proceeding without agreeing.
 5. Use Survey Flow → Randomizer around the three fingerprint task blocks (present all 3, randomised), and again around the three topology task blocks.
-6. **Follow `qualtrics_build_guide.md` Section 5 for exactly which link(s) go in each block** — Fingerprint blocks need both a reference (labelled, all five authors) and a blind (single author, no name) link; this file no longer duplicates that table, to avoid the two documents drifting out of sync with each other.
+6. **Follow `qualtrics_build_guide.md` Section 5 for exactly which link(s) go in each block** — Fingerprint blocks need a reference (labelled, all five authors), a blind (single author, no name), and a matching (all five, all unlabelled, shuffled order) link; this file no longer duplicates that table, to avoid the two documents drifting out of sync with each other.
 7. Preview and test the full flow yourself before publishing.
 8. Publish → distribute the anonymous link.
 9. Set an auto-close date under Survey Options if you want a hard cutoff.
@@ -181,6 +183,12 @@ English: The project also has a `combined_interface.html` ("Combined Interface",
 **RQ1 — 质性编码**
 - 把每个设计的F3自由文本（"具体是什么形状特征让你这样判断"）导出，通读一遍，标记重复出现的主题（比如"提到了某个方向的尖峰""提到了分布均匀/集中""说自己是瞎猜的"），数一下每个主题出现的次数——这里尤其要留意有没有人明确提到"我记得参考图里这个作者是这样的"这类说法，这直接证明了参考版确实被使用、确实起到了作用
 
+**RQ1 — 匹配任务/混淆矩阵（★2026年8月9日新增的M1/M2，比单纯的F1盲测信息量大得多）**
+- 对每个设计，把所有参与者的M1矩阵答案汇总成一张**5×5表**：行=真实作者，列=参与者选的作者，格子里填"被这样配对的次数"。对角线上的数字越高，说明这个设计的整体可区分度越好；如果某两个作者之间（比如某一行A、某一列B）数字特别高，说明这两位作者的图形在这个设计下特别容易被搞混——这是三个设计之间最直接的量化比较依据，比单一的准确率数字更有说服力
+- 打分时对照 `qualtrics_build_guide.md` 第5节里给出的固定答案表（Radar/Bar-code/Small Multiples各自的Shape/Row/Map A-E对应的真实作者），Matrix Table本身不会自动判分，需要你导出数据后自己按这张表核对
+- M2（主观区分度评分）的均值可以和M1算出来的客观准确率放在一起看：如果某个设计参与者自己评价"很容易分辨"但M1的混淆矩阵显示其实经常认错，这个主客观不一致本身就是一个值得在Discussion里讨论的发现（可能说明这个设计"看起来清楚"但实际编码的信息没那么容易被记住/迁移）
+- 比较三个设计时，可以直接算一个简单的"匹配任务总准确率"（对角线格子之和 ÷ 全部格子之和），和F1单独识别的准确率放在同一张表里对照——两者应该大致同向，如果明显不同向（比如某设计单独识别准确率高但匹配任务准确率低），说明这个设计"认得出眼熟的那一个"但"排不出五个都摆在一起时谁是谁"，这种细粒度的差异正是新增这道题最初想要捕捉的东西
+
 **RQ2 — 最核心的数字（T1/T2题）**
 - 对每个拓扑设计，把参与者填的"两个地方"与该数据集里真实权重最高的一对（比如network/linear是Leith & Princes Street，metro看具体是哪条线的哪一对）比对，算"识别正确率"
 - **在识别正确的人里**，看有多少人同时选了"远/较远"——这个百分比就是RQ2最直接的证据
@@ -201,6 +209,7 @@ English: The project also has a `combined_interface.html` ("Combined Interface",
 - Accuracy = correct / total responses, per design (Excel pivot table is sufficient, no stats software needed)
 - Mean confidence per design
 - Self-explanatoriness: % "Yes, easily" per design
+- **Matching task (M1/M2, added 9 August 2026)**: build a 5×5 confusion matrix per design (true author × selected author) from the Matrix Table responses, scored against the fixed answer key documented in `qualtrics_build_guide.md` §5. Diagonal weight = overall distinguishability; off-diagonal hot spots identify which specific author pairs get confused. Compare matching-task accuracy (diagonal / total) against the single-item F1 accuracy — divergence between the two (e.g. high F1 accuracy but low matching accuracy) suggests a design is recognisable in isolation but not reliably distinguishable when all five are seen together, which is a genuinely different and finer-grained finding than accuracy alone. Compare M2's subjective distinctiveness rating against the objective M1 accuracy as a secondary check for over/under-confidence.
 - RQ2 core metric: among participants who correctly identified the strongest pair, % who judged it geographically far
 - RQ2 deep-insight items (T3/T4/synthesis): manually cross-check reported "surprising connections" and "clusters" against the real edge weights and metro line groupings — independent agreement between a participant's unprompted cluster and the algorithm's community-detection output is the strongest possible validation of the method, stronger than any accuracy number, and should be a headline point in the Discussion chapter if it occurs
 - Cross-tabulate all of the above by expert vs. general-public (from background Q3)

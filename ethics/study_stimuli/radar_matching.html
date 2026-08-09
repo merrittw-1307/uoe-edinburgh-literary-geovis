@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Fingerprint Matching — Radar</title>
+<script src="https://d3js.org/d3.v7.min.js"></script>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: "Helvetica Neue", Arial, sans-serif;
+    background: #F8F9FC;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 30px;
+  }
+  h1 { font-size: 20px; color: #21295C; margin-bottom: 4px; text-align: center; }
+  .subtitle { font-size: 12px; color: #888; margin-bottom: 20px; text-align: center; max-width: 640px; }
+  .grid {
+    display: flex; flex-wrap: wrap; gap: 22px;
+    justify-content: center; max-width: 1050px;
+  }
+  .panel {
+    background: white; border-radius: 12px;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    padding: 10px 6px 4px;
+  }
+  .panel-title {
+    text-align: center; font-size: 16px; font-weight: bold;
+    color: #21295C; margin-bottom: 2px;
+  }
+  .tooltip {
+    position: fixed; background: white;
+    border: 1px solid #E0E4F0; border-radius: 8px;
+    padding: 8px 12px; font-size: 12px; color: #333;
+    pointer-events: none; box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    display: none; z-index: 100;
+  }
+</style>
+</head>
+<body>
+<h1>Fingerprint Matching — Radar</h1>
+<div class="subtitle">Here are all five shapes again, shown separately and without names, in a new random order. Hover a point for its value. Use the reference view you saw earlier to decide which shape belongs to which author.</div>
+
+<div class="grid" id="grid"></div>
+<div class="tooltip" id="tooltip"></div>
+
+<script>
+const sectors = [
+  "Almond","Canongate","Craigentinny/Duddingston","Forth","Inverleith",
+  "Leith","Liberton/Gilmerton","New Town","Old Town","Pentlands",
+  "Portobello/Craigmillar","South Central","South West","Western Edinburgh"
+];
+
+// Fixed assignment (same for every participant -- not randomised per
+// session, since this page is opened outside Qualtrics and has no way
+// to report back which shuffle a given participant saw). Answer key is
+// documented in qualtrics_build_guide.md for scoring.
+const shapes = [
+  {"letter": "A", "values": {"Almond": 0.025, "Canongate": 0.0067, "Craigentinny/Duddingston": 0.025, "Forth": 0.0298, "Inverleith": 0.0211, "Leith": 0.4428, "Liberton/Gilmerton": 0.0259, "New Town": 0.097, "Old Town": 0.0711, "Pentlands": 0.0509, "Portobello/Craigmillar": 0.0269, "South Central": 0.0615, "South West": 0.0855, "Western Edinburgh": 0.0307}},
+  {"letter": "B", "values": {"Almond": 0.0498, "Canongate": 0.0074, "Craigentinny/Duddingston": 0.0554, "Forth": 0.0111, "Inverleith": 0.0424, "Leith": 0.1587, "Liberton/Gilmerton": 0.0074, "New Town": 0.1919, "Old Town": 0.2066, "Pentlands": 0.1697, "Portobello/Craigmillar": 0.0314, "South Central": 0.0406, "South West": 0.0018, "Western Edinburgh": 0.0258}},
+  {"letter": "C", "values": {"Almond": 0.0065, "Canongate": 0.0094, "Craigentinny/Duddingston": 0.0094, "Forth": 0.001, "Inverleith": 0.1655, "Leith": 0.0332, "Liberton/Gilmerton": 0.0098, "New Town": 0.4356, "Old Town": 0.0942, "Pentlands": 0.0182, "Portobello/Craigmillar": 0.0065, "South Central": 0.1795, "South West": 0.0137, "Western Edinburgh": 0.0173}},
+  {"letter": "D", "values": {"Almond": 0.0046, "Canongate": 0.1261, "Craigentinny/Duddingston": 0.0344, "Forth": 0.0115, "Inverleith": 0.0115, "Leith": 0.0917, "Liberton/Gilmerton": 0.1124, "New Town": 0.2592, "Old Town": 0.2087, "Pentlands": 0.0092, "Portobello/Craigmillar": 0.0642, "South Central": 0.0436, "South West": 0.0092, "Western Edinburgh": 0.0138}},
+  {"letter": "E", "values": {"Almond": 0.0174, "Canongate": 0.1594, "Craigentinny/Duddingston": 0.0536, "Forth": 0.0014, "Inverleith": 0.0159, "Leith": 0.0957, "Liberton/Gilmerton": 0.0928, "New Town": 0.0725, "Old Town": 0.3203, "Pentlands": 0.0217, "Portobello/Craigmillar": 0.0696, "South West": 0.0101, "South Central": 0.0507, "Western Edinburgh": 0.0188}}
+];
+
+const NEUTRAL = "#5B6B8C";
+const N = sectors.length;
+const angleStep = (2 * Math.PI) / N;
+const angle = i => i * angleStep - Math.PI / 2;
+// Shared max across all five shapes, so panel-to-panel size differences
+// are real signal, not an artefact of independently-scaled axes.
+const maxVal = d3.max(shapes, sh => d3.max(sectors, s => sh.values[s]));
+const W = 300, H = 300, cx = W/2, cy = H/2, R = 100;
+
+const tooltip = document.getElementById("tooltip");
+const grid = document.getElementById("grid");
+
+shapes.forEach(shape => {
+  const panel = document.createElement("div");
+  panel.className = "panel";
+  const title = document.createElement("div");
+  title.className = "panel-title";
+  title.textContent = "Shape " + shape.letter;
+  panel.appendChild(title);
+  grid.appendChild(panel);
+
+  const svg = d3.select(panel).append("svg").attr("width", W).attr("height", H);
+
+  [1,2,3].forEach(l => {
+    svg.append("circle")
+      .attr("cx", cx).attr("cy", cy)
+      .attr("r", R * l / 3)
+      .attr("fill", "none")
+      .attr("stroke", "#D0D8E8")
+      .attr("stroke-width", 0.7);
+  });
+
+  sectors.forEach((s, i) => {
+    const a = angle(i);
+    svg.append("line")
+      .attr("x1", cx).attr("y1", cy)
+      .attr("x2", cx + R * Math.cos(a))
+      .attr("y2", cy + R * Math.sin(a))
+      .attr("stroke", "#C0C8D8").attr("stroke-width", 0.6);
+  });
+
+  const g = svg.append("g").attr("transform", `translate(${cx},${cy})`);
+  const vals = sectors.map(s => shape.values[s]);
+  const line = d3.lineRadial()
+    .radius(d => d / maxVal * R)
+    .angle((d, i) => i * angleStep)
+    .curve(d3.curveLinearClosed);
+
+  g.append("path").datum(vals).attr("d", line)
+    .attr("fill", NEUTRAL).attr("fill-opacity", 0.15).attr("stroke", "none");
+  g.append("path").datum(vals).attr("d", line)
+    .attr("fill", "none").attr("stroke", NEUTRAL)
+    .attr("stroke-width", 2).attr("stroke-linejoin", "round");
+
+  sectors.forEach((sector, i) => {
+    const a = angle(i);
+    const val = shape.values[sector];
+    const px = (val / maxVal) * R * Math.cos(a);
+    const py = (val / maxVal) * R * Math.sin(a);
+    g.append("circle")
+      .attr("cx", px).attr("cy", py).attr("r", 10)
+      .attr("fill", NEUTRAL).attr("opacity", 0)
+      .on("mouseover", function() {
+        d3.select(this).attr("opacity", 0.85).attr("r", 12);
+        tooltip.style.display = "block";
+        tooltip.innerHTML = `Shape ${shape.letter} — ${sector}: <strong>${(val*100).toFixed(1)}%</strong> of mentions`;
+      })
+      .on("mousemove", function(event) {
+        tooltip.style.left = (event.clientX + 14) + "px";
+        tooltip.style.top  = (event.clientY - 10) + "px";
+      })
+      .on("mouseout", function() {
+        d3.select(this).attr("opacity", 0).attr("r", 10);
+        tooltip.style.display = "none";
+      });
+  });
+});
+</script>
+</body>
+</html>
