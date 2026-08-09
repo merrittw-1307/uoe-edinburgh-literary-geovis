@@ -3,7 +3,7 @@
 
 **说明 / Note:** 本文档只包含问卷本身，逐屏排列，可以直接从上到下照抄进Qualtrics。设计说明、招募方案、分析方法见 `ethics/user_study_handbook.md`。本问卷内容与论文 `dissertation/5Aug/dissertation.tex` 的 Appendix A（Task Questions / Survey Questions）完全同步——如果以后要改问卷措辞，两边都要改，保持一致。
 
-预计用时：**35-50分钟**（已同步进最新版PIS）。
+预计用时：**50-65分钟**（几轮修改后的最新估计——PIS/Consent Form里的时间区间尚未同步，见文末提醒）。
 
 ---
 
@@ -13,7 +13,7 @@
 >
 > Thank you for considering taking part in this study about visualising Edinburgh's literary geography. Before you begin, please read the Participant Information Sheet [attach/link the PDF here].
 >
-> This should take about 35–50 minutes. There are no right or wrong answers — we're interested in your honest first impressions.
+> This should take about 50–65 minutes. There are no right or wrong answers — we're interested in your honest first impressions.
 >
 > This project has ethics approval from the Informatics Research Ethics Committee (reference 446635).
 
