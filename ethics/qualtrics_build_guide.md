@@ -2,9 +2,9 @@
 
 **这份文档的用途**：跟着从上到下一步步做，照抄英文文字进Qualtrics，就能把问卷完整搭出来，不需要再回头查别的文档。题目内容跟 `ethics/user_study_questionnaire.md`（问卷正本）以及论文 `dissertation/5Aug/dissertation.tex` 的 Appendix A 完全一致——这份文档只是把那份内容翻译成"在Qualtrics里具体怎么点"的操作步骤。
 
-**预计搭建时间**：3–4小时（Fingerprint部分是"参考版 → 盲测版 → 匹配版"三步结构，每个设计内部还多了F1b、P1两道新题；Topology每个设计多了T1b、T-Strength矩阵评分、T-ClusterVerify识别题三道新题，且Strength/ClusterVerify在三个设计里内容各不相同，需要分别录入；第一次用Qualtrics会慢一些，跟着做不用自己想措辞）。
+**预计搭建时间**：3–4小时（Fingerprint部分是"参考版 → 盲测版 → 匹配版"三步结构，每个设计内部还多了F0、F1b、P1三道新题；Topology每个设计多了T1b、T-Strength矩阵评分、T-ClusterVerify识别题三道新题，且Strength/ClusterVerify在三个设计里内容各不相同，需要分别录入；第一次用Qualtrics会慢一些，跟着做不用自己想措辞）。
 
-**链接核实状态**：2026年8月9日更新（当天四次修改）——Fingerprint任务每个block用三个链接：Step 1参考版（原本的`radar.html`/`barcode.html`/`small_multiples.html`，5人都标名字，用来让参与者自主总结规律）→ Step 2盲测版（`radar_task.html`/`barcode_task.html`/`small_multiples_task.html`，去掉名字，只留1位作者，图形颜色也已改成中性色（不再沿用参考版的作者专属颜色），用来回答F1/F1b/F2/F3/F4）→ Step 3匹配版（`radar_matching.html`/`barcode_matching.html`/`small_multiples_matching.html`，5位作者全部再出现一次、全部不署名、顺序打乱、同样是中性色，用来回答M1/M2/P1）；Topology任务每个block只用一个原版链接，但每个block内部新增了T1b（自由文本解释）、T-Strength（评分矩阵）和T-ClusterVerify（识别选择题）三道不需要额外链接的新题，且后两道题在Network/Linear/Metro三个block里具体内容各不相同（原因见第5、8节——都是为了避免参与者不看图直接照抄记忆/上一个设计的答案）。全部链接（3参考版 + 3盲测版 + 3匹配版 + Topology原版3个 + PIS）当天逐一实测，全部200正常返回。
+**链接核实状态**：2026年8月9日更新（当天五次修改）——Fingerprint任务每个block用三个链接：Step 1参考版（原本的`radar.html`/`barcode.html`/`small_multiples.html`，5人都标名字，用来让参与者自主总结规律）→ Step 2盲测版（`radar_task.html`/`barcode_task.html`/`small_multiples_task.html`，去掉名字，只留1位作者，图形颜色也已改成中性色（不再沿用参考版的作者专属颜色），用来回答F0/F1/F1b/F2/F3/F4）→ Step 3匹配版（`radar_matching.html`/`barcode_matching.html`/`small_multiples_matching.html`，5位作者全部再出现一次、全部不署名、顺序打乱、同样是中性色，用来回答M1/M2/P1）；Topology任务每个block只用一个原版链接，但每个block内部新增了T1b（自由文本解释）、T-Strength（评分矩阵）和T-ClusterVerify（识别选择题）三道不需要额外链接的新题，且后两道题在Network/Linear/Metro三个block里具体内容各不相同（原因见第5、8节——都是为了避免参与者不看图直接照抄记忆/上一个设计的答案）。全部链接（3参考版 + 3盲测版 + 3匹配版 + Topology原版3个 + PIS）当天逐一实测，全部200正常返回。
 
 ---
 
@@ -279,6 +279,8 @@ Please confirm the following before continuing:
 
 **⚠️ Step 2盲测版的图形颜色已改成中性色，不再沿用Step 1参考版的作者专属颜色（2026年8月9日第三次修改，Merritt指出的问题）**：早期版本里`_task.html`用的是那位作者在参考版里原本的颜色（比如Scott在参考版是金色，盲测版也是金色）——这意味着参与者根本不需要看形状，只要记住"参考图里金色的是Scott"这一个颜色标签就能在F1蒙对，测出来的是参与者的颜色记忆力，不是"图形能不能被学会认出来"，完全偏离了RQ1想验证的东西。现在三个`_task.html`文件的图形颜色都已经统一改成中性灰蓝色`#5B6B8C`，跟参考版的颜色不一样，参与者只能靠形状本身判断。Step 3匹配版和Fingerprint的P1从设计之初就已经是中性色，不受影响。
 
+**⚠️ 光改颜色还不够彻底，新增F0专门检验是否真正读懂图形（2026年8月9日第四次修改，Merritt指出的更深层问题）**：就算颜色改成中性色，参与者理论上还是可以纯靠"记住这个锯齿轮廓对应参考图里的Scott"这种**整体剪影记忆**蒙对F1，完全不需要理解"这个尖峰指向Old Town方向，代表这位作者写Old Town写得最多"这层真正的语义——这样测出来的还是识别记忆力，不是"图形有没有把信息真正传达给读者"。F0是加在F1**前面**的一道客观读图题，只看当前这张盲测图本身就能回答、完全不需要记住参考图，直接问"根据这张图，这位作者写得最多的是[哪个扇区/哪个地点]"，选项是真实数据里排名前4接近的候选（不是随便编的假选项）。即使参与者完全没看过参考图，单凭这张盲测图本身也应该能答对——这是跟F1"认出是谁"完全独立的"有没有读懂这张图"检验。
+
 ### Block 5 — 命名为 `Fingerprint - Radar`
 
 #### Q-FP-Radar-Reference
@@ -312,6 +314,26 @@ Please confirm the following before continuing:
   ```
   https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/radar_task.html
   ```
+
+#### Q-FP-Radar-F0 *(★2026年8月9日第四次新增)*
+- **Question Type**：`Multiple Choice`，Single Answer
+- **Question Text**：
+
+  ```
+  Based on the chart shown above (not your memory of the earlier reference view), which sector does this author's writing concentrate on the most?
+  ```
+
+- **Answer Choices**（真实数据里这位作者排名前4的扇区，不是随便编的假选项）：
+
+  ```
+  Old Town
+  Canongate
+  Leith
+  Liberton/Gilmerton
+  ```
+
+- Force Response On；**打开"Randomize choice order"**（正确答案Old Town不能每次都排第一）
+- **为什么加这道题**：光把盲测版的颜色改成中性色（见上面Q-FP-Radar-Blind的说明）还不够彻底——参与者理论上还是可以纯靠"记住这个锯齿轮廓对应参考图里的Scott"这种整体剪影记忆蒙对F1，完全不需要理解"这个尖峰指向Old Town方向，代表这位作者写Old Town写得最多"这层真正的语义。这道题只看**当前这张盲测图本身**就能回答，完全不需要记住参考图——直接检验参与者有没有真正读懂图形在说什么，而不是在匹配一个记住的抽象轮廓。即使参与者完全没看过参考图，单凭这张盲测图本身也应该能答对，这是跟F1"认出是谁"完全独立的"有没有读懂这张图"检验。
 
 #### Q-FP-Radar-F1
 - **Question Type**：`Multiple Choice`，Single Answer
@@ -495,7 +517,7 @@ Please confirm the following before continuing:
 
 ### Block 6 — 命名为 `Fingerprint - Barcode`
 
-跟Block 5完全相同的结构（Reference → Page Break → Blind + F1-F1b-F2-F3-F4 → Page Break → Matching + M1-M2-P1，文字一字不改，**M1矩阵的行标签改成"Row A"–"Row E"**），**唯一区别是三个链接和P1的题干**：
+跟Block 5完全相同的结构（Reference → Page Break → Blind + F0-F1-F1b-F2-F3-F4 → Page Break → Matching + M1-M2-P1，文字一字不改，**M1矩阵的行标签改成"Row A"–"Row E"**），**唯一区别是三个链接、F0的选项、和P1的题干**：
 
 - Step 1参考版：
   ```
@@ -508,6 +530,16 @@ Please confirm the following before continuing:
 - Step 3匹配版：
   ```
   https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/barcode_matching.html
+  ```
+- Q-FP-Barcode-F0题干和选项（Bar-code是逐个地点的图，问的是"具体地点"不是"扇区"；真实数据里Lockhart排名前4的地点）：
+  ```
+  Based on the bars shown above, which place does this author mention the most?
+  ```
+  ```
+  Canongate
+  Castle Street
+  Leith
+  Holyrood
   ```
 - Q-FP-Barcode-P1题干和选项（用真实数据算出来的Bar-code设计里第二相似的一对——最相似的一对是Lockhart/Scott，Radar已经用过了，为了不让参与者靠"上一个设计也是这两个人"这种捷径蒙对，Bar-code故意选了第二相似的一对）：
   ```
@@ -522,7 +554,7 @@ Please confirm the following before continuing:
 
 ### Block 7 — 命名为 `Fingerprint - Small Multiples`
 
-同样的结构（**M1矩阵的行标签改成"Map A"–"Map E"**），**唯一区别是三个链接和P1的题干**：
+同样的结构（**M1矩阵的行标签改成"Map A"–"Map E"**），**唯一区别是三个链接、F0的选项、和P1的题干**：
 
 - Step 1参考版：
   ```
@@ -536,6 +568,16 @@ Please confirm the following before continuing:
   ```
   https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/small_multiples_matching.html
   ```
+- Q-FP-SmallMultiples-F0题干和选项（真实数据里Stevenson按提及次数排名前4的地点，问的是"最大的气泡"）：
+  ```
+  Based on the map shown above, which place does this author mention the most (look for the largest bubble)?
+  ```
+  ```
+  Leith
+  Princes Street
+  Cramond
+  Swanston
+  ```
 - Q-FP-SmallMultiples-P1题干和选项（Small Multiples设计里最相似的一对，按各地点mention数汇总到扇区后算余弦相似度得出）：
   ```
   Look again at Map A and Map D above. One of them is John Gibson Lockhart and the other is Robert Louis Stevenson. Which is which?
@@ -545,7 +587,15 @@ Please confirm the following before continuing:
   Map A = Robert Louis Stevenson, Map D = John Gibson Lockhart
   ```
 
-**省时间小技巧**：与其把Block 5的三个链接问题、两个Page Break、F1-F1b-F2-F3-F4、M1-M2-P1重新搭一遍，不如在Block列表里对Block 5点右键（或三个点菜单）选 **Copy Block**，复制出Block 6和Block 7（两个Page Break都会一起被复制），再进去只改三个链接、M1的行标签文字、P1的题干和选项、和block名字，其余全部不用动。
+**省时间小技巧**：与其把Block 5的三个链接问题、两个Page Break、F0-F1-F1b-F2-F3-F4、M1-M2-P1重新搭一遍，不如在Block列表里对Block 5点右键（或三个点菜单）选 **Copy Block**，复制出Block 6和Block 7（两个Page Break都会一起被复制），再进去只改三个链接、F0的选项、M1的行标签文字、P1的题干和选项、和block名字，其余全部不用动。
+
+**⚠️ F0打分用的固定答案**：
+
+| 设计 | F0正确答案 |
+|---|---|
+| Radar | Old Town |
+| Bar-code | Canongate |
+| Small Multiples | Leith |
 
 **⚠️ 打分用的固定答案（Matrix Table没有"正确答案"这个功能，Qualtrics只负责收集参与者选了什么，评分要你自己在导出数据后手动核对）**：
 
@@ -1019,7 +1069,7 @@ Debrief
 - **Survey Termination**：把默认的"结束语"改成尽量简短，或者留空——因为咱们自己的 `Debrief` block已经包含完整的感谢语，不需要Qualtrics再弹一个重复的默认感谢页。
 - **Security → Anonymize Responses**：打开。这跟PIS和伦理申请里"数据最小化"的承诺一致——不记录IP地址等可识别信息。
 - **General → Back Button**：建议打开，让参与者可以往回改之前的答案（更友好，不强制）。
-- **General → Progress Bar**：建议开启，选 "Text"（显示"还剩几题"或百分比），让67题的问卷显得没那么令人却步。
+- **General → Progress Bar**：建议开启，选 "Text"（显示"还剩几题"或百分比），让70题的问卷显得没那么令人却步。
 
 ---
 
@@ -1033,7 +1083,7 @@ Debrief
 - [ ] **（★2026年8月9日新增，防记忆作弊）**Step 2盲测版（`_task.html`）里图形的颜色应该是中性灰蓝色（`#5B6B8C`），**不应该**跟Step 1参考版里那位作者的专属颜色一样（比如Scott在参考版里是金色，盲测版里不能也是金色）——如果颜色跟参考版对上了，说明这次改动没生效或者被还原了，参与者能靠记颜色蒙对F1，必须再检查一次源代码里的`colors`/`authorColors`
 - [ ] Fingerprint每个block里，Step 1→2、Step 2→3之间各有一个Page Break且都生效——预览时确认看完参考版点Next翻到新的一屏才看到盲测版链接，看完F4点Next再翻一屏才看到匹配版链接，不是所有内容挤在同一屏
 - [ ] M1矩阵表（Q-FP-Radar/Barcode/SmallMultiples-M1）5行都能正常单选，不选满直接点Next会被Force Response拦住；确认行标签在三个block里分别是"Shape A-E"/"Row A-E"/"Map A-E"，不是三个都写成同一套字母含义
-- [ ] **（★2026年8月9日新增）**F1b在F1下面正常出现，选项是5个作者（没有"I don't know"）；P1在M2下面正常出现，题干里提到的两个字母（比如Radar的"Shape D"和"Shape E"）跟Step 3匹配版页面上实际显示的字母对得上，三个Fingerprint block的P1题干和答案选项**互不相同**（不是三个都问同一对作者）
+- [ ] **（★2026年8月9日新增）**F0在F1**前面**正常出现，三个block的选项分别是"Old Town/Canongate/Leith/Liberton-Gilmerton"（Radar）、"Canongate/Castle Street/Leith/Holyrood"（Barcode）、"Leith/Princes Street/Cramond/Swanston"（Small Multiples），已打开"Randomize choice order"；F1b在F1下面正常出现，选项是5个作者（没有"I don't know"）；P1在M2下面正常出现，题干里提到的两个字母（比如Radar的"Shape D"和"Shape E"）跟Step 3匹配版页面上实际显示的字母对得上，三个Fingerprint block的F0选项和P1题干/答案选项**互不相同**（不是三个都问同一套内容）
 - [ ] **（★2026年8月9日新增）**T1后面紧跟着T1b（自由文本"是这张图的什么特征让你这样判断"），三个Topology block都要有
 - [ ] **（★2026年8月9日新增，防抄答案）**T-Strength和T-ClusterVerify在Network/Linear/Metro三个block里的**具体地名和选项要各不相同**（不能三个block长得一模一样）——对照第8节末尾的汇总表逐个核实：Network的Strength是New Town&Princes Street/Lochend&Waverley Station/Leith&Silvermills，Linear应该是Dundas Street&Princes Street/Old Town&Princes Street/Arthur's Seat&Haddington，Metro应该是Bruntsfield&Dundas Street/Howe Street&Stockbridge/Dalkeith&Linlithgow——如果三个block填的是同一套地名，说明复制Block时忘了改，参与者会直接抄上一个block的答案；T-ClusterVerify的三个选项也已经打开"Randomize choice order"（多刷新几次预览，确认三个选项的顺序真的在变，不是每次都一样）
 - [ ] Consent页四个复选框不勾选、直接点Next，确认页面**不会**往下走（会提示"请完成必答题"）
