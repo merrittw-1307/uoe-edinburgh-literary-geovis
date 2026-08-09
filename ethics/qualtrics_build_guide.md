@@ -2,9 +2,9 @@
 
 **这份文档的用途**：跟着从上到下一步步做，照抄英文文字进Qualtrics，就能把问卷完整搭出来，不需要再回头查别的文档。题目内容跟 `ethics/user_study_questionnaire.md`（问卷正本）以及论文 `dissertation/5Aug/dissertation.tex` 的 Appendix A 完全一致——这份文档只是把那份内容翻译成"在Qualtrics里具体怎么点"的操作步骤。
 
-**预计搭建时间**：2.5–3.5小时（Fingerprint部分现在是"参考版 → 盲测版 → 匹配版"三步结构，外加M1矩阵表和M2评分两道新题，比两步结构再多一点搭建量；第一次用Qualtrics会慢一些，跟着做不用自己想措辞）。
+**预计搭建时间**：3–4小时（Fingerprint部分是"参考版 → 盲测版 → 匹配版"三步结构，每个设计内部还多了F1b、P1两道新题；Topology每个设计也多了T-Strength矩阵评分和T-ClusterVerify识别题两道新题；第一次用Qualtrics会慢一些，跟着做不用自己想措辞）。
 
-**链接核实状态**：2026年8月9日更新（当天两次修改）——Fingerprint任务每个block现在用三个链接：Step 1参考版（原本的`radar.html`/`barcode.html`/`small_multiples.html`，5人都标名字，用来让参与者自主总结规律）→ Step 2盲测版（`radar_task.html`/`barcode_task.html`/`small_multiples_task.html`，去掉名字，只留1位作者，用来回答F1-F4）→ Step 3匹配版（`radar_matching.html`/`barcode_matching.html`/`small_multiples_matching.html`，5位作者全部再出现一次、全部不署名、顺序打乱，用来回答M1-M2），原因见第5节。全部链接（3参考版 + 3盲测版 + 3匹配版 + Topology原版3个 + PIS）当天逐一实测，全部200正常返回。
+**链接核实状态**：2026年8月9日更新（当天三次修改）——Fingerprint任务每个block用三个链接：Step 1参考版（原本的`radar.html`/`barcode.html`/`small_multiples.html`，5人都标名字，用来让参与者自主总结规律）→ Step 2盲测版（`radar_task.html`/`barcode_task.html`/`small_multiples_task.html`，去掉名字，只留1位作者，用来回答F1/F1b/F2/F3/F4）→ Step 3匹配版（`radar_matching.html`/`barcode_matching.html`/`small_multiples_matching.html`，5位作者全部再出现一次、全部不署名、顺序打乱，用来回答M1/M2/P1）；Topology任务每个block只用一个原版链接，但每个block内部新增了T-Strength（评分矩阵）和T-ClusterVerify（识别选择题）两道不需要额外链接的新题，原因分别见第5节和第8节。全部链接（3参考版 + 3盲测版 + 3匹配版 + Topology原版3个 + PIS）当天逐一实测，全部200正常返回。
 
 ---
 
@@ -69,13 +69,13 @@
 - 链接下面继续粘贴：
 
   ```
-  This should take about 40–55 minutes. There are no right or wrong answers — we're interested in your honest first impressions.
+  This should take about 45–60 minutes. There are no right or wrong answers — we're interested in your honest first impressions.
 
   This project has ethics approval from the Informatics Research Ethics Committee (reference 446635).
   ```
 
 - 这道题不需要设置 Force Response（纯说明文字，没有交互）。
-- **⚠️ 时间区间已从"35–50分钟"改成"40–55分钟"（2026年8月9日，因为Fingerprint部分新增了Step 3匹配环节）**：这里改的只是Qualtrics题目里的文字。已经定稿的PIS文件（`ethics/PIS_Merritt_final.docx` / `dissertation/5Aug/pis.pdf`）用的还是旧的"35-50分钟"，这份文件不由这份操作手册管，需要Merritt自己打开确认要不要同步改成"40-55分钟"——参见 `user_study_handbook.md` 里的提醒。
+- **⚠️ 时间区间已从"35–50分钟"→"40–55分钟"→"45–60分钟"（2026年8月9日两次修改：第一次加了Step 3匹配环节，第二次又给Fingerprint加了F1b/P1、给Topology加了T-Strength/T-ClusterVerify）**：这里改的只是Qualtrics题目里的文字。已经定稿的PIS文件（`ethics/PIS_Merritt_final.docx` / `dissertation/5Aug/pis.pdf`）用的还是最早的"35-50分钟"，这份文件不由这份操作手册管，需要Merritt自己打开确认要不要同步改成"45-60分钟"——参见 `user_study_handbook.md` 里的提醒。
 
 ---
 
@@ -332,6 +332,27 @@ Please confirm the following before continuing:
 
 - Force Response On；不要随机化选项顺序
 
+#### Q-FP-Radar-F1b *(★2026年8月9日新增)*
+- **Question Type**：`Multiple Choice`，Single Answer
+- **Question Text**：
+
+  ```
+  If your first guess turned out to be wrong, which of the five would be your second guess?
+  ```
+
+- **Answer Choices**（跟F1一样5个作者，不需要"I don't know"这个选项——这道题就是逼参与者做出一个第二选择）：
+
+  ```
+  Alexander McCall Smith
+  Irvine Welsh
+  John Gibson Lockhart
+  Walter Scott
+  Robert Louis Stevenson
+  ```
+
+- Force Response On
+- **为什么加这道题**：F1本身只能拿到"对/错"一个bit，如果很多人一次就猜对或一次就猜错，数据会很单薄，看不出"这个人是完全瞎猜还是至少缩小到了2个候选人"这种更细致的信息——这道题就是用来捕捉这个的。不需要用Display Logic排除F1选过的那个选项，参与者重复选同一个也没关系（分析时按"和F1相同=没有产生有效的第二猜测"处理即可），这样能省掉一层没必要的逻辑配置。
+
 #### Q-FP-Radar-F2
 - **Question Type**：`Multiple Choice`，Single Answer
 - **Question Text**：
@@ -450,11 +471,29 @@ Please confirm the following before continuing:
 
 - Force Response On
 
+#### Q-FP-Radar-P1 *(★2026年8月9日新增)*
+- **Question Type**：`Multiple Choice`，Single Answer
+- **Question Text**：
+
+  ```
+  Look again at Shape D and Shape E above. One of them is John Gibson Lockhart and the other is Walter Scott. Which is which?
+  ```
+
+- **Answer Choices**：
+
+  ```
+  Shape D = John Gibson Lockhart, Shape E = Walter Scott
+  Shape D = Walter Scott, Shape E = John Gibson Lockhart
+  ```
+
+- Force Response On；不需要额外链接，用的还是上面Q-FP-Radar-Matching那个页面
+- **为什么是这两个字母、这两位作者**：用真实的雷达图14维扇区数据算余弦相似度，Lockhart和Scott是Radar设计里全部10对作者组合中最相似的一对（相似度0.844，远高于第二名的0.785），也就是最容易被搞混的一对。M1的5×5矩阵测的是整体区分度，但如果5个形状本来就长得很不一样，M1可能整体正确率很高，看不出"其实某两个作者特别容易混淆"这个更细节的问题（天花板效应）；直接挑出最难分辨的这一对做成二选一，能保证这道题的难度是有依据的、不会因为选项太明显而失去意义，二选一（50%基线）也不会因为选项太多而变得太难。
+
 ---
 
 ### Block 6 — 命名为 `Fingerprint - Barcode`
 
-跟Block 5完全相同的结构（Reference → Page Break → Blind + F1-F4 → Page Break → Matching + M1-M2，文字一字不改，**M1矩阵的行标签改成"Row A"–"Row E"**），**唯一区别是三个链接**：
+跟Block 5完全相同的结构（Reference → Page Break → Blind + F1-F1b-F2-F3-F4 → Page Break → Matching + M1-M2-P1，文字一字不改，**M1矩阵的行标签改成"Row A"–"Row E"**），**唯一区别是三个链接和P1的题干**：
 
 - Step 1参考版：
   ```
@@ -468,12 +507,20 @@ Please confirm the following before continuing:
   ```
   https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/barcode_matching.html
   ```
+- Q-FP-Barcode-P1题干和选项（用真实数据算出来的Bar-code设计里第二相似的一对——最相似的一对是Lockhart/Scott，Radar已经用过了，为了不让参与者靠"上一个设计也是这两个人"这种捷径蒙对，Bar-code故意选了第二相似的一对）：
+  ```
+  Look again at Row A and Row D above. One of them is Walter Scott and the other is Irvine Welsh. Which is which?
+  ```
+  ```
+  Row A = Walter Scott, Row D = Irvine Welsh
+  Row A = Irvine Welsh, Row D = Walter Scott
+  ```
 
 ---
 
 ### Block 7 — 命名为 `Fingerprint - Small Multiples`
 
-同样的结构（**M1矩阵的行标签改成"Map A"–"Map E"**），**唯一区别是三个链接**：
+同样的结构（**M1矩阵的行标签改成"Map A"–"Map E"**），**唯一区别是三个链接和P1的题干**：
 
 - Step 1参考版：
   ```
@@ -487,8 +534,16 @@ Please confirm the following before continuing:
   ```
   https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/ethics/study_stimuli/small_multiples_matching.html
   ```
+- Q-FP-SmallMultiples-P1题干和选项（Small Multiples设计里最相似的一对，按各地点mention数汇总到扇区后算余弦相似度得出）：
+  ```
+  Look again at Map A and Map D above. One of them is John Gibson Lockhart and the other is Robert Louis Stevenson. Which is which?
+  ```
+  ```
+  Map A = John Gibson Lockhart, Map D = Robert Louis Stevenson
+  Map A = Robert Louis Stevenson, Map D = John Gibson Lockhart
+  ```
 
-**省时间小技巧**：与其把Block 5的三个链接问题、两个Page Break、F1-F4、M1-M2重新搭一遍，不如在Block列表里对Block 5点右键（或三个点菜单）选 **Copy Block**，复制出Block 6和Block 7（两个Page Break都会一起被复制），再进去只改三个链接、M1的行标签文字、和block名字，其余全部不用动。
+**省时间小技巧**：与其把Block 5的三个链接问题、两个Page Break、F1-F1b-F2-F3-F4、M1-M2-P1重新搭一遍，不如在Block列表里对Block 5点右键（或三个点菜单）选 **Copy Block**，复制出Block 6和Block 7（两个Page Break都会一起被复制），再进去只改三个链接、M1的行标签文字、P1的题干和选项、和block名字，其余全部不用动。
 
 **⚠️ 打分用的固定答案（Matrix Table没有"正确答案"这个功能，Qualtrics只负责收集参与者选了什么，评分要你自己在导出数据后手动核对）**：
 
@@ -609,6 +664,35 @@ Please confirm the following before continuing:
 
 - Force Response On
 
+#### Q-TP-Network-Strength *(★2026年8月9日新增)*
+- **Question Type**：`Matrix Table`（跟Fingerprint的M1一样，在题库里搜"Matrix"）
+- **Question Text**：
+
+  ```
+  For each of the following pairs of places, how strongly connected do they appear to be in this visualisation?
+  ```
+
+- **Statements（行）**：
+
+  ```
+  New Town & Princes Street
+  Lochend & Waverley Station
+  Leith & Silvermills
+  ```
+
+- **Answer Choices（列，5点量表）**：
+
+  ```
+  Not connected at all
+  Slightly connected
+  Moderately connected
+  Strongly connected
+  Extremely strongly connected
+  ```
+
+- Force Response On
+- **为什么加这道题、这三对地名怎么选的**：T1只让参与者自己找"最强的一对"，如果这一对在图上过于突出（这份数据里Leith-Princes Street权重28，确实明显比其他都高），T1很可能出现天花板效应——几乎人人都答对，看不出三个Topology设计之间在"传达连接强度"这件事上到底谁做得更好。这道题反过来，直接给三对**真实权重分别是强(New Town-Princes Street，权重18)/中(Lochend-Waverley Station，权重4)/弱(Leith-Silvermills，权重2)**的地名（数据来自`data/processed/dir_2/network/data/network_enriched.json`的edges列表，故意避开了T1本来就该被参与者自己找出来的最强那一对，避免完全重复），让参与者对每一对打分。这样即使T1饱和，这道题依然能看出"参与者对连接强弱的感知"跟"真实权重"匹配到什么程度，三个设计（Network/Linear/Metro）用的是同一组共现权重数据，可以直接互相比较评分结果。
+
 #### Q-TP-Network-T3
 - **Question Type**：`Text Entry`，Essay
 - **Question Text**：
@@ -629,6 +713,26 @@ Please confirm the following before continuing:
   ```
 
 - Force Response Off
+
+#### Q-TP-Network-ClusterVerify *(★2026年8月9日新增)*
+- **Question Type**：`Multiple Choice`，Single Answer
+- **Question Text**：
+
+  ```
+  Which of the following groups of places looks like it forms the tightest cluster of interconnections in this visualisation?
+  ```
+
+- **Answer Choices**：
+
+  ```
+  New Town, Princes Street, Dundas Street, Stockbridge
+  New Town, Leith Walk, Holyrood, Waverley Station
+  Grassmarket, Bruntsfield, Tollcross, Cramond
+  ```
+
+- Force Response On
+- **⚠️ 打开"Randomize choice order"**（题目编辑界面右侧"Options"或"Response Order"里）——正确答案（第一条：New Town, Princes Street, Dundas Street, Stockbridge，这是对network共现边数据跑Louvain社群检测算出来的真实社群之一）不能每次都排在同一个位置，否则会被参与者看出规律。另外两条是故意跨社群混搭出来的干扰项，本身在图上并不是紧密关联的一组。
+- **为什么加这道题**：T4是完全开放的"你有没有自己发现聚在一起的地名"，很多参与者可能什么都想不出来直接跳过，容易出现地板效应、拿不到量化数据。这道题给一个有明确正确答案的识别版本，保底能算出一个有区分度的正确率；同时可以拿参与者在T4里自己写的分组和这道题选对的那组做交叉比对——如果一个人在两处都独立指向同一组地名，这是比单独任何一处都更有说服力的证据。
 
 #### Q-TP-Network-T5
 - **Question Type**：`Multiple Choice`，Single Answer
@@ -652,7 +756,7 @@ Please confirm the following before continuing:
 
 ### Block 11 — 命名为 `Topology - Linear`
 
-跟Block 10完全一样的5道题（T1-T5文字直接复制），**唯一区别是链接**：
+跟Block 10完全一样的7道题（T1、T2、Strength、T3、T4、ClusterVerify、T5文字全部直接复制，Strength和ClusterVerify的选项也完全一样，因为network和linear背后是同一份共现权重数据），**唯一区别是链接**：
 
 ```
 https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_2/linear/d3/linear.html
@@ -660,13 +764,25 @@ https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir
 
 ### Block 12 — 命名为 `Topology - Metro`
 
-同样5道题，**唯一区别是链接**：
+T1、T2、Strength、T3、T4、T5文字跟Block 10完全一样直接复制（Strength的三对地名也一样，因为metro背后也是同一份共现权重数据）。**只有ClusterVerify的选项要换成metro自己的线路分组**，因为metro有现成的"线路"这个概念，其他两个设计没有：
 
+```
+Which of the following groups of places looks like it forms the tightest cluster of interconnections in this visualisation?
+```
+```
+University of Edinburgh, Royal Society of Edinburgh, Castle Street, St Giles
+Castle Street, St Giles, Pilrig, Tollcross
+Moray Place, Grassmarket, Dalkeith, Hanover Street
+```
+
+正确答案（第一条）是`metro_lines.json`里"Lockhart's Edinburgh"这条线的真实站点；另外两条分别混了"Welsh's Edinburgh"和"Smith's Edinburgh"/"Scott's Edinburgh"的站点，同样要打开"Randomize choice order"。
+
+**链接**：
 ```
 https://merrittw-1307.github.io/uoe-edinburgh-literary-geovis/data/processed/dir_2/metro/d3/metro.html
 ```
 
-**同样建议用 Copy Block 复制Block 10两次，只改链接和block名字。**
+**同样建议用 Copy Block 复制Block 10两次，只改链接、ClusterVerify的三个选项、和block名字。**
 
 ---
 
@@ -852,7 +968,7 @@ Debrief
 - **Survey Termination**：把默认的"结束语"改成尽量简短，或者留空——因为咱们自己的 `Debrief` block已经包含完整的感谢语，不需要Qualtrics再弹一个重复的默认感谢页。
 - **Security → Anonymize Responses**：打开。这跟PIS和伦理申请里"数据最小化"的承诺一致——不记录IP地址等可识别信息。
 - **General → Back Button**：建议打开，让参与者可以往回改之前的答案（更友好，不强制）。
-- **General → Progress Bar**：建议开启，选 "Text"（显示"还剩几题"或百分比），让52题的问卷显得没那么令人却步。
+- **General → Progress Bar**：建议开启，选 "Text"（显示"还剩几题"或百分比），让64题的问卷显得没那么令人却步。
 
 ---
 
@@ -865,10 +981,12 @@ Debrief
 - [ ] **重点检查**：三个Fingerprint block（5/6/7）里，Step 1参考版链接打开后应该看到**5种颜色/5行/5张地图，图例上5个真名都在**；Step 2盲测版链接（`_task.html`结尾）打开后应该看到**只有1个图形/1行/1张地图，完全没有图例、没有作者名字**；Step 3匹配版链接（`_matching.html`结尾）打开后应该看到**5个图形/5行/5张地图全部同时出现，全部只标字母（Shape/Row/Map A-E），没有任何一个标真名**——三者反过来都会出问题（参考版如果只显示1个作者，参与者就没法自主总结规律；盲测版如果显示5个名字，F1这题就直接被剧透了；匹配版如果标了真名，M1就没有意义了）。三个Topology链接（`network.html`/`linear.html`/`metro.html`）打开后应该是**5位作者合并的完整数据**，这个不用区分参考/盲测，本来就只有一种版本
 - [ ] Fingerprint每个block里，Step 1→2、Step 2→3之间各有一个Page Break且都生效——预览时确认看完参考版点Next翻到新的一屏才看到盲测版链接，看完F4点Next再翻一屏才看到匹配版链接，不是所有内容挤在同一屏
 - [ ] M1矩阵表（Q-FP-Radar/Barcode/SmallMultiples-M1）5行都能正常单选，不选满直接点Next会被Force Response拦住；确认行标签在三个block里分别是"Shape A-E"/"Row A-E"/"Map A-E"，不是三个都写成同一套字母含义
+- [ ] **（★2026年8月9日新增）**F1b在F1下面正常出现，选项是5个作者（没有"I don't know"）；P1在M2下面正常出现，题干里提到的两个字母（比如Radar的"Shape D"和"Shape E"）跟Step 3匹配版页面上实际显示的字母对得上，三个Fingerprint block的P1题干和答案选项**互不相同**（不是三个都问同一对作者）
+- [ ] **（★2026年8月9日新增）**Topology三个block里，T-Strength矩阵表3行都能正常评分（New Town&Princes Street / Lochend&Waverley Station / Leith&Silvermills），Network和Linear的T-Strength文字应完全一样；T-ClusterVerify的三个选项已经打开"Randomize choice order"（多刷新几次预览，确认三个选项的顺序真的在变，不是每次都一样），Metro的T-ClusterVerify选项应该是三条地铁线站点组合，跟Network/Linear的选项（New Town/Princes Street那组）不一样
 - [ ] Consent页四个复选框不勾选、直接点Next，确认页面**不会**往下走（会提示"请完成必答题"）
 - [ ] T1那道"Place A / Place B"的双填空框显示正常
 - [ ] B3的"Other (please specify)"选中后确实弹出了填空框
-- [ ] 从头到尾自己填一遍，看总用时是否落在40-55分钟区间（如果太快，说明填得太随意，正常参与者会更慢；这一步主要是确认题目数量和长度感觉对不对）
+- [ ] 从头到尾自己填一遍，看总用时是否落在45-60分钟区间（如果太快，说明填得太随意，正常参与者会更慢；这一步主要是确认题目数量和长度感觉对不对）
 - [ ] 预览完成后回到 Data & Analysis，**删除你自己这条预览/测试产生的记录**，避免混进正式数据
 
 全部确认无误后，点 **Publish**，然后去 **Distributions** 标签页 → **Anonymous Link**，复制生成的链接——这就是要发给参与者、以及明天要发给Uta的那个问卷链接。
