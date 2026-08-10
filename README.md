@@ -94,13 +94,17 @@ A follow-up investigation, kept fully separate from the six canonical files abov
     │       │   ├── network/        py, d3, data
     │       │   ├── linear/         py, d3, data
     │       │   └── metro/          py, d3, data
+    │       ├── combined/                           Combined Interface: all six views, one author selector
+    │       │   ├── py/, d3/ (incl. history/ of prior versions), data/
     │       └── scale_exploration/                  Author/book-count scaling investigation (see above)
     │           ├── py/, d3/, data/, NOTES.md
     ├── dissertation/
     │   └── <DDMon>/                                LaTeX source, one dated folder per export (e.g. 10Jul/)
     ├── ethics/                                     Ethics approval and study forms (#446635)
+    │   └── study_stimuli/                          Blind/matching stimulus variants for the fingerprint task
     ├── proposal/                                   Project proposal and reading materials
     ├── report/
+    │   ├── midterm_report/                         Midterm progress report (LaTeX + PDF)
     │   ├── presentations/                          Supervisor presentations
     │   └── session_reports/                        Development session reports
     └── docs/                                        Handover documentation (read handover_v3.md first)
@@ -192,7 +196,7 @@ Place-name assignment: point-in-polygon (Shapely) for 69% of places; nearest-sec
 
 ## User Study
 
-Ethics approval granted (Informatics REC, reference 446635). Participant Information Sheet, Consent Form, and the full 46-question Qualtrics-ready questionnaire are finalised — see [`ethics/user_study_questionnaire.md`](ethics/user_study_questionnaire.md) for the participant-facing instrument and [`ethics/user_study_handbook.md`](ethics/user_study_handbook.md) for the recruitment plan, build/distribution SOP, and analysis plan. The study is online, unmoderated, and self-paced (~35–50 min), using the six standalone visualisation links above (not the Combined Interface, which is a supplementary exploration tool). Currently being built out in Qualtrics; not yet distributed.
+Ethics approval granted (Informatics REC, reference 446635). Participant Information Sheet, Consent Form, and the full 70-question Qualtrics-ready questionnaire are finalised — see [`ethics/user_study_questionnaire.md`](ethics/user_study_questionnaire.md) for the participant-facing instrument and [`ethics/user_study_handbook.md`](ethics/user_study_handbook.md) for the recruitment plan, build/distribution SOP, and analysis plan. The study is online, unmoderated, and self-paced (~50–65 min), using the six standalone visualisation links above plus a set of purpose-built blind/matching stimulus variants in [`ethics/study_stimuli/`](ethics/study_stimuli/) for the fingerprint-identification task (not the Combined Interface, which is a supplementary exploration tool). Currently being built in Qualtrics ([`ethics/qualtrics_build_guide.md`](ethics/qualtrics_build_guide.md)); pending supervisor review before distribution.
 
 ## Planned / Open
 

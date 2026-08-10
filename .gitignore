@@ -16,3 +16,16 @@ dissertation/main/*.pdf
 *.zip
 data/raw/sql/litlong_processed_1Jul.sql
 .claude/
+
+# Python environments
+.venv/
+venv/
+*.egg-info/
+
+# Test artifacts
+.pytest_cache/
+
+# Editors/IDEs
+.vscode/
+.idea/
+*.bak
