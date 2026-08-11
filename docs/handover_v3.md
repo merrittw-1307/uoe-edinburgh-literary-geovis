@@ -6,6 +6,10 @@
 
 ---
 
+**⚠️ 时效提醒**：本文档写于7月10日，之后项目又有大量实质性进展未反映在这里——包括Combined Interface的完整UX优化、伦理审批相关的user study问卷从零搭建到70题定稿（含多轮防天花板/地板效应、防记忆作弊的设计迭代）、以及仓库整体的持续维护。**这些内容不在本文档范围内**，需要了解最新状态请查看：README.md的"Completed Since the Original Prototype"和"User Study"两节、`ethics/`目录下的问卷相关文档（`user_study_questionnaire.md`、`qualtrics_build_guide.md`、`user_study_handbook.md`），以及`git log`本身。本文档仍然是六个可视化设计截至7月10日的实现细节和踩坑记录的可靠参考，只是不要把它当作项目当前整体状态的唯一来源。
+
+---
+
 ## ⚠️ 阅读本文档的AI助手注意事项
 
 1. **默认用中文回复**，除非Merritt用英文写

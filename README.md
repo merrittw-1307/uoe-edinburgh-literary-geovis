@@ -227,4 +227,4 @@ Full bibliography: `dissertation/*/mybibfile.bib`.
 
 ## License
 
-Visualisation and pipeline code: [MIT License](LICENSE). The underlying LitLong database remains the copyright of the LitLong project / University of Edinburgh; literary source-text excerpts remain under their original copyright — see the License file for the exact scope.
+The [MIT License](LICENSE) covers the visualisation and data-processing code in this repository — Python build scripts, D3.js/HTML/JS visualisations, and this project's own analysis outputs. It does **not** cover the underlying LitLong Edinburgh dataset, which remains the property of the LitLong project / University of Edinburgh, or excerpts of literary source texts referenced in example sentences, which remain under their original copyright.

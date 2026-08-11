@@ -19,12 +19,3 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
-
----
-
-Scope: this license covers the visualisation and data-processing code in this
-repository (Python build scripts, D3.js/HTML/JS visualisations, and this
-project's own analysis outputs). It does not cover the underlying LitLong
-Edinburgh dataset, which remains the property of the LitLong project /
-University of Edinburgh, or excerpts of literary source texts referenced in
-example sentences, which remain under their original copyright.
