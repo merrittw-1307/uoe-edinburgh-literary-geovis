@@ -1,0 +1,26 @@
+cff-version: 1.2.0
+message: "If you reference this work, please cite it as below."
+title: "A Visual Trace Map of Edinburgh Place Names in Literature"
+abstract: >-
+  An interactive visualisation system exploring literary place names in
+  Edinburgh through two research directions — author spatial "fingerprints"
+  and narrative co-occurrence topology — built on the LitLong Edinburgh
+  database as an MSc dissertation at the University of Edinburgh, School of
+  Informatics.
+authors:
+  - family-names: Wang
+    given-names: Merritt
+    affiliation: "University of Edinburgh, School of Informatics"
+type: software
+url: "https://github.com/merrittw-1307/uoe-edinburgh-literary-geovis"
+repository-code: "https://github.com/merrittw-1307/uoe-edinburgh-literary-geovis"
+license: MIT
+keywords:
+  - data-visualization
+  - digital-humanities
+  - literary-analysis
+  - geovisualization
+  - d3js
+  - leaflet
+  - edinburgh
+  - dissertation
