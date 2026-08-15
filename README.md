@@ -9,6 +9,10 @@
 
 ---
 
+**Contents**: [Overview](#overview) · [Live Demo](#live-demo) · [Key Findings](#key-findings) · [The Six Visualisations](#the-six-visualisations) · [Scale Exploration](#scale-exploration-dataprocessedscale_exploration) · [Repository Structure](#repository-structure) · [Database Setup](#database-setup) · [Python Environment](#python-environment) · [Testing](#testing) · [Five Test Authors](#five-test-authors) · [14 Spatial Sectors](#14-spatial-sectors) · [Technical Notes](#technical-notes) · [Completed Since the Original Prototype](#completed-since-the-original-prototype) · [User Study](#user-study) · [Planned / Open](#planned--open) · [Key References](#key-references) · [License](#license)
+
+---
+
 ## Overview
 
 Interactive visualisation system for literary place names in Edinburgh, built on the [LitLong Edinburgh](http://litlong.org) database (620 literary works, 424 authors, 2,135 place names, 50,248 mention records).
