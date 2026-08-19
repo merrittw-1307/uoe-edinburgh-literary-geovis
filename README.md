@@ -17,7 +17,7 @@
 
 Interactive visualisation system for literary place names in Edinburgh, built on the [LitLong Edinburgh](http://litlong.org) database (620 literary works, 424 authors, 2,135 place names, 50,248 mention records).
 
-**[Read the full dissertation (PDF)](dissertation/5Aug/A_Visual_Trace_Map_of_Edinburgh_Place_Names_in_Literature.pdf)** — for the write-up itself, rather than the interactive system below.
+**[Read the full dissertation (PDF)](dissertation/5Aug/A_Visual_Trace_Map_of_Edinburgh_Place_Names_in_Literature.pdf)** — for the write-up itself, rather than the interactive system below. ⚠️ Compiled 5 August; the LaTeX source (`dissertation/5Aug/dissertation.tex`) has had substantial edits since to the Study Design and Task Questions sections (the fingerprint-matching task, F0/F1b/P1, and the topology anti-memorisation questions), not yet reflected in this PDF — recompile before treating it as current. `ethics/user_study_questionnaire.md` is the up-to-date source for the actual instrument in the meantime.
 
 Core argument: place names in literary text should be visualised as **narrative structure**, not as geographic information. Existing tools plot mentions on a map; this project asks what a literary corpus looks like when narrative co-occurrence and authorial spatial attention — not latitude and longitude — are the primary encoding.
 
