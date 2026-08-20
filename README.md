@@ -140,7 +140,7 @@ Similarly, every script locates the repo root automatically by walking up to the
 
 Data-generation scripts require Python 3.11+ with:
 
-    pip install pandas sqlalchemy psycopg2-binary networkx
+    pip install -r requirements.txt
 
 On macOS, the system Python (`/usr/bin/python3`) is sandboxed in a way that breaks some of these scripts (e.g. `os.getcwd()` inside `http.server`) and does not have these packages installed — use a separate interpreter such as Homebrew's `/usr/local/bin/python3.11` instead.
 
