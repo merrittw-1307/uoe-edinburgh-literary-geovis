@@ -57,3 +57,29 @@ dissertation/4Aug/
 dissertation/5Aug/
 dissertation/10Jul/
 dissertation/20Aug/
+
+# Superseded iterations of the visualisation prototypes: each chart's
+# unsuffixed filename (e.g. radar.html) is always the current, canonical
+# version described in the dissertation. Older *_v1/*_v2 HTML snapshots,
+# their backup chart images, and orphaned intermediate data files (confirmed
+# via grep to have zero references from the current build scripts, the test
+# suite, or the dissertation) are kept local only -- only the current
+# version of each directory's output stays tracked.
+data/processed/combined/d3/history/
+data/processed/dir_1/barcode/d3/barcode_v1.html
+data/processed/dir_1/barcode/d3/barcode_v2.html
+data/processed/dir_1/barcode/data/barcode_data_v2.csv
+data/processed/dir_1/radar/d3/radar_v1.html
+data/processed/dir_1/radar/d3/radar_v2.html
+data/processed/dir_1/radar/data/radar_data.csv
+data/processed/dir_1/small_multiples/d3/small_multiples_v1.html
+data/processed/dir_1/small_multiples/d3/small_multiples_v2.html
+data/processed/dir_2/linear/d3/linear_v1.html
+data/processed/dir_2/linear/py/linear_chart_v1.png
+data/processed/dir_2/metro/d3/metro_v1_geographic.html
+data/processed/dir_2/metro/py/metro_chart_v1.png
+data/processed/dir_2/metro/py/metro_chart_v2.png
+data/processed/dir_2/network/d3/network_v1.html
+data/processed/dir_2/network/d3/network_v2.html
+data/processed/dir_2/network/py/network_chart_v3.png
+data/processed/sectors/location_sectors.csv

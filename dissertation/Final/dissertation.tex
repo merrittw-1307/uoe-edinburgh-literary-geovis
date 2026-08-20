@@ -374,7 +374,7 @@ At render time, each line is drawn as an SVG path through its stations' shared g
 
 \textbf{Data embedding.} All six D3 HTML files embed their data as JavaScript object literals -- larger file sizes and a regeneration step on data change, an acceptable constraint for a research prototype evaluated on a fixed dataset.
  
-\textbf{Versioning and compatibility.} Each HTML file is versioned under filenames such as \texttt{radar\_v1.html}, a record of the design evolution. All files were tested in Safari and Chrome on macOS; D3.js v7 and Leaflet.js 1.9.4 load from CDN at runtime, requiring an internet connection.
+\textbf{Versioning and compatibility.} Each HTML file's design history was tracked through numbered snapshots (e.g.\ \texttt{radar\_v1.html}) during development, kept alongside working project files rather than in the submitted material. All files were tested in Safari and Chrome on macOS; D3.js v7 and Leaflet.js 1.9.4 load from CDN at runtime, requiring an internet connection.
 
 \textbf{Colour accessibility.} The five fixed per-author colours were checked against simulated protanopia, deuteranopia, and tritanopia (the Brettel/Vi{\'e}not transform) rather than assumed distinguishable. All ten pairs remain separable under all three; the closest, McCall Smith and Scott, is still above the confusion-risk threshold used here. The palette is reasonable but not maximally optimised, since colours were originally chosen for interface contrast rather than colour-vision-deficient legibility specifically.
  

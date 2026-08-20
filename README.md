@@ -72,7 +72,7 @@ All use the same five test authors (Alexander McCall Smith, Irvine Welsh, John G
 | `data/processed/dir_2/linear/d3/linear.html` | 2 (secondary) | Places on a single horizontal axis, Bézier arcs for co-occurrence. Weight slider, sort by frequency/sector/alphabet, click an arc for the shared book list, search. |
 | `data/processed/dir_2/metro/d3/metro.html` | 2 (illustrative) | Metro-style map in the visual language of the London Underground — but the five lines are derived from **modularity community detection on real co-occurrence data**, not hand-drawn geography (see Finding above). Click a line to isolate it, click a station for details, search. |
 
-Older iterations of each file are kept alongside as `*_v1.html`, `*_v2.html`, etc. so the design history is preserved; the un-suffixed filename is always the current version described in the dissertation.
+Each file's unsuffixed name is the current, canonical version described in the dissertation. Earlier iterations are kept locally only, not in this repository.
 
 ---
 
@@ -101,7 +101,7 @@ A follow-up investigation, kept fully separate from the six canonical files abov
     │       │   ├── linear/         py, d3, data
     │       │   └── metro/          py, d3, data
     │       ├── combined/                           Combined Interface: all six views, one author selector
-    │       │   ├── py/, d3/ (incl. history/ of prior versions), data/
+    │       │   ├── py/, d3/, data/
     │       └── scale_exploration/                  Author/book-count scaling investigation (see above)
     │           ├── py/, d3/, data/, NOTES.md
     ├── dissertation/
