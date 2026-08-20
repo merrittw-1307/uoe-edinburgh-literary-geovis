@@ -1,6 +1,6 @@
 # Scale Exploration — Decision Log
 
-Mentor-assigned task (see handover_v3.md §10, 第二优先级): test how the visualisations behave at different
+Supervisor-assigned task: test how the visualisations behave at different
 author/book scales (5 authors → all; 2 authors; 2-3 books), screenshot each, document pros/cons.
 
 This directory is intentionally separate from `dir_1/` and `dir_2/`. The existing `radar.html` and
@@ -101,7 +101,7 @@ direct contrast between the two designs' scaling behaviour.
 ### Round 1 verdict
 
 Both charts produced concrete, quantified, non-trivial findings rather than just confirming "yes it gets
-crowded." Folded into dissertation.tex (Limitations §"Five-author prototype", Discussion) and handover_v3.md.
+crowded." Folded into dissertation.tex (Limitations §"Five-author prototype", Discussion).
 
 ## Round 2 findings (bar-code, small multiples, linear, metro)
 
@@ -212,4 +212,4 @@ All four charts produced distinct, concrete, quantified findings, each different
 failure modes: bar-code (navigation/scroll cost), linear (horizontal sprawl, same root cause as bar-code but
 the other axis), small multiples (real, non-linear computational cost — the one design where scale risks an
 actual freeze), metro (the clustering algorithm's structural assumptions break down, not just the picture).
-Folded into dissertation.tex and handover_v3.md alongside the round-1 results.
+Folded into dissertation.tex alongside the round-1 results.

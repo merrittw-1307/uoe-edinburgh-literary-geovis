@@ -17,7 +17,7 @@
 
 Interactive visualisation system for literary place names in Edinburgh, built on the [LitLong Edinburgh](http://litlong.org) database (620 literary works, 424 authors, 2,135 place names, 50,248 mention records).
 
-**[Read the full dissertation (PDF)](dissertation/5Aug/A_Visual_Trace_Map_of_Edinburgh_Place_Names_in_Literature.pdf)** — for the write-up itself, rather than the interactive system below. ⚠️ Compiled 5 August; the LaTeX source (`dissertation/5Aug/dissertation.tex`) has had substantial edits since to the Study Design and Task Questions sections (the fingerprint-matching task, F0/F1b/P1, and the topology anti-memorisation questions), not yet reflected in this PDF — recompile before treating it as current. `ethics/user_study_questionnaire.md` is the up-to-date source for the actual instrument in the meantime.
+**[Read the full dissertation (PDF)](dissertation/20Aug/A_Visual_Trace_Map_of_Edinburgh_Place_Names_in_Literature.pdf)** — for the write-up itself, rather than the interactive system below. This is the submission version: user study results (Chapters 5–7) are written up from the completed n=13 study, and the bibliography has been expanded. ⚠️ The bibliography and a handful of citation insertions were edited after this PDF was last compiled — recompile from `dissertation/20Aug/dissertation.tex` before final submission.
 
 Core argument: place names in literary text should be visualised as **narrative structure**, not as geographic information. Existing tools plot mentions on a map; this project asks what a literary corpus looks like when narrative co-occurrence and authorial spatial attention — not latitude and longitude — are the primary encoding.
 
@@ -105,15 +105,15 @@ A follow-up investigation, kept fully separate from the six canonical files abov
     │       └── scale_exploration/                  Author/book-count scaling investigation (see above)
     │           ├── py/, d3/, data/, NOTES.md
     ├── dissertation/
-    │   └── <DDMon>/                                LaTeX source, one dated folder per export (e.g. 10Jul/)
+    │   └── 20Aug/                                  LaTeX source and compiled PDF (submission version)
     ├── ethics/                                     Ethics approval and study forms (#446635)
-    │   └── study_stimuli/                          Blind/matching stimulus variants for the fingerprint task
+    │   ├── study_stimuli/                          Blind/matching stimulus variants for the fingerprint task
+    │   └── survey_data/                            User study analysis script + aggregate results (py/, processed/)
     ├── proposal/                                   Project proposal and reading materials
     ├── report/
     │   ├── midterm_report/                         Midterm progress report (LaTeX + PDF)
-    │   ├── presentations/                          Supervisor presentations
-    │   └── session_reports/                        Development session reports
-    └── docs/                                        Handover documentation (read handover_v3.md first)
+    │   └── presentations/                          Supervisor presentations
+    └── docs/                                       Screenshots and social-preview image used above
 
 ---
 
@@ -202,14 +202,15 @@ Place-name assignment: point-in-polygon (Shapely) for 69% of places; nearest-sec
 
 ## User Study
 
-Ethics approval granted (Informatics REC, reference 446635). Participant Information Sheet, Consent Form, and the full 70-question Qualtrics-ready questionnaire are finalised — see [`ethics/user_study_questionnaire.md`](ethics/user_study_questionnaire.md) for the participant-facing instrument and [`ethics/user_study_handbook.md`](ethics/user_study_handbook.md) for the recruitment plan, build/distribution SOP, and analysis plan. The study is online, unmoderated, and self-paced (~50–65 min), using the six standalone visualisation links above plus a set of purpose-built blind/matching stimulus variants in [`ethics/study_stimuli/`](ethics/study_stimuli/) for the fingerprint-identification task (not the Combined Interface, which is a supplementary exploration tool). Currently being built in Qualtrics ([`ethics/qualtrics_build_guide.md`](ethics/qualtrics_build_guide.md)); pending supervisor review before distribution.
+Ethics approval granted (Informatics REC, reference 446635). The study was online, unmoderated, and self-paced (~50–65 min), using the six standalone visualisation links above plus a set of purpose-built blind/matching stimulus variants in [`ethics/study_stimuli/`](ethics/study_stimuli/) for the fingerprint-identification task (not the Combined Interface, which is a supplementary exploration tool). The full instrument (Task Questions and Survey Questions) is reproduced in the dissertation's Appendix A.
+
+13 valid responses were retained after excluding 3 low-quality submissions (near-empty or nonsensical free text, or completion well under the target duration — see [`ethics/survey_data/processed/README.md`](ethics/survey_data/processed/README.md) for the exact exclusion criteria), split into an expert group (n=4, self-described background in literary studies, digital humanities, or information visualisation/HCI) and a general-public group (n=9). Aggregate results are in [`ethics/survey_data/processed/metrics_output_2026-08-20.txt`](ethics/survey_data/processed/metrics_output_2026-08-20.txt), computed by [`ethics/survey_data/py/compute_metrics.py`](ethics/survey_data/py/compute_metrics.py), and written up in full in the dissertation's Evaluation and Discussion chapters. Individual-level response data is intentionally not tracked in this repository — see that same `processed/README.md` for why.
 
 ## Planned / Open
 
 - Reader-plot timeline visualisation (data already prepared via `position_pct` in `mention_order`)
 - Narrative weight analysis using `api_posmention` (part-of-speech: dialogue vs. narration vs. description)
 - "Literary silences" mapping (deferred — LitLong's corpus coverage is not comprehensive enough to treat absence as meaningful without risking a methodologically unsound claim)
-- User study data collection, analysis, and write-up into Results/Discussion/Conclusion (see User Study above)
 
 ---
 
@@ -226,8 +227,12 @@ Ethics approval granted (Informatics REC, reference 446635). Participant Informa
 - Shneiderman (1996) — Information-seeking mantra ("overview first, zoom and filter, details on demand")
 - Tufte (1983) — Small multiples
 - Drucker (2011) — Humanities data as *capta*
+- Bostock, Ogievetsky & Heer (2011) — D3.js
+- Cooper & Gregory (2011) — Literary GIS (Lake District travel writing)
+- Munzner (2014) — Nested model for visualisation design and validation
+- Bodenhamer, Corrigan & Harris, eds. (2010) — The Spatial Humanities
 
-Full bibliography: `dissertation/*/mybibfile.bib`.
+Full bibliography: `dissertation/20Aug/mybibfile.bib`.
 
 ---
 

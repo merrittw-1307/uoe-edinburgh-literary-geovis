@@ -37,3 +37,22 @@ venv/
 # cover. Only aggregate statistics (no per-response text) are tracked.
 ethics/survey_data/raw/
 ethics/survey_data/processed/*.csv
+
+# Internal working/process documentation: handover notes, session logs and
+# planning docs kept for our own tracking of task progress, not part of what
+# a supervisor or examiner needs to see. Superseded working drafts of the
+# dissertation are excluded the same way -- only the final submitted version
+# (dissertation/20Aug/) stays tracked.
+docs/handover_v1.md
+docs/handover_v1.pdf
+docs/handover_v2.md
+docs/handover_v3.md
+docs/MSc_projectTimeline.docx
+report/session_reports/
+ethics/user_study_handbook.md
+ethics/qualtrics_build_guide.md
+ethics/user_study_questionnaire.md
+dissertation/1Jul/
+dissertation/4Aug/
+dissertation/5Aug/
+dissertation/10Jul/
