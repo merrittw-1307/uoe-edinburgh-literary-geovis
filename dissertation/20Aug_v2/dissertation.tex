@@ -90,22 +90,17 @@ The success criterion for RQ1, established in discussion with the supervisor, is
 This dissertation makes the following contributions:
  
 \begin{enumerate}[leftmargin=*, label=\arabic*.]
-  \item A novel interactive visualisation system for literary place-name data that represents narrative structure rather than geographic location, implemented in D3.js and delivered as self-contained, deployable HTML files.
- 
-  \item Two complementary visualisation directions: author spatial fingerprints (three designs) and narrative topology networks (three designs), each driven by real data from the LitLong Edinburgh corpus.
- 
-  \item A validated spatial classification of Edinburgh place names using official administrative boundary data from the City of Edinburgh Council, comprising 14 sectors derived from the Neighbourhood Partnership Areas and Natural Neighbourhoods datasets (Open Government Licence v3.0).
- 
-  \item An empirical finding with implications for literary geography: among five representative Edinburgh authors, no single place name is mentioned by three or more authors, and only 18 are shared by any two. Each author constructs an almost entirely private imaginary Edinburgh.
- 
-  \item A method for extracting narrative reading order from the LitLong database by treating the \texttt{start\_word} field as a globally monotonic index, enabling position-normalised analysis of when and where in a narrative each place appears.
- 
-  \item A user evaluation comparing domain expert and general public responses to the six visualisation designs, informing the final design selection.
+  \item A novel interactive visualisation system for literary place-name data representing narrative structure rather than geographic location, implemented in D3.js as self-contained, deployable HTML files.
+  \item Two complementary visualisation directions: author spatial fingerprints (three designs) and narrative topology networks (three designs), each driven by real LitLong Edinburgh corpus data.
+  \item A validated spatial classification of Edinburgh place names using official City of Edinburgh Council boundary data: 14 sectors from the Neighbourhood Partnership Areas and Natural Neighbourhoods datasets (Open Government Licence v3.0).
+  \item An empirical finding for literary geography: among five representative Edinburgh authors, no place name is mentioned by three or more, and only 18 are shared by any two -- each author constructs an almost entirely private imaginary Edinburgh.
+  \item A method for extracting narrative reading order from LitLong via \texttt{start\_word} as a globally monotonic index, enabling position-normalised analysis of when and where each place appears.
+  \item A user evaluation comparing domain-expert and general-public responses to the six designs, informing the final design selection.
 \end{enumerate}
  
 \section{Dissertation Overview}
  
-Chapter~\ref{chap:lit} situates the project within three bodies of literature: literary geography and geocriticism, existing visualisation approaches for literary corpora, and information visualisation principles for humanities data. Chapter~\ref{chap:design} describes the data exploration process, the design decisions made for each of the six visualisation candidates, and the rationale for the choices made. Chapter~\ref{chap:impl} covers the technical implementation, from database setup through to the D3.js interactive prototypes. Chapter~\ref{chap:eval} describes the user study design and reports its results. Chapter~\ref{chap:discussion} discusses the findings in relation to the research questions and reflects on the project's limitations. Chapter~\ref{chap:conclusion} concludes and outlines directions for future work.
+Chapter~\ref{chap:lit} situates the project within literary geography and geocriticism, existing literary-corpus visualisation, and information visualisation principles for humanities data. Chapter~\ref{chap:design} covers data exploration and the design decisions for each of the six visualisation candidates. Chapter~\ref{chap:impl} covers the technical implementation, from database setup to the D3.js prototypes. Chapter~\ref{chap:eval} describes the user study and reports its results. Chapter~\ref{chap:discussion} discusses the findings against the research questions and the project's limitations. Chapter~\ref{chap:conclusion} concludes and outlines future work.
  
  
 % ============================================================
@@ -207,7 +202,7 @@ The Y-axis scaling went through three iterations. A first logarithmic-scale prot
  
 The bar-code view provides three ordering modes (by sector, by frequency, alphabetical) and two scale modes (percentage, absolute mention count), all switchable via controls at the top of the page. A text search field highlights the bars corresponding to a searched place name across all authors simultaneously, and a sector legend allows individual sectors to be hidden, narrowing the display to a subset of the city. Clicking any bar opens a detail panel listing the books that mention the selected place and a representative example sentence, mirroring the sentence-level detail added to the radar chart.
  
-\textbf{Small multiples (tertiary design).} The small multiples view renders five side-by-side maps using Leaflet.js with a CartoDB Positron basemap. Bubble size encodes mention frequency (log scale by default, switchable to linear); bubble colour identifies the author. An optional synchronised-zoom mode locks all five panels to the same viewport, enabling direct spatial comparison. Clicking any bubble opens a popup with the place name, mention count, sector, and an example sentence. A sector-legend filter hides bubbles outside a selected set of sectors across all five panels simultaneously, and a ``compare two authors'' mode replaces the five-panel grid with two larger, independently zoomable maps selected via dropdown menus, for closer side-by-side inspection of a chosen pair.
+\textbf{Small multiples (tertiary design).} Five side-by-side Leaflet.js maps (CartoDB Positron basemap), bubble size encoding mention frequency (log by default, switchable to linear) and colour identifying the author. Clicking a bubble opens a popup with place name, mention count, sector, and an example sentence; a sector-legend filter hides bubbles across all five panels at once; an optional synchronised-zoom mode locks all panels to the same viewport; and a ``compare two authors'' mode swaps the five-panel grid for two larger, independently zoomable maps for closer inspection of a chosen pair.
  
 The CartoDB Positron style was selected over standard OpenStreetMap tiles because its reduced visual complexity (lighter colours, fewer labels) allows the data bubbles to remain visually prominent. The coordinate range is fixed to the Edinburgh core area as described in Finding~5 above.
  
@@ -224,7 +219,7 @@ An interactive weight-threshold slider (range 1--28) allows the user to progress
  
 \textbf{Linear connection diagram (secondary design).} The linear connection diagram arranges place names along a horizontal axis, ordered left to right by total mention frequency. Bézier arcs connect co-occurring pairs above the axis; arc height is proportional to the horizontal distance between the two connected nodes, and stroke width is proportional to co-occurrence weight. A weight-threshold slider (range 1--28) controls which pairs are shown, and the horizontal ordering can be switched between frequency, sector, and alphabetical. Clicking an arc opens a detail panel listing the books in which both connected places co-occur; hovering over a place reveals an example sentence. A search field highlights a named place across the diagram.
  
-The choice of a linear rather than circular layout followed a specific piece of supervisor feedback: a circular arrangement (as in a chord diagram) implies that the structure being represented is cyclical or symmetrical, which is inappropriate for literary narratives, which have a definite beginning and end. The linear axis does not make this implication. The leftmost position (highest-frequency place) corresponds loosely to centrality in the corpus, and the arrangement from left to right can be read as a rough ordering by narrative salience.
+The linear rather than circular layout avoids implying the cyclical or symmetrical structure a chord diagram would (see below); the leftmost position (highest-frequency place) corresponds loosely to centrality in the corpus, so the left-to-right arrangement can be read as a rough ordering by narrative salience.
 
 \paragraph{Designs considered but not selected.} Two Direction-1 candidates were deprioritised: a colour map silhouette (area shading over a simplified coastline) produced visually similar heatmaps for all five authors, since their mentions all concentrate in the city centre, giving limited discriminability; a Direction-2 chord diagram was replaced by the linear connection diagram after supervisor feedback that a circular arrangement implies cyclical structure, inappropriate for narratives with a definite beginning and end. Two further directions were prototyped but deferred: a \emph{Reader-plot timeline}, exploiting the \texttt{position\_pct} field already built into \texttt{mention\_order} to show place-name sequence within a single text (identified as future work, Chapter~\ref{chap:conclusion}), and a \emph{literary silences map} of places absent from the corpus, following Moretti \cite{moretti2005}, deferred because LitLong's coverage is not comprehensive enough to treat absence as meaningful evidence.
  
@@ -239,7 +234,7 @@ This pipeline reduces the map to five data-derived lines (rather than eight hand
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.60\textwidth]{figures/fig_metro.png}
+\includegraphics[width=0.55\textwidth]{figures/fig_metro.png}
 \caption{The metro-style map after the redesign: five lines derived from modularity clustering on the co-occurrence graph and named after their dominant author, with 88\% of adjacent station pairs now backed by measured co-occurrence, against 22\% for the initial hand-drawn prototype (Figure~\ref{fig:metro-before}, Appendix~\ref{app:metro}).}
 \label{fig:metro-after}
 \end{figure}
@@ -302,7 +297,7 @@ A second pass joins \texttt{api\_sentence} and \texttt{api\_document} to attach,
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.60\textwidth]{figures/fig_radar.png}
+\includegraphics[width=0.55\textwidth]{figures/fig_radar.png}
 \caption{The radar chart (primary Direction 1 design), showing all five test authors simultaneously. Each polygon is one author's distribution of place-name mentions across the 14 city sectors; the near-total lack of overlap between polygons is the visual evidence for the ``private imaginary geography'' finding reported in Section~\ref{chap:design}.}
 \label{fig:radar}
 \end{figure}
@@ -315,7 +310,7 @@ Hover interaction uses invisible \texttt{circle} targets (radius 14px) centred o
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.60\textwidth]{figures/fig_barcode.png}
+\includegraphics[width=0.55\textwidth]{figures/fig_barcode.png}
 \caption{The bar-code fingerprint (secondary Direction 1 design). Each row is one author, each bar one place; bar height is normalised to that author's own maximum, so a short bar for a high-mention author is not visually confused with a tall bar for a low-mention author.}
 \label{fig:barcode}
 \end{figure}
@@ -328,7 +323,7 @@ Sector boundaries use two complementary encodings: a low-opacity background rect
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.60\textwidth]{figures/fig_small_multiples.png}
+\includegraphics[width=0.55\textwidth]{figures/fig_small_multiples.png}
 \caption{The small multiples design (tertiary Direction 1 design), five independent Leaflet maps side by side. Unlike the other two Direction 1 designs, this one retains real geographic coordinates as a spatial anchor, at the cost of the visual comparison being harder to make at a glance across panels.}
 \label{fig:small-multiples}
 \end{figure}
@@ -341,7 +336,7 @@ Each of the five panels is an independent Leaflet.js map instance (CartoDB Posit
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.60\textwidth]{figures/fig_network.png}
+\includegraphics[width=0.55\textwidth]{figures/fig_network.png}
 \caption{The force-directed network (primary Direction 2 design). Nodes are places, edges are document-level co-occurrence; node size reflects mention count. Leith and Princes Street, the strongest co-occurring pair in the corpus, are visibly pulled together despite the roughly 2.5km geographic distance between them.}
 \label{fig:network}
 \end{figure}
@@ -352,7 +347,7 @@ The simulation uses four forces: \texttt{forceLink} (spring attraction, distance
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.60\textwidth]{figures/fig_linear.png}
+\includegraphics[width=0.55\textwidth]{figures/fig_linear.png}
 \caption{The linear connection diagram (secondary Direction 2 design). Places sit on a single horizontal axis; arc height and thickness both encode co-occurrence weight, so the strongest connections are immediately visible as the tallest arcs regardless of how far apart their endpoints are on the axis.}
 \label{fig:linear}
 \end{figure}
@@ -363,7 +358,7 @@ Each arc is drawn as a quadratic Bézier path: \texttt{M x1 y0 Q midX (y0 - h) x
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.60\textwidth]{figures/fig_metro.png}
+\includegraphics[width=0.55\textwidth]{figures/fig_metro.png}
 \caption{The metro-style map (illustrative Direction 2 design) after the data-driven redesign described in Section~\ref{sec:metro-redesign}. Lines are named after their dominant author and derived from modularity clustering on the co-occurrence graph, not drawn by hand; interchange stations (double-ringed) mark places that multiple authors' narrative corridors both pass through.}
 \label{fig:metro}
 \end{figure}
@@ -733,7 +728,7 @@ Dundas Street & The Meadows & 15 \\
 
 \begin{figure}[htbp]
 \centering
-\includegraphics[width=0.60\textwidth]{figures/fig_metro_v1_geographic.png}
+\includegraphics[width=0.55\textwidth]{figures/fig_metro_v1_geographic.png}
 \caption{The initial hand-drawn metro-map prototype, before the redesign described in Section~\ref{sec:metro-redesign}. Lines follow geographic and cultural axes (a North Line, an Old Town Line, an East-West Line) chosen by inspection, with only 22\% of adjacent station pairs backed by measured co-occurrence, against 88\% for the redesigned map (Figure~\ref{fig:metro-after}).}
 \label{fig:metro-before}
 \end{figure}
