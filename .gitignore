@@ -58,6 +58,11 @@ dissertation/5Aug/
 dissertation/10Jul/
 dissertation/20Aug/
 
+# Local-only submission package (final PDF + git-archive software zip),
+# assembled for uploading to the ITO submission portal -- not part of the
+# repository itself.
+submission/
+
 # Superseded iterations of the visualisation prototypes: each chart's
 # unsuffixed filename (e.g. radar.html) is always the current, canonical
 # version described in the dissertation. Older *_v1/*_v2 HTML snapshots,
