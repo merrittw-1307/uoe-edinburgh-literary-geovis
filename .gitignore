@@ -1,4 +1,9 @@
 data/raw/sql/litlong_original.sql
+# Contains real third-party admin credentials (email + bcrypt password hash,
+# session/auth tokens) from the original LitLong project's Directus CMS
+# backend -- not this project's data, never should have been committed.
+# Kept local only for reference; not referenced by any script or README.
+data/raw/sql/directus.sql
 .DS_Store
 __pycache__/
 *.pyc
