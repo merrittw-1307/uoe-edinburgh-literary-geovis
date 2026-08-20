@@ -208,6 +208,7 @@ The CartoDB Positron style was selected over standard OpenStreetMap tiles becaus
  
 \section{Direction 2: Narrative Topology Networks}
 \label{sec:direction2}
+\label{sec:metro-redesign}
 
 Three visualisation designs were developed and implemented for Direction~2.
  
@@ -225,7 +226,6 @@ The linear rather than circular layout avoids implying the cyclical or symmetric
  
 \textbf{Metro-style map (illustrative design).} The metro-style map arranges place names as stations on a small number of named lines, in the visual language of Harry Beck's 1933 London Underground map, which replaced geographic accuracy with functional topology (which line to take, where to change) \cite{beck1933}. This project applies the same substitution to literary geography, with lines representing narrative corridors (clusters of places that co-occur strongly) rather than physical routes. Beck's map, however, still encoded a real network -- the lines corresponded to physical tracks, only the geometry was distorted for legibility -- a property an initial prototype of the literary metro map lacked: eight lines were defined manually along geographic and cultural axes, with station order following geographic rather than measured narrative sequence.
 
-\label{sec:metro-redesign}
 An audit of this prototype against the document-level co-occurrence data (Finding~3, Section~\ref{sec:dataexploration}) found that only 15 of 67 adjacent same-line station pairs (22\%) shared at least one book in common: the map's line structure was a geographic argument wearing the visual grammar of a narrative one. The design was rebuilt around the following pipeline to close this gap.
 
 \textbf{(1) Community detection}: modularity-based community detection (\texttt{networkx.community.greedy\_modularity\_communities}) on the 57-place, 403-pair co-occurrence graph (edges with weight $\geq 3$) so line membership reflects measured connectivity rather than manual grouping, with communities over 18 stations recursively re-clustered. \textbf{(2) Station ordering}: a nearest-neighbour chain over real edge weights within each line, so adjacency is backed by measured co-occurrence wherever the graph permits it. \textbf{(3) Interchanges}: a cross-line pair with weight $\geq 10$ becomes a genuine interchange (a real stop on the second line), a threshold chosen empirically for a legible 12 of 57 stations (a lower threshold gave 28, too dense to read as meaningful hubs). \textbf{(4) Line naming}: automatic, after a single author if they account for at least 55\% of a line's book-mention volume (e.g. ``Welsh's Edinburgh''), otherwise after its two highest-mention stations. \textbf{(5) Layout}: a shared coordinate per station via a co-occurrence-weighted spring embedding (\texttt{networkx.spring\_layout}), so lines sharing an interchange meet at one point; positions are grid-snapped with collision avoidance. \textbf{(6) Octilinear correction and labels}: segments not aligned to Beck's $0^\circ$/$45^\circ$/$90^\circ$ convention become a two-part ``dog-leg''; labels are placed by a greedy eight-position search.
