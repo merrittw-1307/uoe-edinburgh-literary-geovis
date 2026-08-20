@@ -68,6 +68,11 @@ dissertation/20Aug/
 # repository itself.
 submission/
 
+# Anonymised copy of the dissertation (name/supervisor/university stripped)
+# made only for running through an external AI-detection checker -- a
+# working utility file, not part of the submitted or public project.
+docs/*_anonymised.pdf
+
 # Superseded iterations of the visualisation prototypes: each chart's
 # unsuffixed filename (e.g. radar.html) is always the current, canonical
 # version described in the dissertation. Older *_v1/*_v2 HTML snapshots,
