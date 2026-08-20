@@ -1,0 +1,91 @@
+N=13 (expert=4, general=9)
+
+======================================================================
+FINGERPRINT TASKS
+======================================================================
+
+--- Radar (blind author = Walter Scott) ---
+F0 (comprehension check, correct='Old Town'): 10/13 = 77%
+F1 (Top-1 identify): 6/13 = 46%
+  F1 answer distribution: [('Walter Scott', 6), ("I don't know", 3), ('Irvine Welsh', 2), ('Alexander McCall Smith', 1), ('Robert Louis Stevenson', 1)]
+Top-2 (F1 or F1b correct): 8/13 = 62%
+F2 confidence distribution: [('Slightly confident', 3), ('Not at all confident', 3), ('Confident', 3), ('Moderately confident', 2), ('Very confident', 2)]
+F4 self-explanatory: [('Yes, with a little effort', 6), ('Yes, easily', 4), ('No, I was confused about how to read it', 3)]
+M1 matching (shape -> answer, correct marked *):
+  M1 overall accuracy (diagonal/total): 45/65 = 69%
+  Top off-diagonal confusions: [(('Robert Louis Stevenson', 'Irvine Welsh'), 3), (('John Gibson Lockhart', 'Robert Louis Stevenson'), 3), (('Irvine Welsh', 'Robert Louis Stevenson'), 2), (('Robert Louis Stevenson', 'John Gibson Lockhart'), 2), (('Alexander McCall Smith', 'John Gibson Lockhart'), 2)]
+M2 subjective distinctiveness: [('Neutral', 4), ('Somewhat easy to confuse', 4), ('Somewhat easy to tell apart', 2), ('Very easy to confuse', 2), ('Very easy to tell apart', 1)]
+P1 (hardest-pair 2AFC, correct='Shape D = John Gibson Lockhart, Shape E = Walter Scott'): 11/13 = 85%
+
+--- Bar (blind author = John Gibson Lockhart) ---
+F0 (comprehension check, correct='Canongate'): 6/13 = 46%
+F1 (Top-1 identify): 6/13 = 46%
+  F1 answer distribution: [('John Gibson Lockhart', 6), ('Alexander McCall Smith', 3), ('Irvine Welsh', 2), ('Walter Scott', 1), ("I don't know", 1)]
+Top-2 (F1 or F1b correct): 10/13 = 77%
+F2 confidence distribution: [('Not at all confident', 4), ('Slightly confident', 3), ('Moderately confident', 2), ('Very confident', 2), ('Confident', 2)]
+F4 self-explanatory: [('No, I was confused about how to read it', 6), ('Yes, easily', 4), ('Yes, with a little effort', 3)]
+M1 matching (shape -> answer, correct marked *):
+  M1 overall accuracy (diagonal/total): 31/65 = 48%
+  Top off-diagonal confusions: [(('Robert Louis Stevenson', 'John Gibson Lockhart'), 4), (('Irvine Welsh', 'Walter Scott'), 4), (('John Gibson Lockhart', 'Robert Louis Stevenson'), 4), (('Walter Scott', 'Alexander McCall Smith'), 3), (('Walter Scott', 'Irvine Welsh'), 2)]
+M2 subjective distinctiveness: [('Neutral', 5), ('Somewhat easy to tell apart', 4), ('Very easy to confuse', 3), ('Somewhat easy to confuse', 1)]
+P1 (hardest-pair 2AFC, correct='Row A = Walter Scott, Row D = Irvine Welsh'): 10/13 = 77%
+
+--- Multi (blind author = Robert Louis Stevenson) ---
+F0 (comprehension check, correct='Leith'): 5/13 = 38%
+F1 (Top-1 identify): 3/13 = 23%
+  F1 answer distribution: [('Alexander McCall Smith', 5), ('Robert Louis Stevenson', 3), ('Irvine Welsh', 2), ('Walter Scott', 2), ('John Gibson Lockhart', 1)]
+Top-2 (F1 or F1b correct): 5/13 = 38%
+F2 confidence distribution: [('Slightly confident', 4), ('Moderately confident', 3), ('Not at all confident', 3), ('Very confident', 2), ('Confident', 1)]
+F4 self-explanatory: [('Yes, easily', 5), ('Yes, with a little effort', 4), ('No, I was confused about how to read it', 4)]
+M1 matching (shape -> answer, correct marked *):
+  M1 overall accuracy (diagonal/total): 32/65 = 49%
+  Top off-diagonal confusions: [(('Walter Scott', 'John Gibson Lockhart'), 5), (('Robert Louis Stevenson', 'Walter Scott'), 5), (('Walter Scott', 'Alexander McCall Smith'), 4), (('Alexander McCall Smith', 'Robert Louis Stevenson'), 4), (('John Gibson Lockhart', 'Alexander McCall Smith'), 3)]
+M2 subjective distinctiveness: [('Somewhat easy to confuse', 4), ('Very easy to confuse', 3), ('Somewhat easy to tell apart', 3), ('Neutral', 2), ('Very easy to tell apart', 1)]
+P1 (hardest-pair 2AFC, correct='Map A = John Gibson Lockhart, Map D = Robert Louis Stevenson'): 10/13 = 77%
+
+======================================================================
+FINGERPRINT RANKING
+======================================================================
+[('Small multiples (maps)', 5), ('Radar chart', 4), ('Bar-code', 4)]
+
+======================================================================
+TOPOLOGY TASKS
+======================================================================
+
+--- Network ---
+T1 (Leith & Princes Street correct): 9/13 = 69%
+T2 near/far distribution: [('Somewhat close', 7), ('Not sure', 3), ('Somewhat far', 2), ('Very far', 1)]
+T-Strength correlation (rating vs real weight, n=39 data points): r=0.64, p=0.000
+  New Town & Princes Street (weight=18): [('Moderately connected', 6), ('Strongly connected', 4), ('Extremely strongly connected', 2), ('Slightly connected', 1)]
+  Lochend & Waverley Station (weight=4): [('Slightly connected', 6), ('Moderately connected', 4), ('Not connected at all', 3)]
+  Leith & Silvermills (weight=2): [('Not connected at all', 5), ('Slightly connected', 4), ('Moderately connected', 3), ('Strongly connected', 1)]
+T-ClusterVerify (correct=New Town, Princes Street, Dundas Street,...): 9/13 = 69%
+  distribution: [('New Town, Princes Street, Dundas Street, Stockbridge', 9), ('New Town, Leith Walk, Holyrood, Waverley Station', 4)]
+T5 self-explanatory: [('Yes, with a little effort', 10), ('No, I was confused about how to read it', 2), ('Yes, easily', 1)]
+
+--- Linear ---
+T1 (Leith & Princes Street correct): 9/13 = 69%
+T2 near/far distribution: [('Somewhat close', 5), ('Very close', 4), ('Not sure', 3), ('Somewhat far', 1)]
+T-Strength correlation (rating vs real weight, n=39 data points): r=0.30, p=0.067
+  Dundas Street & Princes Street (weight=17): [('Slightly connected', 6), ('Moderately connected', 3), ('Extremely strongly connected', 2), ('Not connected at all', 1), ('Strongly connected', 1)]
+  Old Town & Princes Street (weight=6): [('Moderately connected', 5), ('Not connected at all', 3), ('Slightly connected', 3), ('Strongly connected', 2)]
+  Arthur's Seat & Haddington (weight=2): [('Slightly connected', 7), ('Not connected at all', 4), ('Strongly connected', 1), ('Moderately connected', 1)]
+T-ClusterVerify (correct=Leith Walk, Lochend, Pilrig, Waverley St...): 3/13 = 23%
+  distribution: [('Leith Walk, New Town, Grassmarket, Dalkeith', 8), ('Leith Walk, Lochend, Pilrig, Waverley Station', 3), ('Lochend, Stockbridge, Canongate, Musselburgh', 2)]
+T5 self-explanatory: [('Yes, with a little effort', 7), ('No, I was confused about how to read it', 5), ('Yes, easily', 1)]
+
+--- Metro ---
+T1 (Leith & Princes Street correct): 2/13 = 15%
+T2 near/far distribution: [('Somewhat close', 7), ('Not sure', 3), ('Very close', 2), ('Somewhat far', 1)]
+T-Strength correlation (rating vs real weight, n=39 data points): r=0.34, p=0.035
+  Bruntsfield & Dundas Street (weight=16): [('Strongly connected', 5), ('Slightly connected', 4), ('Moderately connected', 2), ('Not connected at all', 1), ('Extremely strongly connected', 1)]
+  Howe Street & Stockbridge (weight=6): [('Moderately connected', 6), ('Not connected at all', 3), ('Slightly connected', 3), ('Strongly connected', 1)]
+  Dalkeith & Linlithgow (weight=2): [('Moderately connected', 6), ('Slightly connected', 5), ('Not connected at all', 2)]
+T-ClusterVerify (correct=University of Edinburgh, Royal Society o...): 7/13 = 54%
+  distribution: [('University of Edinburgh, Royal Society of Edinburgh, Castle Street, St Giles', 7), ('Castle Street, St Giles, Pilrig, Tollcross', 3), ('Moray Place, Grassmarket, Dalkeith, Hanover Street', 3)]
+T5 self-explanatory: [('Yes, with a little effort', 7), ('No, I was confused about how to read it', 5), ('Yes, easily', 1)]
+
+======================================================================
+TOPOLOGY RANKING
+======================================================================
+[('Metro-style map', 7), ('Force-directed network', 5), ('Linear connection diagram', 1)]

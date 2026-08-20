@@ -29,3 +29,11 @@ venv/
 .vscode/
 .idea/
 *.bak
+
+# Individual-level user study response data: kept local only, not pushed to
+# the public repo, even redacted -- small-N personal-network recruitment
+# makes re-identification from free-text writing style/background alone a
+# real risk that goes beyond what "anonymised" in the PIS was scoped to
+# cover. Only aggregate statistics (no per-response text) are tracked.
+ethics/survey_data/raw/
+ethics/survey_data/processed/*.csv
