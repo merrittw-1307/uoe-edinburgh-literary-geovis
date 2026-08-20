@@ -17,7 +17,7 @@
 
 Interactive visualisation system for literary place names in Edinburgh, built on the [LitLong Edinburgh](http://litlong.org) database (620 literary works, 424 authors, 2,135 place names, 50,248 mention records).
 
-**[Read the full dissertation (PDF)](dissertation/20Aug/A_Visual_Trace_Map_of_Edinburgh_Place_Names_in_Literature.pdf)** — for the write-up itself, rather than the interactive system below. This is the submission version: user study results (Chapters 5–7) are written up from the completed n=13 study, and the bibliography has been expanded. ⚠️ The bibliography and a handful of citation insertions were edited after this PDF was last compiled — recompile from `dissertation/20Aug/dissertation.tex` before final submission.
+**[Read the full dissertation (PDF)](dissertation/Final/A_Visual_Trace_Map_of_Edinburgh_Place_Names_in_Literature.pdf)** — for the write-up itself, rather than the interactive system below. This is the submission version: user study results (Chapters 5–7) are written up from the completed n=13 study, main content is 39 pages (within the 40-page limit), and the bibliography has 16 entries.
 
 Core argument: place names in literary text should be visualised as **narrative structure**, not as geographic information. Existing tools plot mentions on a map; this project asks what a literary corpus looks like when narrative co-occurrence and authorial spatial attention — not latitude and longitude — are the primary encoding.
 
@@ -105,7 +105,7 @@ A follow-up investigation, kept fully separate from the six canonical files abov
     │       └── scale_exploration/                  Author/book-count scaling investigation (see above)
     │           ├── py/, d3/, data/, NOTES.md
     ├── dissertation/
-    │   └── 20Aug/                                  LaTeX source and compiled PDF (submission version)
+    │   └── Final/                                  LaTeX source and compiled PDF (submission version)
     ├── ethics/                                     Ethics approval and study forms (#446635)
     │   ├── study_stimuli/                          Blind/matching stimulus variants for the fingerprint task
     │   └── survey_data/                            User study analysis script + aggregate results (py/, processed/)
@@ -232,7 +232,7 @@ Ethics approval granted (Informatics REC, reference 446635). The study was onlin
 - Munzner (2014) — Nested model for visualisation design and validation
 - Bodenhamer, Corrigan & Harris, eds. (2010) — The Spatial Humanities
 
-Full bibliography: `dissertation/20Aug/mybibfile.bib`.
+Full bibliography: `dissertation/Final/mybibfile.bib`.
 
 ---
 

@@ -42,7 +42,7 @@ ethics/survey_data/processed/*.csv
 # planning docs kept for our own tracking of task progress, not part of what
 # a supervisor or examiner needs to see. Superseded working drafts of the
 # dissertation are excluded the same way -- only the final submitted version
-# (dissertation/20Aug/) stays tracked.
+# (dissertation/Final/) stays tracked.
 docs/handover_v1.md
 docs/handover_v1.pdf
 docs/handover_v2.md
@@ -56,3 +56,4 @@ dissertation/1Jul/
 dissertation/4Aug/
 dissertation/5Aug/
 dissertation/10Jul/
+dissertation/20Aug/
